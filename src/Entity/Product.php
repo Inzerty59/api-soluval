@@ -8,12 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
-#[ApiResource(
-    operations: [
-        new \ApiPlatform\Metadata\GetCollection(uriTemplate: '/api/products'),
-        new \ApiPlatform\Metadata\Get(uriTemplate: '/api/products/{id}')
-    ]
-)]
+#[ApiResource]
 class Product
 {
     #[ORM\Id]
