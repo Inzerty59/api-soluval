@@ -279,4 +279,11 @@ class User implements PasswordAuthenticatedUserInterface
     {
         return $this->tokenExpiresAt > new \DateTime();
     }
+
+    public function generateClientSecret(): static
+    {
+        $this->secretId = bin2hex(random_bytes(32));  
+        return $this;
+    }
+
 }
