@@ -27,5 +27,7 @@
 
 .env
 ###> league/oauth2-server-bundle ###
-/config/keys/*.key
+/config/keys/*
+!/config/keys/.gitkeep
+
 ###< league/oauth2-server-bundle ###
