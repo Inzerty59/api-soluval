@@ -26,3 +26,6 @@
 ###< symfony/asset-mapper ###
 
 .env
+###> league/oauth2-server-bundle ###
+/config/keys/*.key
+###< league/oauth2-server-bundle ###
