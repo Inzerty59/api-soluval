@@ -25,7 +25,13 @@ class User implements PasswordAuthenticatedUserInterface
     private ?string $clientId = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $username = null;
+    private ?string $name = null;
+
+    #[ORM\Column(length: 100)]
+    private ?string $surname = null;
+
+    #[ORM\Column(length: 100)]
+    private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
@@ -93,14 +99,14 @@ class User implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUsername(): ?string
+    public function getEmail(): ?string
     {
-        return $this->username;
+        return $this->email;
     }
 
-    public function setUsername(string $username): static
+    public function setEmail(string $email): static
     {
-        $this->username = $username;
+        $this->email = $email;
         return $this;
     }
 
@@ -283,6 +289,30 @@ class User implements PasswordAuthenticatedUserInterface
     public function generateClientSecret(): static
     {
         $this->secretId = bin2hex(random_bytes(32));  
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getSurname(): ?string
+    {
+        return $this->surname;
+    }
+
+    public function setSurname(string $surname): static
+    {
+        $this->surname = $surname;
+
         return $this;
     }
 
