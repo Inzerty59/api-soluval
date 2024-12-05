@@ -2,85 +2,80 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use App\Repository\UserRepository;
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\PasswordHasher\UserPasswordHasherInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ApiResource]
-class User implements PasswordAuthenticatedUserInterface
+#[ORM\Entity(repositoryClass: 'App\Repository\UserRepository')]
+#[ORM\Table(name: 'user')]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, unique: true)]
-    private ?string $clientId = null;
-
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(type: 'string', length: 100)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(type: 'string', length: 100)]
     private ?string $surname = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'string')]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(type: 'string', unique: true)]
+    private ?string $clientId = null;
+
+    #[ORM\Column(type: 'string', unique: true)]
     private ?string $secretId = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private ?string $apiToken = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $tokenExpiresAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(type: 'datetime')]
+    private \DateTimeInterface $createdAt;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updatedAt = null;
+    #[ORM\Column(type: 'datetime')]
+    private \DateTimeInterface $updatedAt;
 
-    #[ORM\Column]
-    private ?bool $isActive = true;
+    #[ORM\Column(type: 'boolean')]
+    private bool $isActive = true;
 
-    #[ORM\Column(length: 50)]
-    private ?string $accountType = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $companyName = null;
 
-    #[ORM\Column(length: 14, nullable: true)]
+    #[ORM\Column(type: 'string', length: 14, nullable: true)]
     private ?string $siretNumber = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
     private ?string $vatNumber = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
-    private array $roles = [];
+    #[ORM\Column(type: 'string')]
+    private string $accountType;
 
-    #[ORM\Column(type: Types::BOOLEAN)]
-    private bool $isAdmin = false;
+    #[ORM\Column(type: 'json')]
+    private array $roles = ['ROLE_USER'];
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Order::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Order::class, cascade: ['persist', 'remove'])]
     private Collection $orders;
 
-    private UserPasswordHasherInterface $passwordHasher;
-
-    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    public function __construct()
     {
-        $this->passwordHasher = $passwordHasher;
         $this->orders = new ArrayCollection();
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+        $this->clientId = Uuid::v4()->toRfc4122();
+        $this->secretId = Uuid::v4()->toRfc4122();
     }
 
     public function getId(): ?int
@@ -88,14 +83,25 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getClientId(): ?string
+    public function getName(): ?string
     {
-        return $this->clientId;
+        return $this->name;
     }
 
-    public function setClientId(string $clientId): static
+    public function setName(string $name): self
     {
-        $this->clientId = $clientId;
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getSurname(): ?string
+    {
+        return $this->surname;
+    }
+
+    public function setSurname(string $surname): self
+    {
+        $this->surname = $surname;
         return $this;
     }
 
@@ -104,7 +110,7 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(string $email): self
     {
         $this->email = $email;
         return $this;
@@ -115,76 +121,26 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(string $password): self
     {
-        $this->password = $this->passwordHasher->hashPassword($this, $password);
+        $this->password = $password;
         return $this;
     }
 
-    public function getSecretId(): ?string
+    public function getRoles(): array
     {
-        return $this->secretId;
+        return array_unique($this->roles);
     }
 
-    public function setSecretId(string $secretId): static
+    public function setRoles(array $roles): self
     {
-        $this->secretId = $secretId;
+        $this->roles = $roles;
         return $this;
     }
 
-    public function getApiToken(): ?string
+    public function getUserIdentifier(): string
     {
-        return $this->apiToken;
-    }
-
-    public function setApiToken(string $apiToken): static
-    {
-        $this->apiToken = $apiToken;
-        return $this;
-    }
-
-    public function getTokenExpiresAt(): ?\DateTimeInterface
-    {
-        return $this->tokenExpiresAt;
-    }
-
-    public function setTokenExpiresAt(\DateTimeInterface $tokenExpiresAt): static
-    {
-        $this->tokenExpiresAt = $tokenExpiresAt;
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    public function isActive(): ?bool
-    {
-        return $this->isActive;
-    }
-
-    public function setActive(bool $isActive): static
-    {
-        $this->isActive = $isActive;
-        return $this;
+        return $this->email;
     }
 
     public function getAccountType(): ?string
@@ -192,7 +148,7 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->accountType;
     }
 
-    public function setAccountType(string $accountType): static
+    public function setAccountType(string $accountType): self
     {
         $this->accountType = $accountType;
         return $this;
@@ -203,7 +159,7 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->companyName;
     }
 
-    public function setCompanyName(string $companyName): static
+    public function setCompanyName(?string $companyName): self
     {
         $this->companyName = $companyName;
         return $this;
@@ -214,7 +170,7 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->siretNumber;
     }
 
-    public function setSiretNumber(string $siretNumber): static
+    public function setSiretNumber(?string $siretNumber): self
     {
         $this->siretNumber = $siretNumber;
         return $this;
@@ -225,95 +181,31 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->vatNumber;
     }
 
-    public function setVatNumber(string $vatNumber): static
+    public function setVatNumber(?string $vatNumber): self
     {
         $this->vatNumber = $vatNumber;
         return $this;
     }
 
-    public function getRoles(): array
+    public function refreshApiToken(): self
     {
-        $roles = $this->roles;
-
-        if ($this->isAdmin) {
-            $roles[] = 'ROLE_ADMIN';
-        }
-
-        if ($this->accountType === 'professionnel') {
-            $roles[] = 'ROLE_USER_PROFESSIONNEL';
-        } else {
-            $roles[] = 'ROLE_USER_PARTICULIER';
-        }
-
-        if (!in_array('ROLE_USER', $roles)) {
-            $roles[] = 'ROLE_USER';
-        }
-
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
+        $this->apiToken = Uuid::v4()->toRfc4122();
+        $this->tokenExpiresAt = (new \DateTime())->modify('+14 days');
         return $this;
     }
 
-    public function isAdmin(): bool
+    public function getTokenExpiresAt(): ?\DateTimeInterface
     {
-        return $this->isAdmin;
+        return $this->tokenExpiresAt;
     }
 
-    public function setIsAdmin(bool $isAdmin): static
+    public function setTokenExpiresAt(?\DateTimeInterface $tokenExpiresAt): self
     {
-        $this->isAdmin = $isAdmin;
+        $this->tokenExpiresAt = $tokenExpiresAt;
         return $this;
     }
 
-    public function getOrders(): Collection
+    public function eraseCredentials(): void
     {
-        return $this->orders;
     }
-
-    public function generateApiToken(): static
-    {
-        $this->apiToken = bin2hex(random_bytes(32));
-        $this->tokenExpiresAt = new \DateTime('+14 days');
-        return $this;
-    }
-
-    public function isApiTokenValid(): bool
-    {
-        return $this->tokenExpiresAt > new \DateTime();
-    }
-
-    public function generateClientSecret(): static
-    {
-        $this->secretId = bin2hex(random_bytes(32));  
-        return $this;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getSurname(): ?string
-    {
-        return $this->surname;
-    }
-
-    public function setSurname(string $surname): static
-    {
-        $this->surname = $surname;
-
-        return $this;
-    }
-
 }
