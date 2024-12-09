@@ -40,6 +40,15 @@ class Product
     #[ORM\Column(type: Types::ARRAY)]
     private array $images = [];
 
+    #[ORM\Column]
+    private ?int $stripePaymentId = null;
+
+    #[ORM\Column(length: 100)]
+    private ?string $paymentStatus = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $totalAmount = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +146,42 @@ class Product
     public function setUpdateAt(\DateTimeInterface $updateAt): static
     {
         $this->updateAt = $updateAt;
+
+        return $this;
+    }
+
+    public function getStripePaymentId(): ?int
+    {
+        return $this->stripePaymentId;
+    }
+
+    public function setStripePaymentId(int $stripePaymentId): static
+    {
+        $this->stripePaymentId = $stripePaymentId;
+
+        return $this;
+    }
+
+    public function getPaymentStatus(): ?string
+    {
+        return $this->paymentStatus;
+    }
+
+    public function setPaymentStatus(string $paymentStatus): static
+    {
+        $this->paymentStatus = $paymentStatus;
+
+        return $this;
+    }
+
+    public function getTotalAmount(): ?string
+    {
+        return $this->totalAmount;
+    }
+
+    public function setTotalAmount(string $totalAmount): static
+    {
+        $this->totalAmount = $totalAmount;
 
         return $this;
     }

@@ -67,8 +67,6 @@ class LoginController extends AbstractController
                     'grant_type' => 'password',
                     'client_id' => $clientId,
                     'client_secret' => $secretId,
-                    'username' => $email,
-                    'password' => $password,
                     'scope' => 'email',
                 ],
             ]);
