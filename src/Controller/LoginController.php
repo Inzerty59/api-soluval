@@ -13,7 +13,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class LoginController extends AbstractController
 {
@@ -44,11 +43,10 @@ class LoginController extends AbstractController
                 $client->setIdentifier(uniqid('client_', true));
                 $client->setName('Client de ' . $user->getEmail());
                 $client->setSecret(uniqid('secret_', true));
-                $client->setGrants('["password"]');
-                $client->setScopes('["email"]');
+                $client->setGrants(['password']);
+                $client->setScopes(['email']);
                 $client->setActive(true);
-
-                $client->setAllowPlainTextPkce(0);
+                $client->setAllowPlainTextPkce(false);
 
                 $entityManager->persist($client);
                 $entityManager->flush();
@@ -58,15 +56,12 @@ class LoginController extends AbstractController
                 $entityManager->flush();
             }
 
-            $clientId = $user->getClientId();
-            $secretId = $user->getSecretId();
-
             $clientHttp = HttpClient::create();
             $response = $clientHttp->request('POST', 'http://localhost:9000/api/login', [
                 'json' => [
                     'grant_type' => 'password',
-                    'client_id' => $clientId,
-                    'client_secret' => $secretId,
+                    'client_id' => $user->getClientId(),
+                    'client_secret' => $user->getSecretId(),
                     'scope' => 'email',
                 ],
             ]);
@@ -78,7 +73,6 @@ class LoginController extends AbstractController
                 $session->set('api_token', $accessToken);
                 $user->setApiToken($accessToken);
                 $user->setTokenExpiresAt((new \DateTime())->modify('+14 days'));
-
                 $entityManager->flush();
 
                 return $this->redirectToRoute('app_home');
