@@ -17,6 +17,16 @@ class Client
     private string $identifier;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $name;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private ?string $secret;
+
+    /**
      * @ORM\Column(type="json")
      */
     private array $redirectUris = [];
@@ -32,9 +42,9 @@ class Client
     private array $scopes = [];
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="boolean")
      */
-    private ?string $secret;
+    private bool $active = true;
 
     public function getIdentifier(): string
     {
@@ -47,14 +57,25 @@ class Client
         return $this;
     }
 
-    public function getRedirectUris(): array
+    public function getName(): string
     {
-        return $this->redirectUris;
+        return $this->name;
     }
 
-    public function setRedirectUris(array $redirectUris): self
+    public function setName(string $name): self
     {
-        $this->redirectUris = $redirectUris;
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getSecret(): ?string
+    {
+        return $this->secret;
+    }
+
+    public function setSecret(?string $secret): self
+    {
+        $this->secret = $secret;
         return $this;
     }
 
@@ -80,14 +101,14 @@ class Client
         return $this;
     }
 
-    public function getSecret(): ?string
+    public function isActive(): bool
     {
-        return $this->secret;
+        return $this->active;
     }
 
-    public function setSecret(?string $secret): self
+    public function setActive(bool $active): self
     {
-        $this->secret = $secret;
+        $this->active = $active;
         return $this;
     }
 }
