@@ -8,42 +8,30 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="oauth2_clients")
  */
+#[ORM\Entity]
+#[ORM\Table(name: "oauth2_clients")]
 class Client
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="string", length=80)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: "string", length: 80, unique: true)]
     private string $identifier;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: "string", length: 255)]
     private string $name;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private ?string $secret;
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $secret = null;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: "json")]
     private array $redirectUris = [];
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: "json")]
     private array $grants = [];
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: "json")]
     private array $scopes = [];
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: "boolean")]
     private bool $active = true;
 
     public function getIdentifier(): string
@@ -76,6 +64,17 @@ class Client
     public function setSecret(?string $secret): self
     {
         $this->secret = $secret;
+        return $this;
+    }
+
+    public function getRedirectUris(): array
+    {
+        return $this->redirectUris;
+    }
+
+    public function setRedirectUris(array $redirectUris): self
+    {
+        $this->redirectUris = $redirectUris;
         return $this;
     }
 
