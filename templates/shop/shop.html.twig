@@ -41,24 +41,22 @@
 
 		<!-- Produit -->
 		<div class="space-y-6">
-			{% for product in products %}
-				<div
-					class="flex items-start bg-gray-50 p-4 rounded shadow">
+			{% for allData in allDatas %}
+				<div class="flex items-start bg-gray-50 p-4 rounded shadow">
 					<!-- Image du produit -->
-					<img
-					src="{{ product.image }}" alt="{{ product.name }}" class="w-28 h-28 object-cover mr-4">
+					{# <img
+															src="{{ part.image }}" alt="{{ part.name }}" class="w-28 h-28 object-cover mr-4"> #}
 
 					<!-- Détails du produit -->
-					<div class="flex-1">
-						<h3 class="text-lg font-semibold text-gray-800">{{ product.name }}</h3>
-						<p class="text-gray-600">{{ product.description }}</p>
+						<div class="flex-1"> <h3 class="text-lg font-semibold text-gray-800">{{ part.name }}</h3>
+						<p class="text-gray-600">{{ part.description }}</p>
 						<p class="mt-2 font-bold text-gray-700">+ Livraison à partir de
-							{{ product.shipping_price }}€</p>
+							{{ part.shipping_price }}€</p>
 					</div>
 
 					<!-- Prix et bouton -->
 					<div class="text-right">
-						<p class="text-lg font-bold text-blue-500 mb-4">{{ product.price }}€</p>
+						<p class="text-lg font-bold text-blue-500 mb-4">{{ part.price }}€</p>
 						<button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Ajouter au panier</button>
 					</div>
 				</div>

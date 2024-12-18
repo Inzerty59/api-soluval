@@ -15,8 +15,9 @@ class ShopController extends AbstractController
         //Il faut comprendre la hiérarchie de notre nomenclature de la façon suivante : 
         //Marque > Gamme > Modèle > Version (VehicleBrand > VehicleRange > VehicleModel > VehicleVersion).
  
-        $parts = [
-            [
+        $allData = [
+            
+            $part = [
                 'name' => 'Filtre à huile', #A chercher bonne dénomination
                 'modelName' => 'PEUGEOT 206 PHASE 2',
                 'ManufacturerReference' => '6242C3',
@@ -88,6 +89,6 @@ class ShopController extends AbstractController
                 'Shipping' => '1'
             ]
     ];
-        return $this->render('shop/shop.html.twig', ['parts' => $parts]);
+        return $this->render('shop/shop.html.twig', ['allData' => $allData]);
     }
 }
