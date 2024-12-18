@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<!-- Barre latérale (Filtres) -->
+	<aside class="w-full lg:w-1/4 bg-white p-4 shadow rounded">
+		<h2 class="text-xl font-bold mb-4">Filtres</h2>
+		<div class="mb-4">
+			<label for="marque" class="block font-semibold mb-1">Marque</label>
+			<select id="marque" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500">
+				<option>Toutes marques</option>
+			</select>
+		</div>
+		<div class="mb-4">
+			<label for="modele" class="block font-semibold mb-1">Modèle</label>
+			<select id="modele" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500">
+				<option>Tous modèles</option>
+			</select>
+		</div>
+		<div class="mb-4">
+			<label for="type-piece" class="block font-semibold mb-1">Type de pièce</label>
+			<input id="type-piece" type="text" placeholder="Moteur, démarreur..." class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500">
+		</div>
+		<button class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">Lancer la recherche</button>
+	</aside>
+
+	<!-- Liste des Produits -->
+	<main class="w-full lg:w-3/4 bg-white p-4 shadow rounded">
+		<h2 class="text-xl font-bold mb-4">35 315 pièces trouvées</h2>
+
+		<!-- Options de tri et pagination -->
+		<div class="flex items-center justify-between mb-4">
+			<div class="flex items-center gap-2">
+				<button class="p-2 border rounded hover:bg-gray-200">10</button>
+				<button class="p-2 border rounded hover:bg-gray-200">25</button>
+				<button class="p-2 border rounded hover:bg-gray-200">50</button>
+			</div>
+			<select class="border p-2 rounded">
+				<option>Trier par</option>
+			</select>
+		</div>
+
+		<!-- Produit -->
+		<div class="space-y-6">
+			{% for product in products %}
+				<div
+					class="flex items-start bg-gray-50 p-4 rounded shadow">
+					<!-- Image du produit -->
+					<img
+					src="{{ product.image }}" alt="{{ product.name }}" class="w-28 h-28 object-cover mr-4">
+
+					<!-- Détails du produit -->
+					<div class="flex-1">
+						<h3 class="text-lg font-semibold text-gray-800">{{ product.name }}</h3>
+						<p class="text-gray-600">{{ product.description }}</p>
+						<p class="mt-2 font-bold text-gray-700">+ Livraison à partir de
+							{{ product.shipping_price }}€</p>
+					</div>
+
+					<!-- Prix et bouton -->
+					<div class="text-right">
+						<p class="text-lg font-bold text-blue-500 mb-4">{{ product.price }}€</p>
+						<button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Ajouter au panier</button>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</main>
+</div></div>{% endblock %}
