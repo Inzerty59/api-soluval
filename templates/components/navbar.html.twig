@@ -1,0 +1,32 @@
+<nav class="bg-white border-b border-gray-200 shadow-sm">
+	<div
+		class="container mx-auto px-4 flex justify-between items-center h-16">
+		<!-- Logo -->
+		<div class="flex items-center">
+			<a href="/" class="flex items-center">
+				<img src="{{ logoPath }}" alt="Logo" class="h-8 w-auto">
+			</div>
+
+			<!-- Menu de navigation -->
+			<div
+				class="flex items-center space-x-6">
+				<!-- Mon compte -->
+				<a href="/panier" class="text-gray-700 hover:text-blue-500 transition">Mon compte</a>
+
+				<!-- Panier -->
+				<a
+					href="/cart" class="relative flex items-center text-gray-700 hover:text-blue-500 transition">
+					<!-- Icône de panier -->
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-4 8h16m-7-2a3 3 0 110-6 3 3 0 010 6z"/>
+					</svg>
+					<!-- Badge pour le nombre d'articles -->
+					{% if cartCount > 0 %}
+						<span class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
+							{{ cartCount }}
+						</span>
+					{% endif %}
+				</a>
+			</div>
+		</div>
+	</nav>
