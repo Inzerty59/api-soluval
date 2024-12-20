@@ -5,7 +5,13 @@ module.exports = {
     "./templates/**/*.html.twig",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        customGreen: '#82BA28',
+        customBlue: '#1E90FF',
+        customRed: '#FF4500',
+      },
+    },
   },
   plugins: [],
 }
