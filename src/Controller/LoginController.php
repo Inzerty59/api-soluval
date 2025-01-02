@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Entity\Client;
 use App\Form\LoginFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpClient\HttpClient;
@@ -38,30 +37,14 @@ class LoginController extends AbstractController
                 return $this->redirectToRoute('app_login');
             }
 
-            if (null === $user->getClientId() || null === $user->getSecretId()) {
-                $client = new Client();
-                $client->setIdentifier(uniqid('client_', true));
-                $client->setName('Client de ' . $user->getEmail());
-                $client->setSecret(uniqid('secret_', true));
-                $client->setGrants(['password']);
-                $client->setScopes(['email']);
-                $client->setActive(true);
-                $client->setAllowPlainTextPkce(false);
-
-                $entityManager->persist($client);
-                $entityManager->flush();
-
-                $user->setClientId($client->getIdentifier());
-                $user->setSecretId($client->getSecret());
-                $entityManager->flush();
-            }
-
             $clientHttp = HttpClient::create();
             $response = $clientHttp->request('POST', 'http://localhost:9000/api/login', [
                 'json' => [
                     'grant_type' => 'password',
                     'client_id' => $user->getClientId(),
                     'client_secret' => $user->getSecretId(),
+                    'username' => $email,
+                    'password' => $password,
                     'scope' => 'email',
                 ],
             ]);
