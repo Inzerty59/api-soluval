@@ -14,6 +14,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.3",
         "easycorp/easyadmin-bundle": "^4.14",
+        "jumbojett/openid-connect-php": "^1.0",
         "league/oauth2-server-bundle": "^0.9.0",
         "nelmio/cors-bundle": "^2.5",
         "phpdocumentor/reflection-docblock": "^5.6",

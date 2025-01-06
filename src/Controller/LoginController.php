@@ -4,14 +4,13 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\LoginFormType;
+use App\Service\OAuth2LoginService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class LoginController extends AbstractController
 {
@@ -19,7 +18,7 @@ class LoginController extends AbstractController
     public function login(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher,
+        OAuth2LoginService $loginService,
         SessionInterface $session
     ): Response {
         $form = $this->createForm(LoginFormType::class);
@@ -30,37 +29,21 @@ class LoginController extends AbstractController
             $email = $data['email'];
             $password = $data['password'];
 
-            $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+            try {
+                $accessToken = $loginService->login($email, $password);
 
-            if (!$user || !$passwordHasher->isPasswordValid($user, $password)) {
-                $this->addFlash('error', 'Identifiants incorrects.');
-                return $this->redirectToRoute('app_login');
-            }
+                $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+                if (!$user) {
+                    throw new \Exception("Utilisateur non trouvé.");
+                }
 
-            $clientHttp = HttpClient::create();
-            $response = $clientHttp->request('POST', 'http://localhost:9000/api/login', [
-                'json' => [
-                    'grant_type' => 'password',
-                    'client_id' => $user->getClientId(),
-                    'client_secret' => $user->getSecretId(),
-                    'username' => $email,
-                    'password' => $password,
-                    'scope' => 'email',
-                ],
-            ]);
-
-            if ($response->getStatusCode() === 200) {
-                $responseData = $response->toArray();
-                $accessToken = $responseData['access_token'];
+                $this->addFlash('success', 'Connexion réussie.');
 
                 $session->set('api_token', $accessToken);
-                $user->setApiToken($accessToken);
-                $user->setTokenExpiresAt((new \DateTime())->modify('+14 days'));
-                $entityManager->flush();
 
                 return $this->redirectToRoute('app_home');
-            } else {
-                $this->addFlash('error', 'Échec de la connexion à l\'API.');
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
             }
         }
 
