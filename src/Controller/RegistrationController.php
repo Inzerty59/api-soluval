@@ -14,8 +14,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class RegistrationController extends AbstractController
 {
     #[Route('/inscription', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): Response
-    {
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager
+    ): Response {
         $user = new User();
 
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -25,6 +28,11 @@ class RegistrationController extends AbstractController
             $plainPassword = $form->get('password')->getData();
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $user->refreshApiToken();
 
             $entityManager->persist($user);
             $entityManager->flush();
