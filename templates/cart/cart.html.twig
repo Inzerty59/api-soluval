@@ -1,11 +1,36 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}
-	{{ parent() }}
-	- Panier
-{% endblock %}
-
 {% block body %}
-	<h1>Détails du panier</h1>
+<div class="container mx-auto mt-6 px-4">
+	<h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Votre panier</h1>
 
-{% endblock %}
+	{% if cart|length == 0 %}
+		<p class="text-center">Votre panier est vide.</p>
+	{% else %}
+		<table class="table-auto w-full border-collapse">
+			<thead>
+				<tr>
+					<th class="border px-4 py-2">Produit</th>
+					<th class="border px-4 py-2">Prix</th>
+					<th class="border px-4 py-2">Quantité</th>
+					<th class="border px-4 py-2">Total</th>
+					<th class="border px-4 py-2">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in cart %}
+					<tr>
+						<td class="border px-4 py-2">{{ item.product.Name }}</td>
+						<td class="border px-4 py-2">{{ item.product.Price }}
+							€</td>
+						<td class="border px-4 py-2">{{ item.quantity }}</td>
+						{# <td class="border px-4 py-2">{{ (item.product.Price|replace({',': '.'})|default(0)|floatval($) * item.quantity)|number_format(2, '.', ',') }} #}
+					</tr>
+				</td>
+				<td class="border px-4 py-2">
+					<a href="{{ path('cart_remove', { id: item.product.Id }) }}" class="text-red-500">Retirer</a>
+				</td>
+			</tbody>
+		</tr>
+	{% endfor %}
+</tbody></table>{% endif %}</div>{% endblock %}
