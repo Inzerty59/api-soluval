@@ -14,3 +14,5 @@
    ```bash
    composer install
    ```
+
+   php bin/console tailwind:build -w

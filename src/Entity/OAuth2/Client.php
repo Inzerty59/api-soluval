@@ -8,33 +8,31 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="oauth2_clients")
  */
+#[ORM\Entity]
+#[ORM\Table(name: "oauth2_clients")]
 class Client
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="string", length=80)
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: "string", length: 80, unique: true)]
     private string $identifier;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: "string", length: 255)]
+    private string $name;
+
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $secret = null;
+
+    #[ORM\Column(type: "json")]
     private array $redirectUris = [];
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: "json")]
     private array $grants = [];
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: "json")]
     private array $scopes = [];
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private ?string $secret;
+    #[ORM\Column(type: "boolean")]
+    private bool $active = true;
 
     public function getIdentifier(): string
     {
@@ -44,6 +42,28 @@ class Client
     public function setIdentifier(string $identifier): self
     {
         $this->identifier = $identifier;
+        return $this;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getSecret(): ?string
+    {
+        return $this->secret;
+    }
+
+    public function setSecret(?string $secret): self
+    {
+        $this->secret = $secret;
         return $this;
     }
 
@@ -80,14 +100,14 @@ class Client
         return $this;
     }
 
-    public function getSecret(): ?string
+    public function isActive(): bool
     {
-        return $this->secret;
+        return $this->active;
     }
 
-    public function setSecret(?string $secret): self
+    public function setActive(bool $active): self
     {
-        $this->secret = $secret;
+        $this->active = $active;
         return $this;
     }
 }

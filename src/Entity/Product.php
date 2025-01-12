@@ -3,12 +3,19 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection()
+    ]
+)]
 class Product
 {
     #[ORM\Id]
@@ -39,6 +46,15 @@ class Product
 
     #[ORM\Column(type: Types::ARRAY)]
     private array $images = [];
+
+    #[ORM\Column]
+    private ?int $stripePaymentId = null;
+
+    #[ORM\Column(length: 100)]
+    private ?string $paymentStatus = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $totalAmount = null;
 
     public function getId(): ?int
     {
@@ -137,6 +153,42 @@ class Product
     public function setUpdateAt(\DateTimeInterface $updateAt): static
     {
         $this->updateAt = $updateAt;
+
+        return $this;
+    }
+
+    public function getStripePaymentId(): ?int
+    {
+        return $this->stripePaymentId;
+    }
+
+    public function setStripePaymentId(int $stripePaymentId): static
+    {
+        $this->stripePaymentId = $stripePaymentId;
+
+        return $this;
+    }
+
+    public function getPaymentStatus(): ?string
+    {
+        return $this->paymentStatus;
+    }
+
+    public function setPaymentStatus(string $paymentStatus): static
+    {
+        $this->paymentStatus = $paymentStatus;
+
+        return $this;
+    }
+
+    public function getTotalAmount(): ?string
+    {
+        return $this->totalAmount;
+    }
+
+    public function setTotalAmount(string $totalAmount): static
+    {
+        $this->totalAmount = $totalAmount;
 
         return $this;
     }

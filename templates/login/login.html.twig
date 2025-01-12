@@ -3,63 +3,7 @@
 {% block title %}Connexion{% endblock %}
 
 {% block body %}
-
-<form id="loginForm">
-    <label for="username">Nom d'utilisateur ou Email :</label>
-    <input type="text" id="username" name="username" required>
-
-    <label for="password">Mot de passe :</label>
-    <input type="password" id="password" name="password" required>
-
-    <button type="submit">Se connecter</button>
-</form>
-
-<div id="errorMessage" style="color: red; display: none;">Identifiants incorrects. Veuillez réessayer.</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const loginForm = document.getElementById('loginForm');
-    
-    loginForm.addEventListener('submit', async function (event) {
-        event.preventDefault(); // Empêcher la soumission classique du formulaire
-        
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        
-        document.getElementById('errorMessage').style.display = 'none';
-
-        const requestBody = {
-            username: username,
-            password: password
-        };
-
-        try {
-            const response = await fetch('/connexion', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                if (data.access_token) {
-                    localStorage.setItem('access_token', data.access_token);
-                    
-                    window.location.href = '/dashboard';
-                } else {
-                    document.getElementById('errorMessage').style.display = 'block';
-                }
-            } else {
-                document.getElementById('errorMessage').style.display = 'block';
-            }
-        } catch (error) {
-            console.error('Erreur lors de la connexion:', error);
-            document.getElementById('errorMessage').style.display = 'block';
-        }
-    });
-});
-</script>
-
+    {{ form_start(loginForm) }}
+        {{ form_widget(loginForm) }}
+    {{ form_end(loginForm) }}
 {% endblock %}
