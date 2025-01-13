@@ -12,12 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ApiResource(
-    operations: [
-        new \ApiPlatform\Metadata\GetCollection(),
-        new \ApiPlatform\Metadata\Get()
-    ]
-)]#[ORM\Table(name: 'user')]
+#[ORM\Table(name: 'user')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
