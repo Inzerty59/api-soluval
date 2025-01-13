@@ -1,11 +1,8 @@
-{# templates/registration/register.html.twig #}
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Inscription{% endblock %}
 
 {% block body %}
-
     {{ form_start(registrationForm) }}
         {{ form_row(registrationForm.name) }}
         {{ form_row(registrationForm.surname) }}
@@ -13,13 +10,30 @@
         {{ form_row(registrationForm.password) }}
         {{ form_row(registrationForm.accountType) }}
 
-        {# Champs supplémentaires pour les professionnels #}
-        {% if registrationForm.accountType.vars.data == 'professionnel' %}
+        <div id="professional-fields" style="display: none;">
             {{ form_row(registrationForm.companyName) }}
             {{ form_row(registrationForm.siretNumber) }}
             {{ form_row(registrationForm.vatNumber) }}
-        {% endif %}
+        </div>
 
         <button type="submit">S'inscrire</button>
     {{ form_end(registrationForm) }}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var accountTypeField = document.getElementById('registration_form_accountType');
+            var professionalFields = document.getElementById('professional-fields');
+
+            function toggleProfessionalFields() {
+                if (accountTypeField.value === 'professionnel') {
+                    professionalFields.style.display = 'block';
+                } else {
+                    professionalFields.style.display = 'none';
+                }
+            }
+
+            accountTypeField.addEventListener('change', toggleProfessionalFields);
+            toggleProfessionalFields(); // Initial call to set the correct state
+        });
+    </script>
 {% endblock %}
