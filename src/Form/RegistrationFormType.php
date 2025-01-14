@@ -81,27 +81,16 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('companyName', TextType::class, [
                 'label' => 'Nom de l\'entreprise',
-                'constraints' => [
-                    new Assert\Callback(function ($object, $context) {
-                        if ($context->getRoot()->get('accountType')->getData() === 'professionnel' && empty($object)) {
-                            $context->buildViolation('Le nom de l\'entreprise ne doit pas être vide.')
-                                ->addViolation();
-                        }
-                    }),
-                ],
                 'required' => false,
                 'error_bubbling' => true,
             ])
             ->add('siretNumber', TextType::class, [
                 'label' => 'Numéro SIRET',
                 'constraints' => [
-                    new Assert\Callback(function ($object, $context) {
-                        if ($context->getRoot()->get('accountType')->getData() === 'professionnel' && empty($object)) {
-                            $context->buildViolation('Le numéro SIRET ne doit pas être vide.')
-                                ->addViolation();
-                        }
-                    }),
-                    new ValidSiret(),
+                    new Assert\Regex([
+                        'pattern' => '/^\d{14}$/',
+                        'message' => 'Le numéro SIRET doit contenir exactement 14 chiffres.',
+                    ]),
                 ],
                 'required' => false,
                 'error_bubbling' => true,
@@ -109,6 +98,10 @@ class RegistrationFormType extends AbstractType
             ->add('vatNumber', TextType::class, [
                 'label' => 'Numéro de TVA',
                 'constraints' => [
+                    new Assert\Regex([
+                        'pattern' => '/^[A-Z]{2}[A-Z0-9]{2,12}$/',
+                        'message' => 'Le numéro de TVA doit commencer par deux lettres suivies de 2 à 12 caractères alphanumériques.',
+                    ]),
                     new Assert\Callback(function ($object, $context) {
                         if ($context->getRoot()->get('accountType')->getData() === 'professionnel' && empty($object)) {
                             $context->buildViolation('Le numéro de TVA ne doit pas être vide.')
