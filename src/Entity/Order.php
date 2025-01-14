@@ -13,12 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
-#[ApiResource(
-    operations: [
-        new Get(),
-        new GetCollection()
-    ]
-)]
 class Order
 {
     #[ORM\Id]
