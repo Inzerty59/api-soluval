@@ -23,6 +23,9 @@ Encore
   .addEntry("app", "./assets/app.js")
   .addEntry("filters", "./assets/js/filters.js")
   .addEntry("updateCart", "./assets/js/updateCart.js")
+  .addEntry("toggleAccountType", "./assets/js/toggleAccountType.js")
+  .addEntry("togglePasswordVisibility", "./assets/js/togglePasswordVisibility.js")
+  .addEntry("passwordVisibilityRegistration", "./assets/js/passwordVisibilityRegistration.js")
 
   // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
   .splitEntryChunks()
