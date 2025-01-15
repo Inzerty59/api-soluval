@@ -15,4 +15,15 @@
    composer install
    ```
 
+   ```bash
+   composer require symfonycasts/tailwind-bundle
+   ```
+   ```bash
    php bin/console tailwind:build -w
+   ```
+   ```bash
+   npm install @symfony/webpack-encore --save-dev
+   ```
+   ```bash
+   npm run dev
+   ```
