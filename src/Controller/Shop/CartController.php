@@ -122,4 +122,26 @@ public function checkout(): Response
     }
     return $this->redirectToRoute('payment_page');
 }
+
+#[Route('/produit/{id}', name: 'product_detail')]
+public function productDetail(int $id, DataImporter $dataImporter): Response
+{
+    $data = $dataImporter->fetchData();
+
+    $productFound = null;
+    foreach ($data['products'] as $product) {
+        if ((int) $product['part']['Id'] === $id) {
+            $productFound = $product;
+            break;
+        }
+    }
+
+    if (!$productFound) {
+        $this->addFlash('error', "Produit avec l'ID $id introuvable.");
+        return $this->redirectToRoute('shop_index');
+    }
+    return $this->render('product/detail.html.twig', [
+        'product' => $productFound,
+    ]);
+}
 }

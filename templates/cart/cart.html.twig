@@ -34,7 +34,7 @@
                         {% if item.part is defined %}
                             <tr class="border-b last:border-none hover:bg-gray-50 transition">
                                 <td class="py-4 px-6 flex items-center">
-                                    <img src="{{ item.part.ImageUrl|default('https://via.placeholder.com/150') }}" alt="{{ item.part.Name }}" class="h-16 w-16 rounded-md border border-gray-300 mr-4">
+                                    <img src="{{ item.vehicle.Vignette|default('https://via.placeholder.com/150') }}" alt="{{ item.part.Name }}" class="h-16 w-16 rounded-md border border-gray-300 mr-4">
                                     <span class="font-semibold text-gray-800">{{ item.part.Name }}</span>
                                 </td>
                                 <td class="py-4 px-6">
