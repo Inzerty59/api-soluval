@@ -26,6 +26,12 @@ services:
         arguments:
             $httpClient: '@http_client'        
 
+    # Definition explicite du service AuthenticationService
+    App\Service\AuthenticationService:
+        arguments:
+            $client: '@http_client'
+            $cache: '@cache.app'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     App\Twig\AppExtension:
