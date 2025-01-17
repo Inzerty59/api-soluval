@@ -12,7 +12,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ApiResource]
 #[ORM\Table(name: 'user')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -216,6 +215,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->tokenExpiresAt = $tokenExpiresAt;
         return $this;
+    }
+
+    public function getApiToken(): ?string
+    {
+    return $this->apiToken;
+    }
+
+    public function setApiToken(?string $apiToken): self
+    {
+    $this->apiToken = $apiToken;
+    return $this;
     }
 
     public function eraseCredentials(): void

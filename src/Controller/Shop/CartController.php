@@ -114,5 +114,12 @@ public function delete(int $id, SessionInterface $session): Response
     return $this->redirectToRoute('cart_view');
 }
 
-    
+#[Route('/finaliser-commande', name: 'checkout')]
+public function checkout(): Response
+{
+    if (!$this->getUser()) {
+        return $this->redirectToRoute('app_login');
+    }
+    return $this->redirectToRoute('payment_page');
+}
 }
