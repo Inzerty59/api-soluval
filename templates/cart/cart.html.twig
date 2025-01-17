@@ -1,87 +1,86 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon panier{% endblock %}
+{% block title %}Mon panier
+{% endblock %}
 
 {% block body %}
 
-<div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Votre panier</h1>
+	<div class="container mx-auto p-6">
+		<h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Votre panier</h1>
 
-    {% for message in app.flashes('success') %}
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 shadow-sm" role="alert">
-            {{ message }}
-        </div>
-    {% endfor %}
-    {% for message in app.flashes('error') %}
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 shadow-sm" role="alert">
-            {{ message }}
-        </div>
-    {% endfor %}
+		{% for message in app.flashes('success') %}
+			<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 shadow-sm" role="alert">
+				{{ message }}
+			</div>
+		{% endfor %}
+		{% for message in app.flashes('error') %}
+			<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 shadow-sm" role="alert">
+				{{ message }}
+			</div>
+		{% endfor %}
 
-    {% if cart|length > 0 %}
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-white shadow-md rounded-lg border border-gray-200">
-                <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
-                    <tr>
-                        <th class="py-4 px-6 text-left">Produit</th>
-                        <th class="py-4 px-6 text-left">Quantité</th>
-                        <th class="py-4 px-6 text-center">Prix unitaire</th>
-                        <th class="py-4 px-6 text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in cart %}
-                        {% if item.part is defined %}
-                            <tr class="border-b last:border-none hover:bg-gray-50 transition">
-                                <td class="py-4 px-6 flex items-center">
-                                    <img src="{{ item.part.ImageUrl|default('https://via.placeholder.com/150') }}" alt="{{ item.part.Name }}" class="h-16 w-16 rounded-md border border-gray-300 mr-4">
-                                    <span class="font-semibold text-gray-800">{{ item.part.Name }}</span>
-                                </td>
-                                <td class="py-4 px-6">
-                                    <input type="number" name="quantity" value="{{ item.quantity|default(1) }}" min="1"
-                                        class="w-16 border border-gray-300 rounded-md text-center"
-                                        onchange="updateQuantity({{ item.part.Id }}, this.value)">
-                                </td>
-                                <td class="py-4 px-6 text-center text-gray-800 font-semibold">{{ item.part.Price }} €</td>
-                                <td class="py-4 px-6 text-center">
-                                    <a href="{{ path('cart_delete', { id: item.part.Id }) }}" 
-                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit du panier ?');"
-                                       class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                        Supprimer
-                                    </a>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="4" class="py-4 px-6 text-center text-red-500">Produit non valide</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+		{% if cart|length > 0 %}
+			<div class="overflow-x-auto">
+				<table class="min-w-full bg-white shadow-md rounded-lg border border-gray-200">
+					<thead class="bg-gray-100 text-gray-700 uppercase text-sm">
+						<tr>
+							<th class="py-4 px-6 text-left">Produit</th>
+							<th class="py-4 px-6 text-left">Quantité</th>
+							<th class="py-4 px-6 text-center">Prix unitaire</th>
+							<th class="py-4 px-6 text-center">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in cart %}
+							{% if item.part is defined %}
+								<tr class="border-b last:border-none hover:bg-gray-50 transition">
+									<td class="py-4 px-6 flex items-center">
+										<img src="{{ item.part.ImageUrl|default('https://via.placeholder.com/150') }}" alt="{{ item.part.Name }}" class="h-16 w-16 rounded-md border border-gray-300 mr-4">
+										<span class="font-semibold text-gray-800">{{ item.part.Name }}</span>
+									</td>
+									<td class="py-4 px-6">
+										<input type="number" name="quantity" value="{{ item.quantity|default(1) }}" min="1" class="w-16 border border-gray-300 rounded-md text-center" onchange="updateQuantity({{ item.part.Id }}, this.value)">
+									</td>
+									<td class="py-4 px-6 text-center text-gray-800 font-semibold">{{ item.part.Price }}
+										€</td>
+									<td class="py-4 px-6 text-center">
+										<a href="{{ path('cart_delete', { id: item.part.Id }) }}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit du panier ?');" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+											Supprimer
+										</a>
+									</td>
+								</tr>
+							{% else %}
+								<tr>
+									<td colspan="4" class="py-4 px-6 text-center text-red-500">Produit non valide</td>
+								</tr>
+							{% endif %}
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
 
-        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center">
-            <p class="text-lg font-bold text-gray-800">
-                Sous-total : 
-                {{ cart|reduce((carry, item) => carry + (item.part.Price|replace({',': '.'})|floatval) * (item.quantity|default(1)), 0)|number_format(2, '.', ',') }} €
-            </p>
-            <div class="mt-4 sm:mt-0 flex gap-4">
-                <a href="{{ path('shop_index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Continuer vos achats
-                </a>
-                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Finaliser la commande
-                </button>
-            </div>
-        </div>
-    {% else %}
-        <div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-6 rounded-lg text-center">
-            <p class="text-lg font-medium">Votre panier est vide.</p>
-            <a href="{{ path('shop_index') }}" class="text-blue-500 hover:underline mt-4 inline-block">Retour à l'accueil</a>
-        </div>
-    {% endif %}
-</div>
+			<div class="mt-6 flex flex-col sm:flex-row justify-between items-center">
+				<p class="text-lg font-bold text-gray-800">
+					Sous-total :
+					{{ cart|reduce((carry, item) => carry + (item.part.Price|replace({',': '.'})|floatval) * (item.quantity|default(1)), 0)|number_format(2, '.', ',') }}
+					€
+				</p>
+				<div class="mt-4 sm:mt-0 flex gap-4">
+					<a href="{{ path('shop_index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+						Continuer vos achats
+					</a>
+					<button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+						Finaliser la commande
+					</button>
+				</div>
+			</div>
+		{% else %}
+			<div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-6 rounded-lg text-center">
+				<p class="text-lg font-medium">Votre panier est vide.</p>
+				<a href="{{ path('shop_index') }}" class="text-blue-500 hover:underline mt-4 inline-block">Retour à l'accueil</a>
+			</div>
+		{% endif %}
+	</div>
 
-{{ encore_entry_script_tags('updateCart') }}
+	{# {{ encore_entry_script_tags('updateCart') }} #}
 {% endblock %}
