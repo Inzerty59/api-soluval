@@ -20,3 +20,15 @@ Créer le fichier public.key + private.key dans le config/keys
 
 Une fois dans le conteneur - build le front
    php bin/console tailwind:build -w
+   ```bash
+   composer require symfonycasts/tailwind-bundle
+   ```
+   ```bash
+   php bin/console tailwind:build -w
+   ```
+   ```bash
+   npm install @symfony/webpack-encore --save-dev
+   ```
+   ```bash
+   npm run dev
+   ```
