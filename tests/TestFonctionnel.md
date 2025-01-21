@@ -37,7 +37,16 @@
 |                           | Visualisation du Mot de passe                | Erreur                 | Basse          |
 |                           | Menu Type de compte                          | Fonctionnel            | Haute          |
 |                           | Réception de Mail de confirmation            | Erreur                 | Moyenne        |
-|                           | Tester les professionnels                    | A faire                |                |
+|                           |                                              |                        |                |
+|                           | Visuel professionnel                         | Fonctionnel            | Basse          |
+|                           | Nom de l'entreprise Vide                     | A faire                | Haute          |
+|                           | Nom de l'entreprise ≠ N° SIRET               | A faire                | Haute          |
+|                           | Nom de l'entreprise ≠ N° TVA                 | A faire                | Haute          |
+|                           | N° Siret Vide                                | A faire                | Haute          |
+|                           | N° Siret incorrect                           | A faire                | Haute          |
+|                           | N° TVA Vide                                  | A faire                | Haute          |
+|                           | N° TVA incorrect                             | A faire                | Haute          |
+|                           | N° SIRET ≠ N° TVA                            | A faire                | Haute          |
 | **C. BOUTIQUE**                                                                                                    |
 | 1) Entête                                                                                                          |
 |                           | Logo Soluval                                 | Fonctionnel            | Moyenne        |
@@ -79,6 +88,16 @@
 |                           | Sous Total                                   | OK                     | Moyenne        |
 |                           | Continuer vos achats                         | Fonctionnel            | Haute          |
 |                           | Finaliser la commande                        | Fonctionnel            | Haute          |
+| **E. PAIEMENT**                                                                                                    |
+|                           | Visuel                                       | Erreur                 | Basse          |
+|                           | A Définir                                    | A tester               |                |
+| **F. QUOTAS**                                                                                                      |
+|                           | Visuel                                       | Erreur                 | Basse          |
+|                           | A Définir                                    | A tester               |                |
+| **G. ADMINISTRATEUR**                                                                                              |
+|                           | Visuel                                       | Erreur                 | Basse          |
+|                           | A Définir                                    | A tester               |                |
+
 
 
 (1) Veuillez remplir ce champ
