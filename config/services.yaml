@@ -1,12 +1,5 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
-parameters:
-
 services:
-    # default configuration for services in *this* file
+    # Configuration par défaut pour les services
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
@@ -20,19 +13,23 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-
-    # Definition explicite du service SiretVerificationService
-    App\Service\SiretVerificationService:
+    # Service OpistoDataFetcher
+    App\Service\OpistoDataFetcher:
         arguments:
-            $httpClient: '@http_client'        
+            $client: '@http_client'
+            $authService: '@App\Service\AuthenticationService'
+            $apiUrl: '%env(AUTH_URL_API)%' # Injection de la variable d'environnement
 
-    # Definition explicite du service AuthenticationService
+    # Service AuthenticationService (déjà défini correctement)
     App\Service\AuthenticationService:
         arguments:
             $client: '@http_client'
             $cache: '@cache.app'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Autres services explicites
+    App\Service\SiretVerificationService:
+        arguments:
+            $httpClient: '@http_client'
+
     App\Twig\AppExtension:
         tags: ['twig.extension']
