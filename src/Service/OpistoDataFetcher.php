@@ -31,7 +31,7 @@ class OpistoDataFetcher
 
         // Définir les paramètres par défaut
         $queryParams = array_merge([
-            'itemsPerPage' => 1,  // Nombre d'éléments par page
+            'itemsPerPage' => 40000,  // Nombre d'éléments par page
             'page' => 0,          // Numéro de la page
             'onlyParts' => "true",  // Limiter la recherche aux pièces
         ], $filters);

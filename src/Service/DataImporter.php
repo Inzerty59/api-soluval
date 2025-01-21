@@ -57,8 +57,8 @@ class DataImporter
     }
 }
  
- //0ok 00 part Id => external_id
-//OK1 part manufacturer reference => manufacturer_reference
+ //0ok 00 part Id => external_id ok
+//OK1 part manufacturer reference => manufacturer_reference ok
 //OK2 part adaptable reference => opisto_reference
 //OK3 catégorie du produit + marque du véhicule + modèle du véhicule + carburant =>
 //OK4 Category Name
