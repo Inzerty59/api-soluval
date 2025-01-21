@@ -23,12 +23,12 @@ class Part
     private ?string $manufacturer_reference = null;
 
     #[ORM\Column(length: 40, nullable: true)]
-    private ?string $opisto_reference = null;
+    private ?string $adaptable_reference = null;
 
     #[ORM\Column(length: 80, nullable: true)]
     private ?string $category_name = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 1000, nullable: true)]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
@@ -50,7 +50,7 @@ class Part
     private ?string $finish_name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $commercial_name = null;
+    private ?string $commercial_designation = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $vehicle_year = null;
@@ -58,8 +58,8 @@ class Part
     #[ORM\Column(nullable: true)]
     private ?int $mileage = null;
 
-    #[ORM\Column(length: 80, nullable: true)]
-    private ?string $color_name = null;
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $color_name = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $displacement = null;
@@ -70,8 +70,8 @@ class Part
     #[ORM\Column(length: 80, nullable: true)]
     private ?string $energy_name = null;
 
-    #[ORM\Column(length: 80, nullable: true)]
-    private ?string $gearbox_type = null;
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $gearbox_type = null;
 
     #[ORM\Column(length: 80, nullable: true)]
     private ?string $engine_code = null;
@@ -120,14 +120,14 @@ class Part
         return $this;
     }
 
-    public function getOpistoReference(): ?string
+    public function getAdaptableReference(): ?string
     {
-        return $this->opisto_reference;
+        return $this->adaptable_reference;
     }
 
-    public function setOpistoReference(?string $opisto_reference): static
+    public function setAdaptableReference(?string $adaptable_reference): static
     {
-        $this->opisto_reference = $opisto_reference;
+        $this->adaptable_reference = $adaptable_reference;
 
         return $this;
     }
@@ -228,14 +228,14 @@ class Part
         return $this;
     }
 
-    public function getCommercialName(): ?string
+    public function getCommercialDesignation(): ?string
     {
-        return $this->commercial_name;
+        return $this->commercial_designation;
     }
 
-    public function setCommercialName(?string $commercial_name): static
+    public function setCommercialDesignation(?string $commercial_designation): static
     {
-        $this->commercial_name = $commercial_name;
+        $this->commercial_designation = $commercial_designation;
 
         return $this;
     }
@@ -264,17 +264,18 @@ class Part
         return $this;
     }
 
-    public function getColorName(): ?string
+    public function getColorName(): ?array
     {
         return $this->color_name;
     }
 
-    public function setColorName(?string $color_name): static
+    public function setColorName(?array $color_name): static
     {
         $this->color_name = $color_name;
 
         return $this;
     }
+    
 
     public function getDisplacement(): ?int
     {
@@ -312,12 +313,12 @@ class Part
         return $this;
     }
 
-    public function getGearboxType(): ?string
+    public function getGearboxType(): ?array
     {
         return $this->gearbox_type;
     }
 
-    public function setGearboxType(?string $gearbox_type): static
+    public function setGearboxType(?array $gearbox_type): static
     {
         $this->gearbox_type = $gearbox_type;
 
