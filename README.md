@@ -15,11 +15,7 @@ Créer le fichier public.key + private.key dans le config/keys
    ```bash
    composer install
    ```
-   4.Installer webpack
-   npm install @symfony/webpack-encore --save-dev
-
-Une fois dans le conteneur - build le front
-   php bin/console tailwind:build -w
+   4. Installer webpack et tailwind 
    ```bash
    composer require symfonycasts/tailwind-bundle
    ```

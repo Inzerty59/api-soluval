@@ -34,13 +34,13 @@
                         {% if item.part is defined %}
                             <tr class="border-b last:border-none hover:bg-gray-50 transition">
                                 <td class="py-4 px-6 flex items-center">
-                                    <img src="{{ item.vehicle.Vignette|default('https://via.placeholder.com/150') }}" alt="{{ item.part.Name }}" class="h-16 w-16 rounded-md border border-gray-300 mr-4">
+                                    <a href="{{ path('cart_product_detail', { id: item.part.Id }) }}">
+                                        <img src="{{ item.vehicle.Vignette|default('https://via.placeholder.com/150') }}" alt="{{ item.part.Name }}" class="h-16 w-16 rounded-md border border-gray-300 mr-4">
+                                    </a>
                                     <span class="font-semibold text-gray-800">{{ item.part.Name }}</span>
                                 </td>
                                 <td class="py-4 px-6">
-                                    <input type="number" name="quantity" value="{{ item.quantity|default(1) }}" min="1"
-                                        class="w-16 border border-gray-300 rounded-md text-center"
-                                        onchange="updateQuantity({{ item.part.Id }}, this.value)">
+                                    <input type="number" name="quantity" value="1" min="1" class="w-16 border border-gray-300 rounded-md text-center" readonly>
                                 </td>
                                 <td class="py-4 px-6 text-center text-gray-800 font-semibold">{{ item.part.Price }} €</td>
                                 <td class="py-4 px-6 text-center">
@@ -82,27 +82,6 @@
 				<a href="{{ path('shop_index') }}" class="text-blue-500 hover:underline mt-4 inline-block">Retour à l'accueil</a>
 			</div>
 		{% endif %}
-	</div>
-        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center">
-            <p class="text-lg font-bold text-gray-800">
-                Sous-total : 
-                {{ cart|reduce((carry, item) => carry + (item.part.Price|replace({',': '.'})|floatval) * (item.quantity|default(1)), 0)|number_format(2, '.', ',') }} €
-            </p>
-            <div class="mt-4 sm:mt-0 flex gap-4">
-                <a href="{{ path('shop_index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Continuer vos achats
-                </a>
-                <button onclick="window.location.href='{{ path('cart_checkout') }}'" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Finaliser la commande
-                </button>
-            </div>
-        </div>
-    {% else %}
-        <div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-6 rounded-lg text-center">
-            <p class="text-lg font-medium">Votre panier est vide.</p>
-            <a href="{{ path('shop_index') }}" class="text-blue-500 hover:underline mt-4 inline-block">Retour à l'accueil</a>
-        </div>
-    {% endif %}
 </div>
 
 	{# {{ encore_entry_script_tags('updateCart') }} #}
