@@ -4,7 +4,6 @@
 {% endblock %}
 
 {% block body %}
-
 	<div class="container mx-auto p-6">
 		<h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Votre panier</h1>
 
@@ -69,7 +68,7 @@
 					<a href="{{ path('shop_index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
 						Continuer vos achats
 					</a>
-					<button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+					<button onclick="window.location.href='{{ path('cart_checkout') }}'" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
 						Finaliser la commande
 					</button>
 				</div>
@@ -81,27 +80,4 @@
 			</div>
 		{% endif %}
 	</div>
-        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center">
-            <p class="text-lg font-bold text-gray-800">
-                Sous-total : 
-                {{ cart|reduce((carry, item) => carry + (item.part.Price|replace({',': '.'})|floatval) * (item.quantity|default(1)), 0)|number_format(2, '.', ',') }} €
-            </p>
-            <div class="mt-4 sm:mt-0 flex gap-4">
-                <a href="{{ path('shop_index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Continuer vos achats
-                </a>
-                <button onclick="window.location.href='{{ path('cart_checkout') }}'" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Finaliser la commande
-                </button>
-            </div>
-        </div>
-    {% else %}
-        <div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-6 rounded-lg text-center">
-            <p class="text-lg font-medium">Votre panier est vide.</p>
-            <a href="{{ path('shop_index') }}" class="text-blue-500 hover:underline mt-4 inline-block">Retour à l'accueil</a>
-        </div>
-    {% endif %}
-</div>
-
-	{# {{ encore_entry_script_tags('updateCart') }} #}
 {% endblock %}
