@@ -58,6 +58,48 @@
 					</tbody>
 				</table>
 			</div>
+    {% if cart|length > 0 %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white shadow-md rounded-lg border border-gray-200">
+                <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
+                    <tr>
+                        <th class="py-4 px-6 text-left">Produit</th>
+                        <th class="py-4 px-6 text-left">Quantité</th>
+                        <th class="py-4 px-6 text-center">Prix unitaire</th>
+                        <th class="py-4 px-6 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                        {% if item.part is defined %}
+                            <tr class="border-b last:border-none hover:bg-gray-50 transition">
+                                <td class="py-4 px-6 flex items-center">
+                                    <img src="{{ item.vehicle.Vignette|default('https://via.placeholder.com/150') }}" alt="{{ item.part.Name }}" class="h-16 w-16 rounded-md border border-gray-300 mr-4">
+                                    <span class="font-semibold text-gray-800">{{ item.part.Name }}</span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <input type="number" name="quantity" value="{{ item.quantity|default(1) }}" min="1"
+                                        class="w-16 border border-gray-300 rounded-md text-center"
+                                        onchange="updateQuantity({{ item.part.Id }}, this.value)">
+                                </td>
+                                <td class="py-4 px-6 text-center text-gray-800 font-semibold">{{ item.part.Price }} €</td>
+                                <td class="py-4 px-6 text-center">
+                                    <a href="{{ path('cart_delete', { id: item.part.Id }) }}" 
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit du panier ?');"
+                                       class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                        Supprimer
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="py-4 px-6 text-center text-red-500">Produit non valide</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
 			<div class="mt-6 flex flex-col sm:flex-row justify-between items-center">
 				<p class="text-lg font-bold text-gray-800">
