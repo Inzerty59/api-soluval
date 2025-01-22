@@ -33,13 +33,13 @@
                         {% if item.part is defined %}
                             <tr class="border-b last:border-none hover:bg-gray-50 transition">
                                 <td class="py-4 px-6 flex items-center">
-                                    <img src="{{ item.vehicle.Vignette|default('https://via.placeholder.com/150') }}" alt="{{ item.part.Name }}" class="h-16 w-16 rounded-md border border-gray-300 mr-4">
+                                    <a href="{{ path('cart_product_detail', { id: item.part.Id }) }}">
+                                        <img src="{{ item.vehicle.Vignette|default('https://via.placeholder.com/150') }}" alt="{{ item.part.Name }}" class="h-16 w-16 rounded-md border border-gray-300 mr-4">
+                                    </a>
                                     <span class="font-semibold text-gray-800">{{ item.part.Name }}</span>
                                 </td>
                                 <td class="py-4 px-6">
-                                    <input type="number" name="quantity" value="{{ item.quantity|default(1) }}" min="1"
-                                        class="w-16 border border-gray-300 rounded-md text-center"
-                                        onchange="updateQuantity({{ item.part.Id }}, this.value)">
+                                    <input type="number" name="quantity" value="1" min="1" class="w-16 border border-gray-300 rounded-md text-center" readonly>
                                 </td>
                                 <td class="py-4 px-6 text-center text-gray-800 font-semibold">{{ item.part.Price }} €</td>
                                 <td class="py-4 px-6 text-center">
@@ -82,4 +82,7 @@
 			</div>
 		{% endif %}
 	</div>
+</div>
+
+	{# {{ encore_entry_script_tags('updateCart') }} #}
 {% endblock %}

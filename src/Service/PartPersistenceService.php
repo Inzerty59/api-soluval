@@ -47,7 +47,7 @@ class PartPersistenceService
     ->setGearboxCode($partData['Vehicle']['Identification']['GearboxCode'] ?? null) // Remplacé par Vehicle
     ->setDoorNumber($partData['Vehicle']['Identification']['DoorNumber'] ?? null) // Remplacé par Vehicle
     ->setVignette($partData['Vignette'] ?? null)
-    ->setPhotos(array_column($partData['Photos'] ?? [], 'Url'))
+    ->setPhotos($partData['Photos'] ?? null)
     ->setPrice($partData['Price'] ?? null);
 
 
