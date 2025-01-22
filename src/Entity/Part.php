@@ -3,19 +3,12 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use App\Repository\PartRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PartRepository::class)]
-#[ApiResource(
-    operations: [
-        new Get(),
-        new GetCollection()
-    ]
-)]
+#[ApiResource]
 class Part
 {
     #[ORM\Id]
@@ -24,43 +17,79 @@ class Part
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $externalId = null;
+    private ?int $external_id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $manufacturer_reference = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(length: 40, nullable: true)]
+    private ?string $adaptable_reference = null;
+
+    #[ORM\Column(length: 80, nullable: true)]
+    private ?string $category_name = null;
+
+    #[ORM\Column(length: 1000, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $price = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $part_condition = null;
 
-    #[ORM\Column]
-    private ?bool $availability = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $warranty = null;
 
-    #[ORM\Column]
-    private ?int $stockQuantity = null;
+    #[ORM\Column(length: 80, nullable: true)]
+    private ?string $brand_name = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $category = null;
+    #[ORM\Column(length: 80, nullable: true)]
+    private ?string $range_name = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $brand = null;
+    #[ORM\Column(length: 80, nullable: true)]
+    private ?string $model_name = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $manufacturerPartNumber = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $finish_name = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
-    private array $vehicleCompatibility = [];
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $commercial_designation = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
-    private array $images = [];
+    #[ORM\Column(nullable: true)]
+    private ?int $vehicle_year = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $mileage = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updatedAt = null;
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $color_name = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $displacement = null;
+
+    #[ORM\Column(length: 80, nullable: true)]
+    private ?string $power = null;
+
+    #[ORM\Column(length: 80, nullable: true)]
+    private ?string $energy_name = null;
+
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $gearbox_type = null;
+
+    #[ORM\Column(length: 80, nullable: true)]
+    private ?string $engine_code = null;
+
+    #[ORM\Column(length: 80, nullable: true)]
+    private ?string $gearbox_code = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $door_number = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $vignette = null;
+
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $photos = null;
+
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $Price = null;
 
     public function getId(): ?int
     {
@@ -69,24 +98,48 @@ class Part
 
     public function getExternalId(): ?int
     {
-        return $this->externalId;
+        return $this->external_id;
     }
 
-    public function setExternalId(int $externalId): static
+    public function setExternalId(int $external_id): static
     {
-        $this->externalId = $externalId;
+        $this->external_id = $external_id;
 
         return $this;
     }
 
-    public function getName(): ?string
+    public function getManufacturerReference(): ?string
     {
-        return $this->name;
+        return $this->manufacturer_reference;
     }
 
-    public function setName(string $name): static
+    public function setManufacturerReference(?string $manufacturer_reference): static
     {
-        $this->name = $name;
+        $this->manufacturer_reference = $manufacturer_reference;
+
+        return $this;
+    }
+
+    public function getAdaptableReference(): ?string
+    {
+        return $this->adaptable_reference;
+    }
+
+    public function setAdaptableReference(?string $adaptable_reference): static
+    {
+        $this->adaptable_reference = $adaptable_reference;
+
+        return $this;
+    }
+
+    public function getCategoryName(): ?string
+    {
+        return $this->category_name;
+    }
+
+    public function setCategoryName(?string $category_name): static
+    {
+        $this->category_name = $category_name;
 
         return $this;
     }
@@ -103,122 +156,243 @@ class Part
         return $this;
     }
 
-    public function getPrice(): ?string
+    public function getPartCondition(): ?int
     {
-        return $this->price;
+        return $this->part_condition;
     }
 
-    public function setPrice(string $price): static
+    public function setPartCondition(?int $part_condition): static
     {
-        $this->price = $price;
+        $this->part_condition = $part_condition;
 
         return $this;
     }
 
-    public function isAvailability(): ?bool
+    public function getWarranty(): ?int
     {
-        return $this->availability;
+        return $this->warranty;
     }
 
-    public function setAvailability(bool $availability): static
+    public function setWarranty(?int $warranty): static
     {
-        $this->availability = $availability;
+        $this->warranty = $warranty;
 
         return $this;
     }
 
-    public function getStockQuantity(): ?int
+    public function getBrandName(): ?string
     {
-        return $this->stockQuantity;
+        return $this->brand_name;
     }
 
-    public function setStockQuantity(int $stockQuantity): static
+    public function setBrandName(?string $brand_name): static
     {
-        $this->stockQuantity = $stockQuantity;
+        $this->brand_name = $brand_name;
 
         return $this;
     }
 
-    public function getCategory(): ?string
+    public function getRangeName(): ?string
     {
-        return $this->category;
+        return $this->range_name;
     }
 
-    public function setCategory(string $category): static
+    public function setRangeName(?string $range_name): static
     {
-        $this->category = $category;
+        $this->range_name = $range_name;
 
         return $this;
     }
 
-    public function getBrand(): ?string
+    public function getModelName(): ?string
     {
-        return $this->brand;
+        return $this->model_name;
     }
 
-    public function setBrand(string $brand): static
+    public function setModelName(?string $model_name): static
     {
-        $this->brand = $brand;
+        $this->model_name = $model_name;
 
         return $this;
     }
 
-    public function getManufacturerPartNumber(): ?string
+    public function getFinishName(): ?string
     {
-        return $this->manufacturerPartNumber;
+        return $this->finish_name;
     }
 
-    public function setManufacturerPartNumber(string $manufacturerPartNumber): static
+    public function setFinishName(?string $finish_name): static
     {
-        $this->manufacturerPartNumber = $manufacturerPartNumber;
+        $this->finish_name = $finish_name;
 
         return $this;
     }
 
-    public function getVehicleCompatibility(): array
+    public function getCommercialDesignation(): ?string
     {
-        return $this->vehicleCompatibility;
+        return $this->commercial_designation;
     }
 
-    public function setVehicleCompatibility(array $vehicleCompatibility): static
+    public function setCommercialDesignation(?string $commercial_designation): static
     {
-        $this->vehicleCompatibility = $vehicleCompatibility;
+        $this->commercial_designation = $commercial_designation;
 
         return $this;
     }
 
-    public function getImages(): array
+    public function getVehicleYear(): ?int
     {
-        return $this->images;
+        return $this->vehicle_year;
     }
 
-    public function setImages(array $images): static
+    public function setVehicleYear(?int $vehicle_year): static
     {
-        $this->images = $images;
+        $this->vehicle_year = $vehicle_year;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getMileage(): ?int
     {
-        return $this->createdAt;
+        return $this->mileage;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    public function setMileage(?int $mileage): static
     {
-        $this->createdAt = $createdAt;
+        $this->mileage = $mileage;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getColorName(): ?array
     {
-        return $this->updatedAt;
+        return $this->color_name;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
+    public function setColorName(?array $color_name): static
     {
-        $this->updatedAt = $updatedAt;
+        $this->color_name = $color_name;
+
+        return $this;
+    }
+    
+
+    public function getDisplacement(): ?int
+    {
+        return $this->displacement;
+    }
+
+    public function setDisplacement(?int $displacement): static
+    {
+        $this->displacement = $displacement;
+
+        return $this;
+    }
+
+    public function getPower(): ?string
+    {
+        return $this->power;
+    }
+
+    public function setPower(?string $power): static
+    {
+        $this->power = $power;
+
+        return $this;
+    }
+
+    public function getEnergyName(): ?string
+    {
+        return $this->energy_name;
+    }
+
+    public function setEnergyName(?string $energy_name): static
+    {
+        $this->energy_name = $energy_name;
+
+        return $this;
+    }
+
+    public function getGearboxType(): ?array
+    {
+        return $this->gearbox_type;
+    }
+
+    public function setGearboxType(?array $gearbox_type): static
+    {
+        $this->gearbox_type = $gearbox_type;
+
+        return $this;
+    }
+
+    public function getEngineCode(): ?string
+    {
+        return $this->engine_code;
+    }
+
+    public function setEngineCode(?string $engine_code): static
+    {
+        $this->engine_code = $engine_code;
+
+        return $this;
+    }
+
+    public function getGearboxCode(): ?string
+    {
+        return $this->gearbox_code;
+    }
+
+    public function setGearboxCode(?string $gearbox_code): static
+    {
+        $this->gearbox_code = $gearbox_code;
+
+        return $this;
+    }
+
+    public function getDoorNumber(): ?int
+    {
+        return $this->door_number;
+    }
+
+    public function setDoorNumber(?int $door_number): static
+    {
+        $this->door_number = $door_number;
+
+        return $this;
+    }
+
+    public function getVignette(): ?string
+    {
+        return $this->vignette;
+    }
+
+    public function setVignette(?string $vignette): static
+    {
+        $this->vignette = $vignette;
+
+        return $this;
+    }
+
+    public function getPhotos(): ?array
+    {
+        return $this->photos;
+    }
+
+    public function setPhotos(?array $photos): static
+    {
+        $this->photos = $photos;
+
+        return $this;
+    }
+
+    public function getPrice(): ?array
+    {
+        return $this->Price;
+    }
+
+    public function setPrice(?array $Price): static
+    {
+        $this->Price = $Price;
 
         return $this;
     }
