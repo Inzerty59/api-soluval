@@ -12,7 +12,8 @@
 |                           | Mail sans extension                          | Fonctionnel            | Haute          |
 |                           | Mauvais Mot de Passe                         | Fonctionnel            | Haute          |
 |                           | Mot de passe oublié                          | A tester               | Moyenne        |
-|                           | Lien Créer un compte                         | Fonctionnel            | Haute          |
+|                           | Cas passant                                  | Fonctionnel            |
+|                           | Bouton Créer un compte                       | Fonctionnel            | Haute          |
 | **B. INSCRIPTION**                                                                                                 |
 |                           | Visuel                                       | Fonctionnel            | Basse          |
 |                           | Nom Vide                                     | Fonctionnel            | Haute          |
@@ -36,6 +37,7 @@
 |                           | Confirmation Mot de passe mauvaise forme     | Erreur                 | Haute          |
 |                           | Visualisation du Mot de passe                | Erreur                 | Basse          |
 |                           | Menu Type de compte                          | Fonctionnel            | Haute          |
+|                           | 
 |                           | Réception de Mail de confirmation            | Erreur                 | Moyenne        |
 |                           |                                              |                        |                |
 |                           | Visuel professionnel                         | Fonctionnel            | Basse          |
@@ -52,21 +54,21 @@
 |                           | Logo Soluval                                 | Fonctionnel            | Moyenne        |
 |                           | Se connecter                                 | OK                     | Basse          |
 |                           | Bouton Panier                                | Fonctionnel            | Haute          |
-|                           | 2) Type de pièce                             |                        |                |
+| 2) Type de pièce                                                                                                   |
 |                           | Recherche dynamique                          | A tester               | Moyenne        |
 |                           | Recherche                                    | A tester               | Haute          |
 |                           | Recherche inexistante                        | A tester               | Moyenne        |
-|                           | 3) Filtres                                                                             |
+| 3) Filtres                                                                                                         |
 |                           | Marque                                       | A tester               | Haute          |
 |                           | Modèle Grisée                                | A tester               | Basse          |
 |                           | Modèle                                       | A tester               | Haute          |
-|                           | 4) Recherche avancée                                                                   |
+| 4) Recherche avancée                                                                                               |
 |                           | Visuel                                       | Fonctionnel            | Basse          |
 |                           | Code Moteur                                  | A tester               | Basse          |
 |                           | Code boîte                                   | A tester               | Basse          |
 |                           | Référence adaptable                          | A tester               |                |
 |                           | Référence constructeur                       | A tester               |                |
-|                           | 5) Liste                                                                               |
+| 5) Liste                                                                                                            |
 |                           | Pièces trouvées                              | A tester               | Basse          |
 |                           | Bouton de pagination 10                      | A tester               | Basse          |
 |                           | Bouton de pagination 25                      | A tester               | Basse          |
@@ -89,6 +91,43 @@
 |                           | Continuer vos achats                         | Fonctionnel            | Haute          |
 |                           | Finaliser la commande                        | Fonctionnel            | Haute          |
 | **E. PAIEMENT**                                                                                                    |
+| 1) Page Livraison                                                                                                  |
+|                           | Visuel                                       | Erreur                 | Basse          |
+|                           | Tableau des pièces commandées                | A tester               | Moyenne        |
+|                           | Selection du mode de livraison               | A tester               | Haute          |
+|                           | Menu adresse de livraison                    | A tester               | Moyenne        |
+|                           | Menu adresse de facturation                  | A tester               | Moyenne        |
+|                           | Bouton Ajouter une adresse                   | A tester               | Moyenne        |
+|                           | Bouton Gestion des adresses                  | A tester               | Moyenne        |
+|                           | Bouton accéder au récapitulatif              | A tester               | Haute          |
+|                           | Bouton Retour                                | A tester               | Haute          |
+| 2) Page Récapitulatif                                                                                              |
+|                           | Visuel                                       | Erreur                 | Basse          |
+|                           | Tableau des pièces commandées                | A tester               | Moyenne        |
+|                           | Vérifier les Totaux                          | A tester               | Basse          |
+|                           | Bouton Régler ma commande                    | A tester               | Haute          |
+|                           | Bouton Retour                                | A tester               | Haute          |
+| 3) Page Finalisation                                                                                               |
+|                           | Visuel                                       | Erreur                 | Basse          |
+|                           | Tableau des pièces commandées                | A tester               | Moyenne        |
+|                           | Liens vers conditions générales  X3          | A tester               | Basse          |
+|                           | Radios Mention Légales                       | A tester               | Haute          |
+|                           | Régler sans validé les mentions légales      | A tester               | Haute          |
+|                           | Bouton Régler ma commande                    | A tester               | Haute          |
+|                           | Bouton Retour                                | A tester               | Haute          |
+|                           | Pop-in Mode de paiement                      | A tester               | Haute          |
+|                           | Selectionner Visa                            | A tester               | Haute          |
+|                           | Selectionner Maestro                         | A tester               | Haute          |
+| 4) Page Paiement CB (VISA ou Maesto)                                                                               |
+|                           | Visuel                                       | Erreur                 | Basse          |
+|                           | Numero de carte                              | A tester               | Haute          |
+|                           | Date d'expiration                            | A tester               | Haute          |
+|                           | Cryptogramme                                 | A tester               | Haute          |
+|                           | Régler sans remplir les champs               | A tester               | Haute          |
+|                           | Régler sans remplir un des champs            | A tester               | Haute          |
+|                           | Régler en remplissant des champs érronés     | A tester               | Haute          |
+|                           | Bouton Payer par carte                       | A tester               | Haute          |
+| **F. PROFIL**                                                                                                      |
 |                           | Visuel                                       | Erreur                 | Basse          |
 |                           | A Définir                                    | A tester               |                |
 | **F. QUOTAS**                                                                                                      |
@@ -97,7 +136,6 @@
 | **G. ADMINISTRATEUR**                                                                                              |
 |                           | Visuel                                       | Erreur                 | Basse          |
 |                           | A Définir                                    | A tester               |                |
-
 
 
 (1) Veuillez remplir ce champ
