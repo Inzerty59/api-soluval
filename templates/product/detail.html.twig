@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du produit{% endblock %}
+
+{% block body %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-2">{{ product.part.Name }}</h1>
+    <p class="text-xl font-semibold mb-4">Prix : {{ product.part.Price }} €</p>
+    <p class="text-lg mb-4">Livraison * : À partir de 1,00 €</p>
+    <p class="text-lg mb-4">Délais de livraison estimés entre 1 et 2 jours ouvrés.</p>
+    <p class="text-lg mb-4">Garantie : {{ product.part.Warranty }}</p>
+    <a href="{{ path('cart_add', { id: product.part.Id }) }}" class="bg-customGreen text-white px-4 py-2 rounded hover:bg-gray-500 mb-4 inline-block">Ajouter au panier</a>
+    
+    <div class="flex">
+        <img src="{{ product.vehicle.Vignette }}" alt="{{ product.part.Name }}" class="w-1/4 h-auto rounded mr-6">
+        <div class="flex-1">
+            <h2 class="text-2xl font-bold mb-4">Caractéristiques</h2>
+            <table class="table-auto w-full mb-6">
+                <tbody>
+                    <tr>
+                        <td class="font-semibold">Référence constructeur</td>
+                        <td>{{ product.part.ManufacturerReference }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Référence Opisto</td>
+                        <td>{{ product.part.Id }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Dénomination de la pièce</td>
+                        <td>{{ product.part.Name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Catégorie du produit</td>
+                        <td>{{ product.part.Category }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Description</td>
+                        <td>{{ product.part.Description }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Prix TTC</td>
+                        <td>{{ product.part.Price }} €</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">État de la pièce</td>
+                        <td>{{ product.part.PartType }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Quantité</td>
+                        <td>1,00</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Durée de garantie</td>
+                        <td>{{ product.part.Warranty }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="text-2xl font-bold mb-4">Véhicule d'origine</h2>
+            <table class="table-auto w-full mb-6">
+                <tbody>
+                    <tr>
+                        <td class="font-semibold">Marque du véhicule</td>
+                        <td>{{ product.vehicleBrand.Name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Gamme du véhicule</td>
+                        <td>{{ product.vehicleRange.Range }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Modèle du véhicule</td>
+                        <td>{{ product.vehicleModel.Model }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Finition du véhicule</td>
+                        <td>{{ product.vehicleVersion.Finish }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Désignation commerciale</td>
+                        <td>{{ product.vehicleVersion.CommercialDesignation }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Année de mise en circulation</td>
+                        <td>{{ product.vehicleModel.Begin }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Kilométrage</td>
+                        <td>{{ product.vehicle.Mileage }} km</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Cylindrée</td>
+                        <td>{{ product.vehicleVersion.Displacement }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Puissance</td>
+                        <td>{{ product.vehicleVersion.Power }} ch</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Carburant</td>
+                        <td>{{ product.vehicleVersion.Energy }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Type de boîte de vitesses</td>
+                        <td>{{ product.vehicleVersion.GearboxType }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Code moteur</td>
+                        <td>{{ product.vehicleVersion.EngineCode }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Code boîte de vitesses</td>
+                        <td>{{ product.vehicleVersion.GearboxCode }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Nombre de portes</td>
+                        <td>{{ product.vehicleVersion.DoorNumber }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
