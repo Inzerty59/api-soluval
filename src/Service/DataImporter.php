@@ -47,6 +47,7 @@ class DataImporter
                     ],
                     'vehicle' => [
                         'Mileage' => '265370', //OK15 part vehicle mileage
+                        'Color' => 'Gris', //OK16 couleur : part vehicle color name
                         'Vignette' => 'https://opisto-prod-pic.opisto.s3.eu-west-1.bso.st/4672/vhu_photo/2024/10/Vehicule-PEUGEOT-206%20PHASE%202-2006-93a221912243fa960f52ec459daa6cbe2914fc0a51c9d58a4fb25a8966fd312a_o.jpg',
                         //OK24 part vignette
                         //OK25 PHOTO : part photo
