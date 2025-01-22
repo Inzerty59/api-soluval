@@ -22,7 +22,10 @@
                     <input type="email" value="{{ last_username }}" name="_username" id="username" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500" autocomplete="email" required autofocus>
                 </div>
                 <div class="mb-4 relative">
-                    <label for="password" class="block font-semibold mb-1">Mot de passe</label>
+                    <div class="flex justify-between items-center mb-1">
+                        <label for="password" class="block font-semibold">Mot de passe</label>
+                        <p><a href="/reinitialisation" class="text-customGreen hover:underline">Mot de passe oublié ?</a></p>
+                    </div>
                     <div class="relative">
                         <input type="password" name="_password" id="password" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500" autocomplete="current-password" required>
                         <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onclick="togglePasswordVisibility()">
