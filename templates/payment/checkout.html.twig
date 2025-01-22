@@ -1,0 +1,18 @@
+{% block body %}
+	<h1>Opisto Test</h1>
+
+	{% if opistoData is defined %}
+		<h2>Données Opisto :</h2>
+		<pre>{{ dump(opistoData) }}</pre>
+		<!-- Debug des données -->
+	{% else %}
+		<p>Aucune donnée disponible.</p>
+	{% endif %}
+
+	{% if error is defined %}
+		<h2>Erreur :</h2>
+		<p>{{ error }}</p>
+		<h3>Contenu brut de la réponse :</h3>
+		<pre>{{ error.responseContent|default('Aucun contenu') }}</pre>
+	{% endif %}
+{% endblock %}
