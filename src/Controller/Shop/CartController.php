@@ -120,7 +120,7 @@ public function checkout(): Response
     if (!$this->getUser()) {
         return $this->redirectToRoute('app_login');
     }
-    return $this->redirectToRoute('payment_page');
+    return $this->redirectToRoute('checkout_page');
 }
 
 #[Route('/produit/{id}', name: 'product_detail')]
