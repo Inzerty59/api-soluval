@@ -1,18 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+Page de Paiement
+{% endblock %}
+
 {% block body %}
-	<h1>Opisto Test</h1>
+<!-- Page en pleine largeur, fond gris -->
+<div class="min-h-screen bg-gray-100 p-8 text-gray-800">
 
-	{% if opistoData is defined %}
-		<h2>Données Opisto :</h2>
-		<pre>{{ dump(opistoData) }}</pre>
-		<!-- Debug des données -->
-	{% else %}
-		<p>Aucune donnée disponible.</p>
-	{% endif %}
+    <!-- Bouton pour revenir en arrière -->
+    <div class="mb-6">
+        <button
+            type="button"
+            onclick="history.back()"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+        >
+            <!-- Petite flèche gauche optionnelle (SVG) -->
+            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Retour
+        </button>
+    </div>
 
-	{% if error is defined %}
-		<h2>Erreur :</h2>
-		<p>{{ error }}</p>
-		<h3>Contenu brut de la réponse :</h3>
-		<pre>{{ error.responseContent|default('Aucun contenu') }}</pre>
-	{% endif %}
+    <!-- Titre principal -->
+    <h1 class="text-2xl font-bold mb-6">Résumé de la commande</h1>
+
+    <!-- Récapitulatif de la commande -->
+    <div class="mb-8">
+        <ul class="space-y-2">
+            <li class="flex justify-between">
+                <span>Produit 1</span>
+                <span>20,00 €</span>
+            </li>
+            <li class="flex justify-between">
+                <span>Produit 2</span>
+                <span>15,00 €</span>
+            </li>
+        </ul>
+        <div class="flex justify-between font-bold border-t pt-2 mt-2">
+            <span>Total</span>
+            <span>35,00 €</span>
+        </div>
+    </div>
+
+    <!-- Choix du mode de livraison -->
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-2">Choix du mode de livraison</h2>
+        <div class="space-y-2">
+            <label class="flex items-center">
+                <input type="radio" name="delivery_mode" value="comptoir" class="mr-2">
+                <span>Récupérer la commande au comptoir (Gratuit)</span>
+            </label>
+            <label class="flex items-center">
+                <input type="radio" name="delivery_mode" value="livraison" class="mr-2">
+                <span>Livraison (1 à 2 jours ouvrés) à partir de 5,00 €</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Deux colonnes : formulaires à gauche, récapitulatif à droite -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Colonne gauche : adresses de livraison et de facturation -->
+        <div>
+            <!-- Adresse de livraison -->
+            <h2 class="text-xl font-semibold mb-2">Adresse de livraison</h2>
+            <div class="space-y-4 mb-6">
+                <input type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Nom complet">
+                <input type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Adresse">
+                <input type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Ville">
+                <input type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Code postal">
+                <select class="w-full p-2 border border-gray-300 rounded bg-white">
+                    <option value="" disabled selected>Pays</option>
+                    <option value="FR">France</option>
+                    <option value="BE">Belgique</option>
+                    <option value="CH">Suisse</option>
+                </select>
+            </div>
+
+            <!-- Adresse de facturation -->
+            <h2 class="text-xl font-semibold mb-2">Adresse de facturation</h2>
+            <div class="space-y-4">
+                <input type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Nom complet">
+                <input type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Adresse">
+                <input type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Ville">
+                <input type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Code postal">
+                <select class="w-full p-2 border border-gray-300 rounded bg-white">
+                    <option value="" disabled selected>Pays</option>
+                    <option value="FR">France</option>
+                    <option value="BE">Belgique</option>
+                    <option value="CH">Suisse</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Colonne droite : récapitulatif des adresses -->
+        <div>
+            <h2 class="text-xl font-semibold mb-2">Récapitulatif des adresses</h2>
+            <div class="mb-4">
+                <p class="font-bold">La commande sera expédiée à :</p>
+                <p>Franck Depoorter</p>
+                <p>2 boulevard Thomson</p>
+                <p>59810 Lesquin</p>
+                <p>FRANCE</p>
+            </div>
+            <div>
+                <p class="font-bold">La facture sera adressée à :</p>
+                <p>Franck Depoorter</p>
+                <p>2 boulevard Thomson</p>
+                <p>59810 Lesquin</p>
+                <p>FRANCE</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bouton de confirmation -->
+    <div class="mt-8">
+        <form action="{{ path('orderSummary_page') }}" method="GET">
+    <button 
+        type="submit" 
+        class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+    >
+        Continuer vers le paiement
+    </button>
+    </div>
+</div>
 {% endblock %}
