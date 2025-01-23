@@ -11,27 +11,34 @@
         <!-- Image principale + Miniatures -->
         <div class="flex-shrink-0 w-full md:w-1/3 flex flex-col items-center bg-gray-100 rounded-lg shadow-md p-4 space-y-4">
             <!-- Image principale -->
-            <img src="{{ product.vehicle.Vignette }}" alt="{{ product.part.Name }}" class="rounded-lg max-w-full max-h-64">
+            <img src="{{ part.vignette }}" alt="{{ part.getName() }}" class="rounded-lg max-w-full max-h-64">
             <!-- Miniatures -->
-            <div class="flex space-x-2">
-                <img src="{{ product.vehicle.Vignette }}" alt="{{ product.part.Name }}" class="w-16 h-16 object-cover border rounded-lg">
-                <img src="{{ product.vehicle.Vignette }}" alt="{{ product.part.Name }}" class="w-16 h-16 object-cover border rounded-lg">
-                <img src="{{ product.vehicle.Vignette }}" alt="{{ product.part.Name }}" class="w-16 h-16 object-cover border rounded-lg">
-                <button class="w-16 h-16 flex items-center justify-center border rounded-lg text-gray-500 hover:bg-gray-100">
-                    +
-                </button>
+            <div class="flex flex-wrap space-x-2">
+                {% for photo in part.photos|slice(0, 5) %}
+                    <img src="{{ photo }}" alt="{{ part.getName() }}" class="w-16 h-16 object-cover border rounded-lg">
+                {% endfor %}
+                {% if part.photos|length > 5 %}
+                    <button id="show-more-photos" class="w-16 h-16 flex items-center justify-center border rounded-lg text-gray-500 hover:bg-gray-100">
+                        +
+                    </button>
+                {% endif %}
+            </div>
+            <div id="more-photos" class="hidden flex flex-wrap space-x-2 mt-2">
+                {% for photo in part.photos|slice(5) %}
+                    <img src="{{ photo }}" alt="{{ part.getName() }}" class="w-16 h-16 object-cover border rounded-lg">
+                {% endfor %}
             </div>
         </div>
 
         <!-- Détails produit -->
         <div class="w-full md:flex-1 space-y-4">
-            <h1 class="text-4xl font-extrabold text-gray-800">{{ product.part.Name }}</h1>
-            <p class="text-2xl text-customGreen font-bold">Prix : {{ product.part.Price }} €</p>
+            <h1 class="text-4xl font-extrabold text-gray-800">{{ part.getName() }}</h1>
+            <p class="text-2xl text-customGreen font-bold">Prix : {{ part.getFinalPrice() }} €</p>
             <p class="text-lg text-gray-600">Livraison * : À partir de 1,00 €</p>
             <p class="text-lg text-gray-600">Délais de livraison estimés entre 1 et 2 jours ouvrés.</p>
-            <p class="text-lg text-gray-600">Garantie : {{ product.part.Warranty }}</p>
+            <p class="text-lg text-gray-600">Garantie : {{ part.warranty }} mois</p>
             <div class="flex space-x-4">
-                <a href="{{ path('cart_add', { id: product.part.Id }) }}" class="bg-customGreen text-white px-6 py-3 rounded-lg hover:bg-green-700 inline-block">Ajouter au panier</a>
+                <a href="{{ path('cart_add', { id: part.id }) }}" class="bg-customGreen text-white px-6 py-3 rounded-lg hover:bg-green-700 inline-block">Ajouter au panier</a>
             </div>
         </div>
     </div>
@@ -44,15 +51,15 @@
             <table class="table-auto w-full border-collapse border border-gray-200 rounded-lg shadow-md">
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for label, value in {
-                        'Référence constructeur': product.part.ManufacturerReference,
-                        'Référence Opisto': product.part.Id,
-                        'Dénomination de la pièce': product.part.Name,
-                        'Catégorie du produit': product.part.Category,
-                        'Description': product.part.Description,
-                        'Prix TTC': product.part.Price ~ ' €',
-                        'État de la pièce': product.part.PartType,
+                        'Référence constructeur': part.manufacturerReference,
+                        'Référence Opisto': part.id,
+                        'Dénomination de la pièce': part.getName(),
+                        'Catégorie du produit': part.categoryName,
+                        'Description': part.description,
+                        'Prix TTC': part.getFinalPrice() ~ ' €',
+                        'État de la pièce': part.partCondition,
                         'Quantité': '1,00',
-                        'Durée de garantie': product.part.Warranty
+                        'Durée de garantie': part.warranty
                     } %}
                     <tr>
                         <td class="px-4 py-2 font-semibold text-gray-700">{{ label }}</td>
@@ -69,21 +76,21 @@
             <table class="table-auto w-full border-collapse border border-gray-200 rounded-lg shadow-md">
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for label, value in {
-                        'Marque du véhicule': product.vehicleBrand.Name,
-                        'Gamme du véhicule': product.vehicleRange.Range,
-                        'Modèle du véhicule': product.vehicleModel.Model,
-                        'Finition du véhicule': product.vehicleVersion.Finish,
-                        'Désignation commerciale': product.vehicleVersion.CommercialDesignation,
-                        'Année de mise en circulation': product.vehicleModel.Begin,
-                        'Kilométrage': product.vehicle.Mileage ~ ' km',
-                        'Couleur': product.vehicle.Color,
-                        'Cylindrée': product.vehicleVersion.Displacement,
-                        'Puissance': product.vehicleVersion.Power ~ ' ch',
-                        'Carburant': product.vehicleVersion.Energy,
-                        'Type de boîte de vitesses': product.vehicleVersion.GearboxType,
-                        'Code moteur': product.vehicleVersion.EngineCode,
-                        'Code boîte de vitesses': product.vehicleVersion.GearboxCode,
-                        'Nombre de portes': product.vehicleVersion.DoorNumber
+                        'Marque du véhicule': part.brandName,
+                        'Gamme du véhicule': part.rangeName,
+                        'Modèle du véhicule': part.modelName,
+                        'Finition du véhicule': part.finishName,
+                        'Désignation commerciale': part.commercialDesignation,
+                        'Année de mise en circulation': part.vehicleYear,
+                        'Kilométrage': part.mileage ~ ' km',
+                        'Couleur': part.colorName ? part.colorName|join(', ') : 'N/A',
+                        'Cylindrée': part.displacement,
+                        'Puissance': part.power ~ ' ch',
+                        'Carburant': part.energyName,
+                        'Type de boîte de vitesses': part.gearboxType ? part.gearboxType|join(', ') : 'N/A',
+                        'Code moteur': part.engineCode,
+                        'Code boîte de vitesses': part.gearboxCode,
+                        'Nombre de portes': part.doorNumber
                     } %}
                     <tr>
                         <td class="px-4 py-2 font-semibold text-gray-700">{{ label }}</td>
@@ -95,4 +102,10 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('show-more-photos').addEventListener('click', function() {
+        document.getElementById('more-photos').classList.toggle('hidden');
+    });
+</script>
 {% endblock %}
