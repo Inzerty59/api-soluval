@@ -91,6 +91,6 @@ class CartController extends AbstractController
     if (!$this->getUser()) {
         return $this->redirectToRoute('app_login');
     }
-    return $this->redirectToRoute('payment_page');
+    return $this->redirectToRoute('checkout_page');
     }
 }
