@@ -3,13 +3,19 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\PartRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PartRepository::class)]
-#[ApiResource]
-class Part
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection()
+    ]
+)]class Part
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -395,5 +401,30 @@ class Part
         $this->Price = $Price;
 
         return $this;
+    }
+
+    
+    public function getName(): string
+    {   
+    $cleanCategoryName = preg_replace('/\s*\(.*?\)\s*/', '', $this->category_name);
+    return trim(sprintf(
+        '%s %s %s %s',
+        $cleanCategoryName,
+        $this->brand_name,
+        $this->model_name,
+        $this->energy_name
+    ));
+    }
+
+    public function getFinalPrice(): ?string
+    {
+    if (is_array($this->Price) && isset($this->Price['OriginPrice'], $this->Price['VATRate'])) {
+        $originPrice = $this->Price['OriginPrice'];
+        $vatRate = $this->Price['VATRate'];
+        $finalPrice = $originPrice + ($originPrice * $vatRate / 100);
+        $finalPrice = floor($finalPrice * 100) / 100;
+        return number_format($finalPrice, 2, '.', '');
+    }
+    return null;
     }
 }
