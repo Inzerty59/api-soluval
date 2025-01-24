@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-Récapitulatif de la commande
+Résumé de la commande
 {% endblock %}
 
 {% block body %}
@@ -39,15 +39,14 @@ Récapitulatif de la commande
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
-                <!-- Exemple d'une seule ligne, répétez pour chaque produit si besoin -->
-                <tr>
-                    <td class="px-4 py-3">
-                        Moto ventilateur radiateur OPEL CORSA D PHASE 1 Diesel - ref : 99805046
-                    </td>
-                    <td class="px-4 py-3">1,00</td>
-                    <td class="px-4 py-3">80,00 €</td>
-                    <td class="px-4 py-3">Livraison</td>
-                </tr>
+                {% for item in cart %}
+                    <tr>
+                        <td class="px-4 py-3">{{ item.part.getName() }}</td>
+                        <td class="px-4 py-3">{{ item.quantity|default(1) }}</td>
+                        <td class="px-4 py-3">{{ item.part.getFinalPrice() }} €</td>
+                        <td class="px-4 py-3">Livraison</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -65,7 +64,7 @@ Récapitulatif de la commande
                 <tbody class="divide-y divide-gray-200 bg-white rounded-md shadow-sm">
                     <tr>
                         <td class="py-3 px-4 font-medium">Total articles</td>
-                        <td class="py-3 px-4 text-right">80,00 €</td>
+                        <td class="py-3 px-4 text-right">{{ total }} €</td>
                     </tr>
                     <tr>
                         <td class="py-3 px-4 font-medium">Frais de port</td>
@@ -73,7 +72,7 @@ Récapitulatif de la commande
                     </tr>
                     <tr>
                         <td class="py-3 px-4 font-bold text-base">Net à payer</td>
-                        <td class="py-3 px-4 font-bold text-base text-right">97,00 €</td>
+                        <td class="py-3 px-4 font-bold text-base text-right">{{ total + 17 }} €</td>
                     </tr>
                 </tbody>
             </table>
@@ -83,8 +82,8 @@ Récapitulatif de la commande
     <!-- Bouton pour continuer le processus de commande/paiement -->
     <div class="mt-8">
         <button
-            class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition
-                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
             Régler la commande
         </button>
