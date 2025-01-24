@@ -29,18 +29,16 @@ Page de Paiement
     <!-- Récapitulatif de la commande -->
     <div class="mb-8">
         <ul class="space-y-2">
-            <li class="flex justify-between">
-                <span>Produit 1</span>
-                <span>20,00 €</span>
-            </li>
-            <li class="flex justify-between">
-                <span>Produit 2</span>
-                <span>15,00 €</span>
-            </li>
+            {% for item in cart %}
+                <li class="flex justify-between">
+                    <span>{{ item.part.getName() }}</span>
+                    <span>{{ item.part.getFinalPrice() }} €</span>
+                </li>
+            {% endfor %}
         </ul>
         <div class="flex justify-between font-bold border-t pt-2 mt-2">
             <span>Total</span>
-            <span>35,00 €</span>
+            <span>{{ total }} €</span>
         </div>
     </div>
 
@@ -119,7 +117,7 @@ Page de Paiement
         <form action="{{ path('orderSummary_page') }}" method="GET">
     <button 
         type="submit" 
-        class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
     >
         Continuer vers le paiement
     </button>
