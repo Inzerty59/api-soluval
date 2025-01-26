@@ -57,11 +57,10 @@ Page de Paiement
         </div>
     </div>
 
-    <!-- Deux colonnes : formulaires à gauche, récapitulatif à droite -->
+    <!-- Formulaires : adresses de livraison et de facturation -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Colonne gauche : adresses de livraison et de facturation -->
+        <!-- Adresse de livraison -->
         <div>
-            <!-- Adresse de livraison -->
             <h2 class="text-xl font-semibold mb-2">Adresse de livraison</h2>
             <div class="space-y-4 mb-6">
                 <input type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Nom complet">
@@ -75,8 +74,10 @@ Page de Paiement
                     <option value="CH">Suisse</option>
                 </select>
             </div>
+        </div>
 
-            <!-- Adresse de facturation -->
+        <!-- Adresse de facturation -->
+        <div>
             <h2 class="text-xl font-semibold mb-2">Adresse de facturation</h2>
             <div class="space-y-4">
                 <input type="text" class="w-full p-2 border border-gray-300 rounded" placeholder="Nom complet">
@@ -91,36 +92,15 @@ Page de Paiement
                 </select>
             </div>
         </div>
-
-        <!-- Colonne droite : récapitulatif des adresses -->
-        <div>
-            <h2 class="text-xl font-semibold mb-2">Récapitulatif des adresses</h2>
-            <div class="mb-4">
-                <p class="font-bold">La commande sera expédiée à :</p>
-                <p>Franck Depoorter</p>
-                <p>2 boulevard Thomson</p>
-                <p>59810 Lesquin</p>
-                <p>FRANCE</p>
-            </div>
-            <div>
-                <p class="font-bold">La facture sera adressée à :</p>
-                <p>Franck Depoorter</p>
-                <p>2 boulevard Thomson</p>
-                <p>59810 Lesquin</p>
-                <p>FRANCE</p>
-            </div>
-        </div>
     </div>
 
     <!-- Bouton de confirmation -->
-    <div class="mt-8">
+    <div class="mt-8" style="text-align: right;">
         <form action="{{ path('orderSummary_page') }}" method="GET">
-    <button 
-        type="submit" 
-        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-    >
-        Continuer vers le paiement
-    </button>
+            <button class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                Continuer vers le paiement
+            </button>
+        </form>
     </div>
 </div>
 {% endblock %}

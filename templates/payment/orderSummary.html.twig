@@ -27,10 +27,10 @@ Résumé de la commande
     <!-- Titre principal -->
     <h1 class="text-2xl font-bold mb-6">Résumé de la commande</h1>
 
-    <!-- Tableau récapitulatif : pleine largeur, pas d'effet hover -->
-    <div class="overflow-x-auto">
+    <!-- Tableau récapitulatif -->
+    <div class="overflow-x-auto mb-8">
         <table class="w-full table-auto text-left border-collapse">
-            <thead class="bg-blue-600 text-white">
+            <thead class="bg-customGreen text-white">
                 <tr>
                     <th class="px-4 py-3 font-semibold">Dénomination de la pièce</th>
                     <th class="px-4 py-3 font-semibold">Quantité</th>
@@ -51,27 +51,54 @@ Résumé de la commande
         </table>
     </div>
 
-    <!-- Informations sur la livraison -->
-    <p class="mt-4 text-gray-700">
-        Cette commande vous sera livrée pour
-        <span class="font-semibold text-gray-800">17,00 €</span>
-    </p>
+    <!-- Section des adresses et des paiements -->
+    <div class="flex flex-col lg:flex-row justify-between gap-8 items-stretch">
+        <!-- Récapitulatif des adresses -->
+        <div class="w-full lg:w-1/2 p-6 border border-gray-300 bg-white rounded-md shadow-sm flex-grow">
+            <h2 class="text-xl font-semibold mb-4">Récapitulatif des adresses</h2>
+            <div class="mb-4">
+                <p class="font-bold">Adresse de livraison :</p>
+                <p>Franck Depoorter</p>
+                <p>2 boulevard Thomson</p>
+                <p>59810 Lesquin</p>
+                <p>France</p>
+            </div>
+            <div>
+                <p class="font-bold">Adresse de facturation :</p>
+                <p>Franck Depoorter</p>
+                <p>2 boulevard Thomson</p>
+                <p>59810 Lesquin</p>
+                <p>France</p>
+            </div>
+        </div>
 
-    <!-- Tableau des totaux -->
-    <div class="mt-6 flex justify-end">
-        <div class="w-full md:w-1/2 lg:w-1/3">
+        <!-- Détails du paiement -->
+        <div class="w-full lg:w-1/2 p-6 border border-gray-300 bg-white rounded-md shadow-sm flex-grow">
+            <h2 class="text-xl font-semibold mb-4">Détails du paiement</h2>
             <table class="w-full text-sm text-gray-700 border-collapse">
-                <tbody class="divide-y divide-gray-200 bg-white rounded-md shadow-sm">
+                <tbody class="divide-y divide-gray-200">
+                <tr>
+                        <td class="py-3 px-4 font-medium">Total HT</td>
+                        <td class="py-3 px-4 text-right">68 €</td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4 font-medium">TVA (10%)</td>
+                        <td class="py-3 px-4 text-right">11.98 €</td>
+                    </tr>
                     <tr>
                         <td class="py-3 px-4 font-medium">Total articles</td>
                         <td class="py-3 px-4 text-right">{{ total }} €</td>
                     </tr>
                     <tr>
-                        <td class="py-3 px-4 font-medium">Frais de port</td>
+                        <td class="py-3 px-4 font-medium">Frais de port HT</td>
+                        <td class="py-3 px-4 text-right">13,00 €</td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4 font-medium">Frais de port TTC</td>
                         <td class="py-3 px-4 text-right">17,00 €</td>
                     </tr>
                     <tr>
-                        <td class="py-3 px-4 font-bold text-base">Net à payer</td>
+                        <td class="py-3 px-4 font-bold text-base">Net à payer TTC</td>
                         <td class="py-3 px-4 font-bold text-base text-right">{{ total + 17 }} €</td>
                     </tr>
                 </tbody>
@@ -79,12 +106,10 @@ Résumé de la commande
         </div>
     </div>
 
-    <!-- Bouton pour continuer le processus de commande/paiement -->
-    <div class="mt-8">
+    <!-- Bouton pour continuer -->
+    <div class="mt-8 text-right">
         <button
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition
-                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-        >
+            class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
             Régler la commande
         </button>
     </div>
