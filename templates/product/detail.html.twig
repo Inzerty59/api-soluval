@@ -4,7 +4,18 @@
 
 {% block body %}
 <div class="container mx-auto p-6 space-y-8">
-    <a href="javascript:history.back()" class="text-gray-600 text-sm hover:text-gray-800">&larr; Page Précédente</a>
+    <button
+        type="button"
+        onclick="history.back()"
+        class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700
+               hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition"
+    >
+        <!-- Petite flèche gauche (SVG) -->
+        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Page Précédente
+    </button>
 
     <!-- Section principale : Image + Détails -->
     <div class="flex flex-wrap md:flex-nowrap space-y-6 md:space-y-0 md:space-x-8 rtl:space-x-reverse items-start">
