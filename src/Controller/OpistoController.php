@@ -20,7 +20,6 @@ class OpistoController extends AbstractController
     #[Route('/opisto/parts', name: 'fetch_opisto_parts', methods: ['GET'])]
     public function fetchParts(Request $request): JsonResponse
     {
-        // Récupérer les filtres (exemple : ?brandName=TOYOTA)
         $filters = $request->query->all();
 
         try {
@@ -54,6 +53,8 @@ class OpistoController extends AbstractController
                 'vignette' => $part->getVignette(),
                 'photos' => $part->getPhotos(),
                 'price' => $part->getPrice(),
+                'casse_id' => $part->getCasseId(),
+                'shipping_id' => $part->getShippingId(),
 
 
             ], $parts);

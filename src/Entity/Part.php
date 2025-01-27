@@ -6,6 +6,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\PartRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -96,6 +98,23 @@ use Doctrine\ORM\Mapping as ORM;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private ?array $Price = null;
+
+    #[ORM\Column]
+    private ?int $casse_id = null;
+
+    #[ORM\Column]
+    private ?int $Shipping_id = null;
+
+    /**
+     * @var Collection<int, Order>
+     */
+    #[ORM\ManyToMany(targetEntity: Order::class, inversedBy: 'parts')]
+    private Collection $category;
+
+    public function __construct()
+    {
+        $this->category = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -426,5 +445,79 @@ use Doctrine\ORM\Mapping as ORM;
         return number_format($finalPrice, 2, '.', '');
     }
     return null;
+    }
+
+    public function getPriceHT(): ?string
+    {
+    if (is_array($this->Price) && isset($this->Price['OriginPrice'])) {
+        $originPrice = $this->Price['OriginPrice'];
+        return number_format($originPrice, 2, '.', '');
+    }
+    return null;
+    }
+
+    public function getEstimatedVAT(): ?string
+    {
+    $finalPrice = $this->getFinalPrice();
+    $priceHT = $this->getPriceHT();
+
+    if ($finalPrice && $priceHT) {
+        $vatAmount = $finalPrice - $priceHT;
+
+        return number_format($vatAmount, 2, '.', '');
+    }
+    return null;
+    }
+
+    public function getCasseId(): ?int
+    {
+        return $this->casse_id;
+    }
+
+    public function setCasseId(int $casse_id): static
+    {
+        $this->casse_id = $casse_id;
+
+        return $this;
+    }
+
+    public function getShippingId(): ?int
+    {
+        return $this->Shipping_id;
+    }
+
+    public function setShippingId(int $Shipping_id): static
+    {
+        $this->Shipping_id = $Shipping_id;
+
+        return $this;
+    }
+
+    public function getCategory(): ?Order
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Order $category): static
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
+    public function addCategory(Order $category): static
+    {
+        if (!$this->category->contains($category)) {
+            $this->category->add($category);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Order $category): static
+    {
+        $this->category->removeElement($category);
+
+        return $this;
     }
 }
