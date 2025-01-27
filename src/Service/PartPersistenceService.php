@@ -31,24 +31,28 @@ class PartPersistenceService
     ->setDescription($partData['Description'] ?? null)
     ->setPartCondition($partData['Condition'] ?? null)
     ->setWarranty($partData['Warranty'] ?? null)
-    ->setBrandName($partData['Vehicle']['Identification']['Brand']['Name'] ?? null) // Remplacé par Vehicle
-    ->setRangeName($partData['Vehicle']['Identification']['Range']['Name'] ?? null) // Remplacé par Vehicle
-    ->setModelName($partData['Vehicle']['Identification']['Model']['Name'] ?? null) // Remplacé par Vehicle
-    ->setFinishName($partData['Vehicle']['Identification']['Finish'] ?? null) // Remplacé par Vehicle
-    ->setCommercialDesignation($partData['Vehicle']['Identification']['CommercialDesignation'] ?? null) // Remplacé par Vehicle
-    ->setVehicleYear($partData['Vehicle']['Year'] ?? null) // Remplacé par Vehicle
-    ->setMileage($partData['Vehicle']['Mileage'] ?? null) // Remplacé par Vehicle
-    ->setColorName($partData['Vehicle']['Color'] ?? null) // Remplacé par Vehicle
-    ->setDisplacement($partData['Vehicle']['Identification']['Displacement'] ?? null) // Remplacé par Vehicle
-    ->setPower($partData['Vehicle']['Identification']['Power'] ?? null) // Remplacé par Vehicle
-    ->setEnergyName($partData['Vehicle']['Identification']['Energy']['Name'] ?? null) // Remplacé par Vehicle
-    ->setGearboxType($partData['Vehicle']['Identification']['GearboxType'] ?? null) // Remplacé par Vehicle
-    ->setEngineCode($partData['Vehicle']['Identification']['EngineCode'] ?? null) // Remplacé par Vehicle
-    ->setGearboxCode($partData['Vehicle']['Identification']['GearboxCode'] ?? null) // Remplacé par Vehicle
-    ->setDoorNumber($partData['Vehicle']['Identification']['DoorNumber'] ?? null) // Remplacé par Vehicle
+    ->setBrandName($partData['Vehicle']['Identification']['Brand']['Name'] ?? null) 
+    ->setRangeName($partData['Vehicle']['Identification']['Range']['Name'] ?? null) 
+    ->setModelName($partData['Vehicle']['Identification']['Model']['Name'] ?? null)
+    ->setFinishName($partData['Vehicle']['Identification']['Finish'] ?? null)
+    ->setCommercialDesignation($partData['Vehicle']['Identification']['CommercialDesignation'] ?? null)
+    ->setVehicleYear($partData['Vehicle']['Year'] ?? null)
+    ->setMileage($partData['Vehicle']['Mileage'] ?? null)
+    ->setColorName($partData['Vehicle']['Color'] ?? null)
+    ->setDisplacement($partData['Vehicle']['Identification']['Displacement'] ?? null)
+    ->setPower($partData['Vehicle']['Identification']['Power'] ?? null)
+    ->setEnergyName($partData['Vehicle']['Identification']['Energy']['Name'] ?? null)
+    ->setGearboxType($partData['Vehicle']['Identification']['GearboxType'] ?? null)
+    ->setEngineCode($partData['Vehicle']['Identification']['EngineCode'] ?? null)
+    ->setGearboxCode($partData['Vehicle']['Identification']['GearboxCode'] ?? null)
+    ->setDoorNumber($partData['Vehicle']['Identification']['DoorNumber'] ?? null)
     ->setVignette($partData['Vignette'] ?? null)
     ->setPhotos($partData['Photos'] ?? null)
-    ->setPrice($partData['Price'] ?? null);
+    ->setPrice($partData['Price'] ?? null)
+    ->setCasseId($partData['Casse']['Id'] ?? null)
+    ->setShippingId($partData['Shipping']['ShippingId'] ?? null);
+
+
 
 
         // Vérifier l'existence pour éviter les doublons
