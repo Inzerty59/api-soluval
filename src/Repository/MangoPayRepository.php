@@ -2,39 +2,39 @@
 
 namespace App\Repository;
 
-use App\Entity\Vehicle;
+use App\Entity\MangoPay;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Vehicle>
+ * @extends ServiceEntityRepository<MangoPay>
  */
-class VehicleRepository extends ServiceEntityRepository
+class MangoPayRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Vehicle::class);
+        parent::__construct($registry, MangoPay::class);
     }
 
     //    /**
-    //     * @return Vehicle[] Returns an array of Vehicle objects
+    //     * @return MangoPay[] Returns an array of MangoPay objects
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('v')
-    //            ->andWhere('v.exampleField = :val')
+    //        return $this->createQueryBuilder('m')
+    //            ->andWhere('m.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('v.id', 'ASC')
+    //            ->orderBy('m.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Vehicle
+    //    public function findOneBySomeField($value): ?MangoPay
     //    {
-    //        return $this->createQueryBuilder('v')
-    //            ->andWhere('v.exampleField = :val')
+    //        return $this->createQueryBuilder('m')
+    //            ->andWhere('m.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()
