@@ -18,9 +18,19 @@ class OrderSummaryController extends AbstractController
             return $carry + ($item['part']->getFinalPrice() * ($item['quantity'] ?? 1));
         }, 0);
 
+        $totalHT = array_reduce($cart, function ($carry, $item) {
+            return $carry + ($item['part']->getPriceHT() * ($item['quantity'] ?? 1));
+        }, 0);
+
+        $totalVAT = array_reduce($cart, function ($carry, $item) {
+            return $carry + ($item['part']->getEstimatedVAT() * ($item['quantity'] ?? 1));
+        }, 0);
+
         return $this->render('payment/orderSummary.html.twig', [
             'cart' => $cart,
             'total' => $total,
+            'totalHT' => $totalHT,
+            'totalVAT' => $totalVAT,
         ]);
     }
 }

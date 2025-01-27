@@ -32,18 +32,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string')]
     private ?string $password = null;
 
-    #[ORM\Column(type: 'string', unique: true)]
-    private ?string $clientId = null;
-
-    #[ORM\Column(type: 'string', unique: true)]
-    private ?string $secretId = null;
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $apiToken = null;
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $tokenExpiresAt = null;
-
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $createdAt;
 
@@ -68,16 +56,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'json')]
     private array $roles = ['ROLE_USER'];
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Order::class, cascade: ['persist', 'remove'])]
-    private Collection $orders;
+    /**
+     * @var Collection<int, Order>
+     */
+    #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'user')]
+    private Collection $category;
 
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
-        $this->clientId = Uuid::v4()->toRfc4122();
-        $this->secretId = Uuid::v4()->toRfc4122();
+        $this->category = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -127,16 +117,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->password = $password;
         return $this;
-    }
-
-    public function getClientId(): ?string
-    {
-        return $this->clientId;
-    }
-
-    public function getSecretId(): ?string
-    {
-        return $this->secretId;
     }
 
     public function getRoles(): array
@@ -199,36 +179,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function refreshApiToken(): self
-    {
-        $this->apiToken = Uuid::v4()->toRfc4122();
-        $this->tokenExpiresAt = (new \DateTime())->modify('+14 days');
-        return $this;
-    }
-
-    public function getTokenExpiresAt(): ?\DateTimeInterface
-    {
-        return $this->tokenExpiresAt;
-    }
-
-    public function setTokenExpiresAt(?\DateTimeInterface $tokenExpiresAt): self
-    {
-        $this->tokenExpiresAt = $tokenExpiresAt;
-        return $this;
-    }
-
-    public function getApiToken(): ?string
-    {
-    return $this->apiToken;
-    }
-
-    public function setApiToken(?string $apiToken): self
-    {
-    $this->apiToken = $apiToken;
-    return $this;
-    }
-
     public function eraseCredentials(): void
     {
+    }
+
+    /**
+     * @return Collection<int, Order>
+     */
+    public function getCategory(): Collection
+    {
+        return $this->category;
+    }
+
+    public function addCategory(Order $category): static
+    {
+        if (!$this->category->contains($category)) {
+            $this->category->add($category);
+            $category->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Order $category): static
+    {
+        if ($this->category->removeElement($category)) {
+            // set the owning side to null (unless already changed)
+            if ($category->getUser() === $this) {
+                $category->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
