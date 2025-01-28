@@ -195,4 +195,41 @@ class BillingAdress
 
         return $this;
     }
+
+    public function getCountryName(): string
+    {
+        $countries = [
+            53 => 'France',
+            1084 => 'Algérie',
+            1058 => 'Allemagne',
+            1077 => 'Autriche',
+            383 => 'Belgique',
+            1081 => 'Danemark',
+            997 => 'Espagne',
+            1080 => 'Finlande',
+            1066 => 'Corse',
+            1063 => 'Guadeloupe',
+            1065 => 'Ile de la Réunion',
+            1064 => 'Martinique',
+            1067 => 'Mayotte',
+            1068 => 'Polynésie Française',
+            1069 => 'Saint-Barthélemy',
+            1070 => 'Saint-Martin',
+            1071 => 'Saint-Pierre-et-Miquelon',
+            1072 => 'Wallis et Futuna',
+            1082 => 'Grèce',
+            1074 => 'Guyane Française',
+            998 => 'Italie',
+            1000 => 'Luxembourg',
+            1083 => 'Maroc',
+            1075 => 'Monaco',
+            1078 => 'Norvège',
+            1073 => 'Pays-Bas',
+            1001 => 'Portugal',
+            1017 => 'Suisse',
+            1079 => 'Suède',
+        ];
+
+        return $countries[$this->CountryId] ?? 'Inconnu';
+    }
 }
