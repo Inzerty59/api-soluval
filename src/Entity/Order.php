@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
@@ -39,6 +40,12 @@ class Order
      */
     #[ORM\ManyToMany(targetEntity: Part::class, mappedBy: 'category')]
     private Collection $parts;
+
+    #[ORM\Column]
+    private ?int $order_number = null;
+
+    #[ORM\Column(type: Types::ARRAY)]
+    private array $status = [];
 
     public function __construct()
     {
@@ -148,6 +155,30 @@ class Order
     public function setMangoPay(?MangoPay $mangoPay): static
     {
         $this->mangoPay = $mangoPay;
+
+        return $this;
+    }
+
+    public function getOrderNumber(): ?int
+    {
+        return $this->order_number;
+    }
+
+    public function setOrderNumber(int $order_number): static
+    {
+        $this->order_number = $order_number;
+
+        return $this;
+    }
+
+    public function getStatus(): array
+    {
+        return $this->status;
+    }
+
+    public function setStatus(array $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }
