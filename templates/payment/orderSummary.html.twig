@@ -58,17 +58,19 @@ Résumé de la commande
             <h2 class="text-xl font-semibold mb-4">Récapitulatif des adresses</h2>
             <div class="mb-4">
                 <p class="font-bold">Adresse de livraison :</p>
-                <p>Franck Depoorter</p>
-                <p>2 boulevard Thomson</p>
-                <p>59810 Lesquin</p>
-                <p>France</p>
+                <p>{{ deliveryAdress.Firstname }} {{ deliveryAdress.Lastname }}</p>
+                <p>{{ deliveryAdress.Street }}</p>
+                <p>{{ deliveryAdress.StreetAdditionnal }}</p>
+                <p>{{ deliveryAdress.PostCode }} {{ deliveryAdress.City }}</p>
+                <p>{{ deliveryAdress.getCountryName() }}</p>
             </div>
             <div>
                 <p class="font-bold">Adresse de facturation :</p>
-                <p>Franck Depoorter</p>
-                <p>2 boulevard Thomson</p>
-                <p>59810 Lesquin</p>
-                <p>France</p>
+                <p>{{ billingAdress.Firstname }} {{ billingAdress.Lastname }}</p>
+                <p>{{ billingAdress.Street }}</p>
+                <p>{{ billingAdress.StreetAdditionnal }}</p>
+                <p>{{ billingAdress.PostCode }} {{ billingAdress.City }}</p>
+                <p>{{ billingAdress.getCountryName() }}</p>
             </div>
         </div>
 
@@ -77,13 +79,13 @@ Résumé de la commande
             <h2 class="text-xl font-semibold mb-4">Détails du paiement</h2>
             <table class="w-full text-sm text-gray-700 border-collapse">
                 <tbody class="divide-y divide-gray-200">
-                <tr>
+                    <tr>
                         <td class="py-3 px-4 font-medium">Total articles HT</td>
-                        <td class="py-3 px-4 text-right">{{totalHT}} €</td>
+                        <td class="py-3 px-4 text-right">{{ totalHT }} €</td>
                     </tr>
                     <tr>
                         <td class="py-3 px-4 font-medium">TVA (10%)</td>
-                        <td class="py-3 px-4 text-right">{{totalVAT}} €</td>
+                        <td class="py-3 px-4 text-right">{{ totalVAT }} €</td>
                     </tr>
                     <tr>
                         <td class="py-3 px-4 font-medium">Total articles TTC</td>
@@ -91,15 +93,15 @@ Résumé de la commande
                     </tr>
                     <tr>
                         <td class="py-3 px-4 font-medium">Frais de port HT</td>
-                        <td class="py-3 px-4 text-right">13,00 €</td>
+                        <td class="py-3 px-4 text-right">{{ shippingCosts.HT }} €</td>
                     </tr>
                     <tr>
                         <td class="py-3 px-4 font-medium">Frais de port TTC</td>
-                        <td class="py-3 px-4 text-right">17,00 €</td>
+                        <td class="py-3 px-4 text-right">{{ shippingCosts.TTC }} €</td>
                     </tr>
                     <tr>
                         <td class="py-3 px-4 font-bold text-base">Net à payer TTC</td>
-                        <td class="py-3 px-4 font-bold text-base text-right">{{ total + 17 }} €</td>
+                        <td class="py-3 px-4 font-bold text-base text-right">{{ total + shippingCosts.TTC }} €</td>
                     </tr>
                 </tbody>
             </table>
