@@ -3,34 +3,39 @@
 namespace App\Service;
 
 use App\Repository\PartRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Part;
 
 class StockService
 {
-    private $partRepository;
+    private PartRepository $partRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(PartRepository $partRepository)
+    public function __construct(PartRepository $partRepository, EntityManagerInterface $entityManager)
     {
         $this->partRepository = $partRepository;
+        $this->entityManager = $entityManager;
     }
 
-    /**
-     * Vérifie si une pièce a suffisamment de stock.
-     *
-     * @param int $partId
-     * @param int $quantity
-     * @return bool
-     * @throws \Exception
-     */
     public function isStockAvailable(int $partId, int $quantity): bool
     {
-        // Rechercher la pièce
         $part = $this->partRepository->find($partId);
-
         if (!$part) {
             throw new \Exception("Pièce introuvable.");
         }
 
-        // Vérifier si le stock est suffisant
         return $part->getStock() >= $quantity;
     }
+
+    public function decreaseStock(Part $part, int $quantity): void
+    {
+        if ($part->getStock() < $quantity) {
+            throw new \Exception("Stock insuffisant pour : " . $part->getName());
+        }
+
+        $part->setStock($part->getStock() - $quantity);
+        $this->entityManager->persist($part);
+        $this->entityManager->flush();
+    }
 }
+
