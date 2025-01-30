@@ -10,6 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: BillingAdressRepository::class)]
 class BillingAdress
 {
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "billingAdresses")]
+    #[ORM\JoinColumn(nullable: false)]
+    // private ?User $user = null;
+    private ?User $user;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -47,6 +51,17 @@ class BillingAdress
      */
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'billingAdress')]
     private Collection $category;
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
 
     public function __construct()
     {

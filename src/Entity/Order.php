@@ -43,17 +43,16 @@ class Order
     private Collection $parts;
 
     #[ORM\Column]
-<<<<<<< HEAD
     private ?\DateTimeImmutable $CreatedAt = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $UpdatedAt = null;
-=======
+
     private ?int $order_number = null;
 
     #[ORM\Column(type: Types::ARRAY)]
     private array $status = [];
->>>>>>> 9f03a0d108e8dc4ecd4bed8be766230b4109a7ec
+
 
     public function __construct()
     {
@@ -167,7 +166,7 @@ class Order
         return $this;
     }
 
-<<<<<<< HEAD
+
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->CreatedAt;
@@ -176,7 +175,10 @@ class Order
     public function setCreatedAt(\DateTimeImmutable $CreatedAt): static
     {
         $this->CreatedAt = $CreatedAt;
-=======
+
+        return $this;
+    }
+
     public function getOrderNumber(): ?int
     {
         return $this->order_number;
@@ -185,12 +187,11 @@ class Order
     public function setOrderNumber(int $order_number): static
     {
         $this->order_number = $order_number;
->>>>>>> 9f03a0d108e8dc4ecd4bed8be766230b4109a7ec
 
         return $this;
     }
 
-<<<<<<< HEAD
+
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->UpdatedAt;
@@ -215,7 +216,7 @@ class Order
     {
         $this->UpdatedAt = new \DateTimeImmutable();
     }
-=======
+
     public function getStatus(): array
     {
         return $this->status;
@@ -227,5 +228,5 @@ class Order
 
         return $this;
     }
->>>>>>> 9f03a0d108e8dc4ecd4bed8be766230b4109a7ec
+
 }
