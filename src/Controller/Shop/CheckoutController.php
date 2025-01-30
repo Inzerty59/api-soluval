@@ -12,15 +12,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CheckoutController extends AbstractController
 {
-    private $security;
+    private $tokenStorage;
 
-    public function __construct(Security $security)
+    public function __construct(TokenStorageInterface $tokenStorage)
     {
-        $this->security = $security;
+        $this->tokenStorage = $tokenStorage;
     }
 
     #[Route('/paiement', name: 'checkout_page')]
@@ -41,21 +41,37 @@ class CheckoutController extends AbstractController
         $deliveryForm->handleRequest($request);
         $billingForm->handleRequest($request);
 
-        if ($deliveryForm->isSubmitted() && $deliveryForm->isValid() && $billingForm->isSubmitted() && $billingForm->isValid()) {
-            $user = $this->security->getUser();
+        if ($billingForm->isSubmitted() && $billingForm->isValid()) {
+            $user = $this->tokenStorage->getToken()->getUser();
             if ($user) {
-                $deliveryAdress->setEmail($user->getEmail());
                 $billingAdress->setEmail($user->getEmail());
             }
 
-            $entityManager->persist($deliveryAdress);
-            $entityManager->persist($billingAdress);
-            $entityManager->flush();
+            $deliveryMode = $request->request->get('delivery_mode');
 
-            return $this->redirectToRoute('orderSummary_page',[
-                'deliveryAdress' => $deliveryAdress->getId(),
-                'billingAdress' => $billingAdress->getId(),
-            ]);
+            if ($deliveryMode === 'comptoir') {
+                $entityManager->persist($billingAdress);
+                $entityManager->flush();
+
+                return $this->redirectToRoute('orderSummary_page', [
+                    'billingAdress' => $billingAdress->getId(),
+                    'delivery_mode' => $deliveryMode,
+                ]);
+            } elseif ($deliveryForm->isSubmitted() && $deliveryForm->isValid()) {
+                if ($user) {
+                    $deliveryAdress->setEmail($user->getEmail());
+                }
+
+                $entityManager->persist($deliveryAdress);
+                $entityManager->persist($billingAdress);
+                $entityManager->flush();
+
+                return $this->redirectToRoute('orderSummary_page', [
+                    'deliveryAdress' => $deliveryAdress->getId(),
+                    'billingAdress' => $billingAdress->getId(),
+                    'delivery_mode' => $deliveryMode,
+                ]);
+            }
         }
 
         return $this->render('payment/checkout.html.twig', [
