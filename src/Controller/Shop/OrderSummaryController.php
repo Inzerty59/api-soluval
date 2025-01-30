@@ -32,12 +32,13 @@ class OrderSummaryController extends AbstractController
 
         $deliveryAdressId = $request->query->get('deliveryAdress');
         $billingAdressId = $request->query->get('billingAdress');
+        $deliveryMode = $request->query->get('delivery_mode');
 
-        $deliveryAdress = $entityManager->getRepository(DeliveryAdress::class)->find($deliveryAdressId);
+        $deliveryAdress = $deliveryAdressId ? $entityManager->getRepository(DeliveryAdress::class)->find($deliveryAdressId) : null;
         $billingAdress = $entityManager->getRepository(BillingAdress::class)->find($billingAdressId);
 
-        $shippingCosts = $this->getShippingCosts($deliveryAdress->getCountryName());
-        
+        $shippingCosts = $deliveryAdress ? $this->getShippingCosts($deliveryAdress->getCountryName()) : ['HT' => 0, 'TTC' => 0];
+
         return $this->render('payment/orderSummary.html.twig', [
             'cart' => $cart,
             'total' => $total,
@@ -46,6 +47,7 @@ class OrderSummaryController extends AbstractController
             'deliveryAdress' => $deliveryAdress,
             'billingAdress' => $billingAdress,
             'shippingCosts' => $shippingCosts,
+            'deliveryMode' => $deliveryMode,
         ]);
     }
 

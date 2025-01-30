@@ -26,7 +26,8 @@ Encore
   .addEntry("toggleAccountType", "./assets/js/toggleAccountType.js")
   .addEntry("togglePasswordVisibility", "./assets/js/togglePasswordVisibility.js")
   .addEntry("passwordVisibilityRegistration", "./assets/js/passwordVisibilityRegistration.js")
-
+  .addEntry("toggleDeliveryAdress", "./assets/js/toggleDeliveryAdress.js")
+  
   // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
   .splitEntryChunks()
 

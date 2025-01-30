@@ -44,7 +44,7 @@ Résumé de la commande
                         <td class="px-4 py-3">{{ item.part.getName() }}</td>
                         <td class="px-4 py-3">{{ item.quantity|default(1) }}</td>
                         <td class="px-4 py-3">{{ item.part.getFinalPrice() }} €</td>
-                        <td class="px-4 py-3">Livraison</td>
+                        <td class="px-4 py-3">{{ deliveryMode == 'comptoir' ? 'Récupération au comptoir' : 'Livraison' }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -57,14 +57,6 @@ Résumé de la commande
         <div class="w-full lg:w-1/2 p-6 border border-gray-300 bg-white rounded-md shadow-sm flex-grow">
             <h2 class="text-xl font-semibold mb-4">Récapitulatif des adresses</h2>
             <div class="mb-4">
-                <p class="font-bold">Adresse de livraison :</p>
-                <p>{{ deliveryAdress.Firstname }} {{ deliveryAdress.Lastname }}</p>
-                <p>{{ deliveryAdress.Street }}</p>
-                <p>{{ deliveryAdress.StreetAdditionnal }}</p>
-                <p>{{ deliveryAdress.PostCode }} {{ deliveryAdress.City }}</p>
-                <p>{{ deliveryAdress.getCountryName() }}</p>
-            </div>
-            <div>
                 <p class="font-bold">Adresse de facturation :</p>
                 <p>{{ billingAdress.Firstname }} {{ billingAdress.Lastname }}</p>
                 <p>{{ billingAdress.Street }}</p>
@@ -72,6 +64,16 @@ Résumé de la commande
                 <p>{{ billingAdress.PostCode }} {{ billingAdress.City }}</p>
                 <p>{{ billingAdress.getCountryName() }}</p>
             </div>
+            {% if deliveryMode != 'comptoir' and deliveryAdress is not null %}
+            <div>
+                <p class="font-bold">Adresse de livraison :</p>
+                <p>{{ deliveryAdress.Firstname }} {{ deliveryAdress.Lastname }}</p>
+                <p>{{ deliveryAdress.Street }}</p>
+                <p>{{ deliveryAdress.StreetAdditionnal }}</p>
+                <p>{{ deliveryAdress.PostCode }} {{ deliveryAdress.City }}</p>
+                <p>{{ deliveryAdress.getCountryName() }}</p>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Détails du paiement -->
@@ -87,6 +89,7 @@ Résumé de la commande
                         <td class="py-3 px-4 font-medium">TVA (10%)</td>
                         <td class="py-3 px-4 text-right">{{ totalVAT }} €</td>
                     </tr>
+                    {% if deliveryMode != 'comptoir' %}
                     <tr>
                         <td class="py-3 px-4 font-medium">Total articles TTC</td>
                         <td class="py-3 px-4 text-right">{{ total }} €</td>
@@ -99,9 +102,10 @@ Résumé de la commande
                         <td class="py-3 px-4 font-medium">Frais de port TTC</td>
                         <td class="py-3 px-4 text-right">{{ shippingCosts.TTC }} €</td>
                     </tr>
+                    {% endif %}
                     <tr>
                         <td class="py-3 px-4 font-bold text-base">Net à payer TTC</td>
-                        <td class="py-3 px-4 font-bold text-base text-right">{{ total + shippingCosts.TTC }} €</td>
+                        <td class="py-3 px-4 font-bold text-base text-right">{{ total + (deliveryMode != 'comptoir' ? shippingCosts.TTC : 0) }} €</td>
                     </tr>
                 </tbody>
             </table>
