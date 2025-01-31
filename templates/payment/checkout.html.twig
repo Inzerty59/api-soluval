@@ -108,28 +108,37 @@ Résumé de la commande
 
 //TODO placer le script dans assets/js et l'appeler avec encore_entry_script_tags
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const deliveryModeInputs = document.querySelectorAll('input[name="delivery_mode"]');
-        const deliveryFormFields = document.querySelectorAll('#delivery-address input, #delivery-address select, #delivery-address textarea');
-        const billingFormFields = document.querySelectorAll('#billing-address input, #billing-address select, #billing-address textarea');
+document.addEventListener('DOMContentLoaded', function () {
+    const deliveryModeInputs = document.querySelectorAll('input[name="delivery_mode"]');
+    const deliveryFormFields = document.querySelectorAll('#delivery-address input, #delivery-address select, #delivery-address textarea');
+    const billingFormFields = document.querySelectorAll('#billing-address input, #billing-address select, #billing-address textarea');
 
-        function toggleRequiredFields() {
-            const selectedMode = document.querySelector('input[name="delivery_mode"]:checked').value;
+    function toggleRequiredFields() {
+        const selectedMode = document.querySelector('input[name="delivery_mode"]:checked').value;
+        const isComptoir = selectedMode === 'comptoir';
 
-            if (selectedMode === 'comptoir') {
-                deliveryFormFields.forEach(field => field.required = false);
-                billingFormFields.forEach(field => field.required = true);
+        deliveryFormFields.forEach(field => {
+            if (field.name !== 'streetAdditional') {
+                field.required = !isComptoir;
             } else {
-                deliveryFormFields.forEach(field => field.required = true);
-                billingFormFields.forEach(field => field.required = true);
+                field.required = false;
             }
-        }
-
-        deliveryModeInputs.forEach(input => {
-            input.addEventListener('change', toggleRequiredFields);
         });
 
-        toggleRequiredFields();
+        billingFormFields.forEach(field => {
+            if (field.name !== 'streetAdditional') {
+                field.required = !isComptoir;
+            } else {
+                field.required = false;
+            }
+        });
+    }
+
+    deliveryModeInputs.forEach(input => {
+        input.addEventListener('change', toggleRequiredFields);
     });
+
+    toggleRequiredFields();
+});
 </script>
 {% endblock %}
