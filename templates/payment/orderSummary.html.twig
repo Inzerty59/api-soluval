@@ -1,32 +1,30 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-Résumé de la commande
+	Résumé de la commande
 {% endblock %}
 
 {% block body %}
-<!-- Page entière, fond gris clair -->
-<div class="min-h-screen bg-gray-50 py-6 px-8 text-gray-800">
+	<!-- Page entière, fond gris clair -->
+	<div
+		class="min-h-screen bg-gray-50 py-6 px-8 text-gray-800">
 
-    <!-- Bouton pour revenir en arrière -->
-    <div class="mb-6">
-        <button
-            type="button"
-            onclick="history.back()"
-            class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700
-                   hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition"
-        >
-            <!-- Petite flèche gauche (SVG) -->
-            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            Retour
-        </button>
-    </div>
+		<!-- Bouton pour revenir en arrière -->
+		<div class="mb-6">
+			<button
+				type="button" onclick="history.back()" class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700
+										                   hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition">
+				<!-- Petite flèche gauche (SVG) -->
+				<svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+				</svg>
+				Retour
+			</button>
+		</div>
 
-    <!-- Titre principal -->
-    <h1 class="text-2xl font-bold mb-6">Résumé de la commande</h1>
-
+		<!-- Titre principal -->
+		<h1 class="text-2xl font-bold mb-6">Résumé de la commande</h1>
+				
     <!-- Tableau récapitulatif -->
     <div class="overflow-x-auto mb-8">
         <table class="w-full table-auto text-left border-collapse">
@@ -112,12 +110,13 @@ Résumé de la commande
         </div>
     </div>
 
-    <!-- Bouton pour continuer -->
-    <div class="mt-8 text-right">
-        <button
-            class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
-            Régler la commande
-        </button>
-    </div>
-</div>
+		<!-- Bouton pour continuer -->
+		<div class="mt-8 text-right">
+			<form action="{{ path('order_create') }}" method="POST">
+				<button type="submit" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+					Régler la commande
+				</button>
+			</form>
+		</div>
+	</div>
 {% endblock %}

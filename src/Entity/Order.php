@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
+#[ORM\HasLifecycleCallbacks] // Ajout pour activer les callbacks
 class Order
 {
     #[ORM\Id]
@@ -42,10 +43,16 @@ class Order
     private Collection $parts;
 
     #[ORM\Column]
+    private ?\DateTimeImmutable $CreatedAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $UpdatedAt = null;
+
     private ?int $order_number = null;
 
     #[ORM\Column(type: Types::ARRAY)]
     private array $status = [];
+
 
     public function __construct()
     {
@@ -159,6 +166,19 @@ class Order
         return $this;
     }
 
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->CreatedAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $CreatedAt): static
+    {
+        $this->CreatedAt = $CreatedAt;
+
+        return $this;
+    }
+
     public function getOrderNumber(): ?int
     {
         return $this->order_number;
@@ -169,6 +189,32 @@ class Order
         $this->order_number = $order_number;
 
         return $this;
+    }
+
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->UpdatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $UpdatedAt): static
+    {
+        $this->UpdatedAt = $UpdatedAt;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $this->CreatedAt = new \DateTimeImmutable();
+        $this->UpdatedAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->UpdatedAt = new \DateTimeImmutable();
     }
 
     public function getStatus(): array
@@ -182,4 +228,5 @@ class Order
 
         return $this;
     }
+
 }
