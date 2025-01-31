@@ -469,6 +469,20 @@ use Doctrine\ORM\Mapping as ORM;
     return null;
     }
 
+    public function getStock(): int
+    {
+        $data = json_decode($this->price, true); // Décoder le JSON
+        return $data['quantity'] ?? 0; // Retourner la quantité ou 0 si non défini
+    }
+
+    public function setStock(int $quantity): self
+    {
+        $data = json_decode($this->price, true);
+        $data['quantity'] = $quantity; // Mettre à jour la quantité
+        $this->price = json_encode($data); // Réencoder en JSON
+
+        return $this;
+    }
     public function getCasseId(): ?int
     {
         return $this->casse_id;

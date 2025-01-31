@@ -28,3 +28,7 @@ Créer le fichier public.key + private.key dans le config/keys
    ```bash
    npm run dev
    ```
+php bin/console doctrine:fixtures:load
+
+php bin/console make:migration
+php bin/console doctrine:migrations:migrate
