@@ -62,12 +62,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'user')]
     private Collection $category;
 
+    /**
+     * @var Collection<int, BillingAdress>
+     */
+    #[ORM\OneToMany(targetEntity: BillingAdress::class, mappedBy: 'user')]
+    private Collection $billingAdresses;
+
+    /**
+     * @var Collection<int, DeliveryAdress>
+     */
+    #[ORM\OneToMany(targetEntity: DeliveryAdress::class, mappedBy: 'user')]
+    private Collection $deliveryAdresses;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
         $this->category = new ArrayCollection();
+        $this->billingAdresses = new ArrayCollection();
+        $this->deliveryAdresses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -207,6 +221,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($category->getUser() === $this) {
                 $category->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BillingAdress>
+     */
+    public function getBillingAdresses(): Collection
+    {
+        return $this->billingAdresses;
+    }
+
+    public function addBillingAdress(BillingAdress $billingAdress): static
+    {
+        if (!$this->billingAdresses->contains($billingAdress)) {
+            $this->billingAdresses->add($billingAdress);
+            $billingAdress->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBillingAdress(BillingAdress $billingAdress): static
+    {
+        if ($this->billingAdresses->removeElement($billingAdress)) {
+            // set the owning side to null (unless already changed)
+            if ($billingAdress->getUser() === $this) {
+                $billingAdress->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DeliveryAdress>
+     */
+    public function getDeliveryAdresses(): Collection
+    {
+        return $this->deliveryAdresses;
+    }
+
+    public function addDeliveryAdress(DeliveryAdress $deliveryAdress): static
+    {
+        if (!$this->deliveryAdresses->contains($deliveryAdress)) {
+            $this->deliveryAdresses->add($deliveryAdress);
+            $deliveryAdress->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDeliveryAdress(DeliveryAdress $deliveryAdress): static
+    {
+        if ($this->deliveryAdresses->removeElement($deliveryAdress)) {
+            // set the owning side to null (unless already changed)
+            if ($deliveryAdress->getUser() === $this) {
+                $deliveryAdress->setUser(null);
             }
         }
 

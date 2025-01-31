@@ -42,6 +42,7 @@ class BillingAdressType extends AbstractType
             ->add('StreetAdditionnal', TextType::class, [
                 'attr' => ['placeholder' => 'Adresse Complémentaire'],
                 'label' => false,
+                'required' => false,
             ])
             ->add('PostCode', TextType::class, [
                 'attr' => ['placeholder' => 'Code postal'],

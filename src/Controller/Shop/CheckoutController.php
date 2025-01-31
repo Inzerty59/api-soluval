@@ -45,6 +45,7 @@ class CheckoutController extends AbstractController
             $user = $this->tokenStorage->getToken()->getUser();
             if ($user) {
                 $billingAdress->setEmail($user->getEmail());
+                $billingAdress->setUser($user);
             }
 
             $deliveryMode = $request->request->get('delivery_mode');
@@ -60,6 +61,7 @@ class CheckoutController extends AbstractController
             } elseif ($deliveryForm->isSubmitted() && $deliveryForm->isValid()) {
                 if ($user) {
                     $deliveryAdress->setEmail($user->getEmail());
+                    $deliveryAdress->setUser($user);
                 }
 
                 $entityManager->persist($deliveryAdress);
