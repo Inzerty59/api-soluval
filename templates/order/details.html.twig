@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Résumé de la commande #{{ order.id }}
+{% endblock %}
+
+{% block content %}
+	<div class="container my-5">
+		<h1 class="mt-4">Résumé de la commande #{{ order.id }}</h1>
+
+		<section class="mb-5">
+			<h2 class="h4">Informations générales</h2>
+			<div class="row">
+				<div class="col-md-6">
+					<p>
+						<strong>Utilisateur :</strong>
+						{{ order.user }}</p>
+					<p>
+						<strong>Adresse de facturation :</strong>
+						{{ order.billingAddress }}</p>
+					<p>
+						<strong>Adresse de livraison :</strong>
+						{{ order.deliveryAddress }}</p>
+				</div>
+				<div class="col-md-6">
+					<p>
+						<strong>Livraison gratuite :</strong>
+						{{ order.isFreeShipping ? 'Oui' : 'Non' }}</p>
+					<p>
+						<strong>À envoyer :</strong>
+						{{ order.toSend ? 'Oui' : 'Non' }}</p>
+					<p>
+						<strong>Date de création :</strong>
+						{{ order.createdAt }}</p>
+					<p>
+						<strong>Dernière mise à jour :</strong>
+						{{ order.updatedAt }}</p>
+				</div>
+			</div>
+		</section>
+
+		<section>
+			<h2 class="h4">Pièces associées</h2>
+			{% if order.parts is not empty %}
+				<ul class="list-group">
+					{% for part in order.parts %}
+						<li class="list-group-item d-flex justify-content-between align-items-center">
+							<div>
+								<strong>{{ part.name }}</strong>
+								(ID :
+								{{ part.id }})
+							</div>
+							<span class="badge bg-primary">Stock :
+								{{ part.stock }}</span>
+						</li>
+					{% endfor %}
+				</ul>
+			{% else %}
+				<p>Aucune pièce associée à cette commande.</p>
+			{% endif %}
+		</section>
+	</div>
+{% endblock %}

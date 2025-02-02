@@ -2,9 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -13,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
+#[ORM\HasLifecycleCallbacks] // Ajout pour activer les callbacks
 class Order
 {
     #[ORM\Id]
@@ -21,36 +19,44 @@ class Order
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $externalId = null;
+    private ?bool $ToSend = null;
 
     #[ORM\Column]
-    private ?float $amount = null;
+    private ?bool $IsFreeShipping = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $status = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $invoicePath = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'category')]
     private ?User $user = null;
 
+    #[ORM\ManyToOne(inversedBy: 'category')]
+    private ?BillingAdress $billingAdress = null;
+
+    #[ORM\ManyToOne(inversedBy: 'category')]
+    private ?DeliveryAdress $deliveryAdress = null;
+
+    #[ORM\ManyToOne(inversedBy: 'category')]
+    private ?MangoPay $mangoPay = null;
+
     /**
-     * @var Collection<int, Product>
+     * @var Collection<int, Part>
      */
-    #[ORM\ManyToMany(targetEntity: Product::class)]
-    private Collection $products;
+    #[ORM\ManyToMany(targetEntity: Part::class, mappedBy: 'category')]
+    private Collection $parts;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $CreatedAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $UpdatedAt = null;
+
+    private ?int $order_number = null;
+
+    #[ORM\Column(type: Types::ARRAY)]
+    private array $status = [];
+
 
     public function __construct()
     {
-        $this->products = new ArrayCollection();
+        $this->parts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -58,74 +64,56 @@ class Order
         return $this->id;
     }
 
-    public function getExternalId(): ?int
+    public function isToSend(): ?bool
     {
-        return $this->externalId;
+        return $this->ToSend;
     }
 
-    public function setExternalId(int $externalId): static
+    public function setToSend(bool $ToSend): static
     {
-        $this->externalId = $externalId;
+        $this->ToSend = $ToSend;
 
         return $this;
     }
 
-    public function getAmount(): ?float
+    public function isFreeShipping(): ?bool
     {
-        return $this->amount;
+        return $this->IsFreeShipping;
     }
 
-    public function setAmount(float $amount): static
+    public function setFreeShipping(bool $IsFreeShipping): static
     {
-        $this->amount = $amount;
+        $this->IsFreeShipping = $IsFreeShipping;
 
         return $this;
     }
 
-    public function getStatus(): ?string
+    /**
+     * @return Collection<int, Part>
+     */
+    public function getParts(): Collection
     {
-        return $this->status;
+        return $this->parts;
     }
 
-    public function setStatus(string $status): static
+    public function addPart(Part $part): static
     {
-        $this->status = $status;
+        if (!$this->parts->contains($part)) {
+            $this->parts->add($part);
+            $part->setCategory($this);
+        }
 
         return $this;
     }
 
-    public function getInvoicePath(): ?string
+    public function removePart(Part $part): static
     {
-        return $this->invoicePath;
-    }
-
-    public function setInvoicePath(?string $invoicePath): static
-    {
-        $this->invoicePath = $invoicePath;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
+        if ($this->parts->removeElement($part)) {
+            // set the owning side to null (unless already changed)
+            if ($part->getCategory() === $this) {
+                $part->setCategory(null);
+            }
+        }
 
         return $this;
     }
@@ -142,27 +130,103 @@ class Order
         return $this;
     }
 
-    /**
-     * @return Collection<int, Product>
-     */
-    public function getProducts(): Collection
+    public function getBillingAdress(): ?BillingAdress
     {
-        return $this->products;
+        return $this->billingAdress;
     }
 
-    public function addProduct(Product $product): static
+    public function setBillingAdress(?BillingAdress $billingAdress): static
     {
-        if (!$this->products->contains($product)) {
-            $this->products->add($product);
-        }
+        $this->billingAdress = $billingAdress;
 
         return $this;
     }
 
-    public function removeProduct(Product $product): static
+    public function getDeliveryAdress(): ?DeliveryAdress
     {
-        $this->products->removeElement($product);
+        return $this->deliveryAdress;
+    }
+
+    public function setDeliveryAdress(?DeliveryAdress $deliveryAdress): static
+    {
+        $this->deliveryAdress = $deliveryAdress;
 
         return $this;
     }
+
+    public function getMangoPay(): ?MangoPay
+    {
+        return $this->mangoPay;
+    }
+
+    public function setMangoPay(?MangoPay $mangoPay): static
+    {
+        $this->mangoPay = $mangoPay;
+
+        return $this;
+    }
+
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->CreatedAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $CreatedAt): static
+    {
+        $this->CreatedAt = $CreatedAt;
+
+        return $this;
+    }
+
+    public function getOrderNumber(): ?int
+    {
+        return $this->order_number;
+    }
+
+    public function setOrderNumber(int $order_number): static
+    {
+        $this->order_number = $order_number;
+
+        return $this;
+    }
+
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->UpdatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $UpdatedAt): static
+    {
+        $this->UpdatedAt = $UpdatedAt;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $this->CreatedAt = new \DateTimeImmutable();
+        $this->UpdatedAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->UpdatedAt = new \DateTimeImmutable();
+    }
+
+    public function getStatus(): array
+    {
+        return $this->status;
+    }
+
+    public function setStatus(array $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
 }
