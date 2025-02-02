@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Résumé de la commande
+{% endblock %}
+
+{% block body %}
+	<!-- Page entière, fond gris clair -->
+	<div
+		class="min-h-screen bg-gray-50 py-6 px-8 text-gray-800">
+
+		<!-- Bouton pour revenir en arrière -->
+		<div class="mb-6">
+			<button
+				type="button" onclick="history.back()" class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700
+										                   hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition">
+				<!-- Petite flèche gauche (SVG) -->
+				<svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+				</svg>
+				Retour
+			</button>
+		</div>
+
+		<!-- Titre principal -->
+		<h1 class="text-2xl font-bold mb-6">Résumé de la commande</h1>
+				
+    <!-- Tableau récapitulatif -->
+    <div class="overflow-x-auto mb-8">
+        <table class="w-full table-auto text-left border-collapse">
+            <thead class="bg-customGreen text-white">
+                <tr>
+                    <th class="px-4 py-3 font-semibold">Dénomination de la pièce</th>
+                    <th class="px-4 py-3 font-semibold">Quantité</th>
+                    <th class="px-4 py-3 font-semibold">Prix</th>
+                    <th class="px-4 py-3 font-semibold">Mode de récupération</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+                {% for item in cart %}
+                    <tr>
+                        <td class="px-4 py-3">{{ item.part.getName() }}</td>
+                        <td class="px-4 py-3">{{ item.quantity|default(1) }}</td>
+                        <td class="px-4 py-3">{{ item.part.getFinalPrice() }} €</td>
+                        <td class="px-4 py-3">{{ deliveryMode == 'comptoir' ? 'Récupération au comptoir' : 'Livraison' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Section des adresses et des paiements -->
+    <div class="flex flex-col lg:flex-row justify-between gap-8 items-stretch">
+        <!-- Récapitulatif des adresses -->
+        <div class="w-full lg:w-1/2 p-6 border border-gray-300 bg-white rounded-md shadow-sm flex-grow">
+            <h2 class="text-xl font-semibold mb-4">Récapitulatif des adresses</h2>
+            <div class="mb-4">
+                <p class="font-bold">Adresse de facturation :</p>
+                <p>{{ billingAdress.Firstname }} {{ billingAdress.Lastname }}</p>
+                <p>{{ billingAdress.Street }}</p>
+                <p>{{ billingAdress.StreetAdditionnal }}</p>
+                <p>{{ billingAdress.PostCode }} {{ billingAdress.City }}</p>
+                <p>{{ billingAdress.getCountryName() }}</p>
+            </div>
+            {% if deliveryMode != 'comptoir' and deliveryAdress is not null %}
+            <div>
+                <p class="font-bold">Adresse de livraison :</p>
+                <p>{{ deliveryAdress.Firstname }} {{ deliveryAdress.Lastname }}</p>
+                <p>{{ deliveryAdress.Street }}</p>
+                <p>{{ deliveryAdress.StreetAdditionnal }}</p>
+                <p>{{ deliveryAdress.PostCode }} {{ deliveryAdress.City }}</p>
+                <p>{{ deliveryAdress.getCountryName() }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Détails du paiement -->
+        <div class="w-full lg:w-1/2 p-6 border border-gray-300 bg-white rounded-md shadow-sm flex-grow">
+            <h2 class="text-xl font-semibold mb-4">Détails du paiement</h2>
+            <table class="w-full text-sm text-gray-700 border-collapse">
+                <tbody class="divide-y divide-gray-200">
+                    <tr>
+                        <td class="py-3 px-4 font-medium">Total articles HT</td>
+                        <td class="py-3 px-4 text-right">{{ totalHT }} €</td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4 font-medium">TVA (10%)</td>
+                        <td class="py-3 px-4 text-right">{{ totalVAT }} €</td>
+                    </tr>
+                    {% if deliveryMode != 'comptoir' %}
+                    <tr>
+                        <td class="py-3 px-4 font-medium">Total articles TTC</td>
+                        <td class="py-3 px-4 text-right">{{ total }} €</td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4 font-medium">Frais de port HT</td>
+                        <td class="py-3 px-4 text-right">{{ shippingCosts.HT }} €</td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4 font-medium">Frais de port TTC</td>
+                        <td class="py-3 px-4 text-right">{{ shippingCosts.TTC }} €</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="py-3 px-4 font-bold text-base">Net à payer TTC</td>
+                        <td class="py-3 px-4 font-bold text-base text-right">{{ total + (deliveryMode != 'comptoir' ? shippingCosts.TTC : 0) }} €</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+		<!-- Bouton pour continuer -->
+		<div class="mt-8 text-right">
+			<form action="{{ path('order_create') }}" method="POST">
+				<button type="submit" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+					Régler la commande
+				</button>
+			</form>
+		</div>
+	</div>
+{% endblock %}
