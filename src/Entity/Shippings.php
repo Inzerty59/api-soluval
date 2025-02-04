@@ -255,4 +255,14 @@ class Shippings
 
         return $this;
     }
+
+    public function getShippingCosts(): array
+    {
+        $shippingCosts = [
+            'TTC' => round($this->getCost() * $this->getCoefficient(), 2),
+            'HT' => round($this->getCostExcludingTaxes() * $this->getCoefficient(), 2),
+        ];
+
+        return $shippingCosts;
+    }
 }
