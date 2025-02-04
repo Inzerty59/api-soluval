@@ -114,6 +114,9 @@ use Doctrine\ORM\Mapping as ORM;
     #[ORM\Column(length: 255)]
     private ?string $weight = null;
 
+    #[ORM\Column]
+    private ?bool $IsInStock = null;
+
     public function __construct()
     {
         $this->category = new ArrayCollection();
@@ -472,20 +475,7 @@ use Doctrine\ORM\Mapping as ORM;
     return null;
     }
 
-    public function getStock(): int
-    {
-        $data = json_decode($this->price, true); // Décoder le JSON
-        return $data['quantity'] ?? 0; // Retourner la quantité ou 0 si non défini
-    }
 
-    public function setStock(int $quantity): self
-    {
-        $data = json_decode($this->price, true);
-        $data['quantity'] = $quantity; // Mettre à jour la quantité
-        $this->price = json_encode($data); // Réencoder en JSON
-
-        return $this;
-    }
     public function getCasseId(): ?int
     {
         return $this->casse_id;
@@ -546,6 +536,18 @@ use Doctrine\ORM\Mapping as ORM;
     public function setWeight(string $weight): static
     {
         $this->weight = $weight;
+
+        return $this;
+    }
+
+    public function isInStock(): ?bool
+    {
+        return $this->IsInStock;
+    }
+
+    public function setInStock(bool $IsInStock): static
+    {
+        $this->IsInStock = $IsInStock;
 
         return $this;
     }

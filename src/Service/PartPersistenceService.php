@@ -52,7 +52,8 @@ class PartPersistenceService
             ->setPrice($partData['Price'] ?? null)
             ->setCasseId($partData['Casse']['Id'] ?? null)
             ->setShippingId($partData['Shipping']['ShippingId'] ?? null)
-            ->SetWeight($partData['Weight'] ?? null);
+            ->SetWeight($partData['Weight'] ?? null)
+            ->setInStock($partData['IsInStock'] ?? null);
 
         // Vérifier l'existence pour éviter les doublons
         $existingPart = $this->entityManager->getRepository(Part::class)

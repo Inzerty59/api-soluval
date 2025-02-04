@@ -48,10 +48,11 @@ class Order
     #[ORM\Column]
     private ?\DateTimeImmutable $UpdatedAt = null;
 
-    private ?int $order_number = null;
-
     #[ORM\Column(type: Types::ARRAY)]
     private array $status = [];
+
+    #[ORM\Column(length: 255)]
+    private ?string $orderNumber = null;
 
 
     public function __construct()
@@ -179,19 +180,6 @@ class Order
         return $this;
     }
 
-    public function getOrderNumber(): ?int
-    {
-        return $this->order_number;
-    }
-
-    public function setOrderNumber(int $order_number): static
-    {
-        $this->order_number = $order_number;
-
-        return $this;
-    }
-
-
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->UpdatedAt;
@@ -225,6 +213,18 @@ class Order
     public function setStatus(array $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getOrderNumber(): ?string
+    {
+        return $this->orderNumber;
+    }
+
+    public function setOrderNumber(string $orderNumber): static
+    {
+        $this->orderNumber = $orderNumber;
 
         return $this;
     }
