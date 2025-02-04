@@ -33,3 +33,11 @@ services:
 
     App\Twig\AppExtension:
         tags: ['twig.extension']
+
+    App\Form\DeliveryAdressType:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+
+    App\Form\BillingAdressType:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'

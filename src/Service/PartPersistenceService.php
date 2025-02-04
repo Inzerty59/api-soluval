@@ -2,6 +2,7 @@
 namespace App\Service;
 
 use App\Entity\Part;
+use App\Entity\Shippings;
 use Doctrine\ORM\EntityManagerInterface;
 
 class PartPersistenceService
@@ -25,35 +26,33 @@ class PartPersistenceService
 
         // Mapper les données de l'API à l'entité
         $part->setExternalId($partData['Id'] ?? null)
-    ->setManufacturerReference($partData['ManufacturerReference'] ?? null)
-    ->setAdaptableReference($partData['AdaptableReference'] ?? null)
-    ->setCategoryName($partData['Category']['Name'] ?? null)
-    ->setDescription($partData['Description'] ?? null)
-    ->setPartCondition($partData['Condition'] ?? null)
-    ->setWarranty($partData['Warranty'] ?? null)
-    ->setBrandName($partData['Vehicle']['Identification']['Brand']['Name'] ?? null) 
-    ->setRangeName($partData['Vehicle']['Identification']['Range']['Name'] ?? null) 
-    ->setModelName($partData['Vehicle']['Identification']['Model']['Name'] ?? null)
-    ->setFinishName($partData['Vehicle']['Identification']['Finish'] ?? null)
-    ->setCommercialDesignation($partData['Vehicle']['Identification']['CommercialDesignation'] ?? null)
-    ->setVehicleYear($partData['Vehicle']['Year'] ?? null)
-    ->setMileage($partData['Vehicle']['Mileage'] ?? null)
-    ->setColorName($partData['Vehicle']['Color'] ?? null)
-    ->setDisplacement($partData['Vehicle']['Identification']['Displacement'] ?? null)
-    ->setPower($partData['Vehicle']['Identification']['Power'] ?? null)
-    ->setEnergyName($partData['Vehicle']['Identification']['Energy']['Name'] ?? null)
-    ->setGearboxType($partData['Vehicle']['Identification']['GearboxType'] ?? null)
-    ->setEngineCode($partData['Vehicle']['Identification']['EngineCode'] ?? null)
-    ->setGearboxCode($partData['Vehicle']['Identification']['GearboxCode'] ?? null)
-    ->setDoorNumber($partData['Vehicle']['Identification']['DoorNumber'] ?? null)
-    ->setVignette($partData['Vignette'] ?? null)
-    ->setPhotos($partData['Photos'] ?? null)
-    ->setPrice($partData['Price'] ?? null)
-    ->setCasseId($partData['Casse']['Id'] ?? null)
-    ->setShippingId($partData['Shipping']['ShippingId'] ?? null);
-
-
-
+            ->setManufacturerReference($partData['ManufacturerReference'] ?? null)
+            ->setAdaptableReference($partData['AdaptableReference'] ?? null)
+            ->setCategoryName($partData['Category']['Name'] ?? null)
+            ->setDescription($partData['Description'] ?? null)
+            ->setPartCondition($partData['Condition'] ?? null)
+            ->setWarranty($partData['Warranty'] ?? null)
+            ->setBrandName($partData['Vehicle']['Identification']['Brand']['Name'] ?? null)
+            ->setRangeName($partData['Vehicle']['Identification']['Range']['Name'] ?? null)
+            ->setModelName($partData['Vehicle']['Identification']['Model']['Name'] ?? null)
+            ->setFinishName($partData['Vehicle']['Identification']['Finish'] ?? null)
+            ->setCommercialDesignation($partData['Vehicle']['Identification']['CommercialDesignation'] ?? null)
+            ->setVehicleYear($partData['Vehicle']['Year'] ?? null)
+            ->setMileage($partData['Vehicle']['Mileage'] ?? null)
+            ->setColorName($partData['Vehicle']['Color'] ?? null)
+            ->setDisplacement($partData['Vehicle']['Identification']['Displacement'] ?? null)
+            ->setPower($partData['Vehicle']['Identification']['Power'] ?? null)
+            ->setEnergyName($partData['Vehicle']['Identification']['Energy']['Name'] ?? null)
+            ->setGearboxType($partData['Vehicle']['Identification']['GearboxType'] ?? null)
+            ->setEngineCode($partData['Vehicle']['Identification']['EngineCode'] ?? null)
+            ->setGearboxCode($partData['Vehicle']['Identification']['GearboxCode'] ?? null)
+            ->setDoorNumber($partData['Vehicle']['Identification']['DoorNumber'] ?? null)
+            ->setVignette($partData['Vignette'] ?? null)
+            ->setPhotos($partData['Photos'] ?? null)
+            ->setPrice($partData['Price'] ?? null)
+            ->setCasseId($partData['Casse']['Id'] ?? null)
+            ->setShippingId($partData['Shipping']['ShippingId'] ?? null)
+            ->SetWeight($partData['Weight'] ?? null);
 
         // Vérifier l'existence pour éviter les doublons
         $existingPart = $this->entityManager->getRepository(Part::class)
@@ -61,6 +60,46 @@ class PartPersistenceService
 
         if (!$existingPart) {
             $this->entityManager->persist($part);
+            $this->entityManager->flush(); // Persist et sauvegarde immédiatement
+        }
+
+        if (isset($partData['Shippings']) && is_array($partData['Shippings'])) {
+            foreach ($partData['Shippings'] as $shippingData) {
+                $this->persistShipping($shippingData);
+            }
+        }
+    }
+
+    /**
+     * Persiste un shipping dans la base de données.
+     *
+     * @param array $shippingData Les données du shipping.
+     * @return void
+     */
+    public function persistShipping(array $shippingData): void
+    {
+        $shipping = new Shippings();
+
+        $shipping->setShippingId($shippingData['ShippingId'] ?? null)
+            ->setTitle($shippingData['Title'] ?? null)
+            ->setCoefficient($shippingData['Coefficient'] ?? null)
+            ->setCost($shippingData['Cost'] ?? null)
+            ->setCostExcludingTaxes($shippingData['CostExcludingTaxes'] ?? null)
+            ->setDeliveryAvailable($shippingData['IsDeliveryAvailable'] ?? null)
+            ->setVATRate($shippingData['VATRate'] ?? null)
+            ->setDelayMin($shippingData['DelayMin'] ?? null)
+            ->setDelayMax($shippingData['DelayMax'] ?? null)
+            ->setCountryId($shippingData['CountryId'] ?? null)
+            ->setISOCode($shippingData['ISOCode'] ?? null)
+            ->setDiscountPart2($shippingData['DiscountPart2'] ?? null)
+            ->setDiscountPart3($shippingData['DiscountPart3'] ?? null);
+
+        // Vérifier l'existence pour éviter les doublons
+        $existingShipping = $this->entityManager->getRepository(Shippings::class)
+            ->findOneBy(['ShippingId' => $shipping->getShippingId()]);
+
+        if (!$existingShipping) {
+            $this->entityManager->persist($shipping);
             $this->entityManager->flush(); // Persist et sauvegarde immédiatement
         }
     }

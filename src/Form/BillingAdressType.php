@@ -3,18 +3,28 @@
 namespace App\Form;
 
 use App\Entity\BillingAdress;
+use App\Entity\Shippings;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\EntityManagerInterface;
 
 class BillingAdressType extends AbstractType
 {
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $defaultShipping = $this->entityManager->getRepository(Shippings::class)->findOneBy(['Title' => 'France']);
+
         $builder
             ->add('Firstname', TextType::class, [
                 'attr' => ['placeholder' => 'Prénom'],
@@ -40,53 +50,24 @@ class BillingAdressType extends AbstractType
                 'label' => false,
             ])
             ->add('StreetAdditionnal', TextType::class, [
-                'attr' => ['placeholder' => 'Adresse Complémentaire'],
+                'attr' => ['placeholder' => 'Complément d\'adresse'],
                 'label' => false,
                 'required' => false,
-            ])
-            ->add('PostCode', TextType::class, [
-                'attr' => ['placeholder' => 'Code postal'],
-                'label' => false,
             ])
             ->add('City', TextType::class, [
                 'attr' => ['placeholder' => 'Ville'],
                 'label' => false,
             ])
-            ->add('CountryId', ChoiceType::class, [
-                'choices' => [                    
-                    'Algérie' => 32,  
-                    'Allemagne' => 5,  
-                    'Autriche' => 6,  
-                    'Belgique' => 1,  
-                    'Corse' => 206,  
-                    'Danemark' => 9,  
-                    'Espagne' => 3,  
-                    'Finlande' => 11,  
-                    'France' => 0,  
-                    'Grèce' => 12,  
-                    'Guadeloupe' => 68,  
-                    'Guyane Française' => 96,  
-                    'Ile de la Réunion' => 77,  
-                    'Italie' => 4,  
-                    'Luxembourg' => 17,  
-                    'Maroc' => 31,  
-                    'Martinique' => 69,  
-                    'Mayotte' => 83,  
-                    'Monaco' => 110,  
-                    'Norvège' => 72,  
-                    'Pays-Bas' => 19,  
-                    'Polynésie Française' => 113,  
-                    'Portugal' => 21,  
-                    'Saint-Barthélemy' => 115,  
-                    'Saint-Martin' => 117,  
-                    'Saint-Pierre-et-Miquelon' => 119,  
-                    'Suède' => 27,  
-                    'Suisse' => 28,  
-                    'Wallis et Futuna' => 120,
-                ],
-                'attr' => ['placeholder' => 'Pays'],
+            ->add('PostCode', TextType::class, [
+                'attr' => ['placeholder' => 'Code postal'],
                 'label' => false,
-                'data' => 0,
+            ])
+            ->add('shipping', EntityType::class, [
+                'class' => Shippings::class,
+                'choice_label' => 'Title',
+                'data' => $defaultShipping,
+                'required' => true,
+                'placeholder' => false,
             ]);
     }
 

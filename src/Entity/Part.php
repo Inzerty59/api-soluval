@@ -111,6 +111,9 @@ use Doctrine\ORM\Mapping as ORM;
     #[ORM\ManyToMany(targetEntity: Order::class, inversedBy: 'parts')]
     private Collection $category;
 
+    #[ORM\Column(length: 255)]
+    private ?string $weight = null;
+
     public function __construct()
     {
         $this->category = new ArrayCollection();
@@ -531,6 +534,18 @@ use Doctrine\ORM\Mapping as ORM;
     public function removeCategory(Order $category): static
     {
         $this->category->removeElement($category);
+
+        return $this;
+    }
+
+    public function getWeight(): ?string
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(string $weight): static
+    {
+        $this->weight = $weight;
 
         return $this;
     }
