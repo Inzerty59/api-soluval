@@ -4,6 +4,7 @@ namespace App\Controller\Shop;
 
 use App\Entity\DeliveryAdress;
 use App\Entity\BillingAdress;
+use App\Entity\Shippings;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,7 +38,13 @@ class OrderSummaryController extends AbstractController
         $deliveryAdress = $deliveryAdressId ? $entityManager->getRepository(DeliveryAdress::class)->find($deliveryAdressId) : null;
         $billingAdress = $entityManager->getRepository(BillingAdress::class)->find($billingAdressId);
 
-        $shippingCosts = $deliveryAdress ? $this->getShippingCosts($deliveryAdress->getCountryName()) : ['HT' => 0, 'TTC' => 0];
+        $shippingCosts = ['HT' => 0, 'TTC' => 0];
+        if ($deliveryAdress) {
+            $shipping = $entityManager->getRepository(Shippings::class)->findOneBy(['CountryId' => $deliveryAdress->getCountryId()]);
+            if ($shipping) {
+                $shippingCosts = $shipping->getShippingCosts();
+            }
+        }
 
         return $this->render('payment/orderSummary.html.twig', [
             'cart' => $cart,
@@ -49,41 +56,5 @@ class OrderSummaryController extends AbstractController
             'shippingCosts' => $shippingCosts,
             'deliveryMode' => $deliveryMode,
         ]);
-    }
-
-    private function getShippingCosts(string $country): array
-    {
-        $shippingCosts = [
-            'France' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Belgique' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Espagne' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Italie' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Luxembourg' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Portugal' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Suisse' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Allemagne' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Guadeloupe' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Martinique' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Ile de la Réunion' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Corse' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Mayotte' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Polynésie Française' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Saint-Barthélemy' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Saint-Martin' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Saint-Pierre-et-Miquelon' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Wallis et Futuna' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Pays-Bas' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Guyane Française' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Monaco' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Autriche' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Norvège' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Suède' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Finlande' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Danemark' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Grèce' => ['TTC' => 17.00, 'HT' => 14.17],
-            'Maroc' => ['TTC' => 14.17, 'HT' => 14.17],
-            'Algérie' => ['TTC' => 14.17, 'HT' => 14.17],
-        ];
-        return $shippingCosts[$country] ?? ['TTC' => 0, 'HT' => 0];
     }
 }
