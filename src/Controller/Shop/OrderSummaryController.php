@@ -39,10 +39,15 @@ class OrderSummaryController extends AbstractController
         $billingAdress = $entityManager->getRepository(BillingAdress::class)->find($billingAdressId);
 
         $shippingCosts = ['HT' => 0, 'TTC' => 0];
+        $deliveryMinTime = null;
+        $deliveryMaxTime = null;
+
         if ($deliveryAdress) {
             $shipping = $entityManager->getRepository(Shippings::class)->findOneBy(['CountryId' => $deliveryAdress->getCountryId()]);
             if ($shipping) {
                 $shippingCosts = $shipping->getShippingCosts();
+                $deliveryMinTime = $shipping->getDelayMin();
+                $deliveryMaxTime = $shipping->getDelayMax();
             }
         }
 
@@ -55,6 +60,8 @@ class OrderSummaryController extends AbstractController
             'billingAdress' => $billingAdress,
             'shippingCosts' => $shippingCosts,
             'deliveryMode' => $deliveryMode,
+            'deliveryMinTime' => $deliveryMinTime,
+            'deliveryMaxTime' => $deliveryMaxTime,
         ]);
     }
 }

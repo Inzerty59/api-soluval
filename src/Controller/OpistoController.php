@@ -56,6 +56,7 @@ class OpistoController extends AbstractController
                 'casse_id' => $part->getCasseId(),
                 'shipping_id' => $part->getShippingId(),
                 'weight' => $part->getWeight(),
+                'is_in_stock' => $part->isInStock(),
 
 
             ], $parts);
