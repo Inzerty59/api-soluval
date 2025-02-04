@@ -62,15 +62,15 @@
             <table class="table-auto w-full border-collapse border border-gray-200 rounded-lg shadow-md">
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for label, value in {
-                        'Référence constructeur': part.manufacturerReference,
-                        'Référence Opisto': part.id,
-                        'Dénomination de la pièce': part.getName(),
-                        'Catégorie du produit': part.categoryName,
-                        'Description': part.description,
-                        'Prix TTC': part.getFinalPrice() ~ ' €',
-                        'État de la pièce': part.partCondition,
-                        'Quantité': '1,00',
-                        'Durée de garantie': part.warranty
+                        'Référence constructeur': part.manufacturerReference|default('Non renseignée'),
+                        'Référence Opisto': part.id|default('Non renseignée'),
+                        'Dénomination de la pièce': part.getName()|default('Non renseignée'),
+                        'Catégorie du produit': part.categoryName|default('Non renseignée'),
+                        'Description': part.description|default('Non renseignée'),
+                        'Prix TTC': (part.getFinalPrice() ? part.getFinalPrice() ~ ' €' : 'Non renseignée'),
+                        'État de la pièce': part.partCondition|default('Non renseignée'),
+                        'Quantité': '1',
+                        'Durée de garantie': (part.warranty ? part.warranty ~ ' mois' : 'Non renseignée')
                     } %}
                     <tr>
                         <td class="px-4 py-2 font-semibold text-gray-700">{{ label }}</td>
@@ -87,21 +87,21 @@
             <table class="table-auto w-full border-collapse border border-gray-200 rounded-lg shadow-md">
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for label, value in {
-                        'Marque du véhicule': part.brandName,
-                        'Gamme du véhicule': part.rangeName,
-                        'Modèle du véhicule': part.modelName,
-                        'Finition du véhicule': part.finishName,
-                        'Désignation commerciale': part.commercialDesignation,
-                        'Année de mise en circulation': part.vehicleYear,
-                        'Kilométrage': part.mileage ~ ' km',
-                        'Couleur': part.colorName ? part.colorName|join(', ') : 'N/A',
-                        'Cylindrée': part.displacement,
-                        'Puissance': part.power ~ ' ch',
-                        'Carburant': part.energyName,
-                        'Type de boîte de vitesses': part.gearboxType ? part.gearboxType|join(', ') : 'N/A',
-                        'Code moteur': part.engineCode,
-                        'Code boîte de vitesses': part.gearboxCode,
-                        'Nombre de portes': part.doorNumber
+                        'Marque du véhicule': part.brandName|default('Non renseignée'),
+                        'Gamme du véhicule': part.rangeName|default('Non renseignée'),
+                        'Modèle du véhicule': part.modelName|default('Non renseignée'),
+                        'Finition du véhicule': part.finishName|default('Non renseignée'),
+                        'Désignation commerciale': part.commercialDesignation|default('Non renseignée'),
+                        'Année de mise en circulation': part.vehicleYear|default('Non renseignée'),
+                        'Kilométrage': (part.mileage ? part.mileage ~ ' km' : 'Non renseignée'),
+                        'Couleur': part.colorName ? part.colorName|join(', ') : 'Non renseignée',
+                        'Cylindrée': part.displacement|default('Non renseignée'),
+                        'Puissance': (part.power ? part.power ~ ' ch' : 'Non renseignée'),
+                        'Carburant': part.energyName|default('Non renseignée'),
+                        'Type de boîte de vitesses': part.gearboxType ? part.gearboxType|join(', ') : 'Non renseignée',
+                        'Code moteur': part.engineCode|default('Non renseignée'),
+                        'Code boîte de vitesses': part.gearboxCode|default('Non renseignée'),
+                        'Nombre de portes': part.doorNumber|default('Non renseignée')
                     } %}
                     <tr>
                         <td class="px-4 py-2 font-semibold text-gray-700">{{ label }}</td>
