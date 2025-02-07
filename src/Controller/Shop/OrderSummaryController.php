@@ -6,6 +6,7 @@ use App\Entity\DeliveryAdress;
 use App\Entity\BillingAdress;
 use App\Entity\Shippings;
 use App\Entity\Order;
+use App\Entity\Part;
 use App\Service\OpistoStockChecker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -92,42 +93,41 @@ class OrderSummaryController extends AbstractController
     {
         $cart = $session->get('cart', []);
 
-        $cart = array_filter($cart, function ($item) {
-            if (!$this->stockChecker->checkStock($item['part']->getExternalId())) {
-                $this->addFlash('error', "La pièce {$item['part']->getName()} n'est plus disponible.");
-                return false;
-            }
-            return true;
-        });
-
-        $session->set('cart', $cart);
-
-        if (empty($cart)) {
-            return $this->redirectToRoute('cart_view');
-        }
-
         $billingAdressId = $session->get('billingAdress');
-        $deliveryAdressId = $session->get('deliveryAdress');
         $deliveryMode = $session->get('delivery_mode');
 
-        $billingAdress = $entityManager->getRepository(BillingAdress::class)->find($billingAdressId);
-        $deliveryAdress = $entityManager->getRepository(DeliveryAdress::class)->find($deliveryAdressId);
+        if (!$billingAdressId) {
+            $this->addFlash('error', 'L\'adresse de facturation est manquante.');
+            return $this->redirectToRoute('orderSummary_page');
+        }
 
-        if (!$billingAdress || ($deliveryMode !== 'comptoir' && !$deliveryAdress)) {
-            $this->addFlash('error', 'Les adresses de facturation ou de livraison sont manquantes.');
+        $billingAdress = $entityManager->getRepository(BillingAdress::class)->find($billingAdressId);
+        if (!$billingAdress) {
+            $this->addFlash('error', 'L\'adresse de facturation est invalide.');
             return $this->redirectToRoute('orderSummary_page');
         }
 
         $order = new Order();
         $order->setUser($this->getUser());
         $order->setBillingAdress($billingAdress);
-        $order->setDeliveryAdress($deliveryAdress);
+
+        if ($deliveryMode !== 'comptoir') {
+            $deliveryAdressId = $session->get('deliveryAdress');
+            $deliveryAdress = $deliveryAdressId ? $entityManager->getRepository(DeliveryAdress::class)->find($deliveryAdressId) : null;
+            if ($deliveryAdress) {
+                $order->setDeliveryAdress($deliveryAdress);
+            }
+        }
+
         $order->setToSend($deliveryMode !== 'comptoir');
         $order->setFreeShipping($deliveryMode === 'comptoir');
-        $order->setOrderNumber(uniqid('order_'));
+        $order->setOrderNumber(uniqid());
 
         foreach ($cart as $item) {
-            $order->addPart($item['part']);
+            $part = $entityManager->getRepository(Part::class)->find($item['part']->getId());
+            if ($part) {
+                $order->addPart($part);
+            }
         }
 
         $entityManager->persist($order);
