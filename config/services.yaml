@@ -31,6 +31,11 @@ services:
         arguments:
             $httpClient: '@http_client'
 
+    App\Service\OpistoStockChecker:
+        arguments:
+            $authUrlApi: '%env(AUTH_URL_API)%'
+            $logger: '@logger'
+
     App\Twig\AppExtension:
         tags: ['twig.extension']
 
