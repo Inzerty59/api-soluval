@@ -114,9 +114,6 @@ use Doctrine\ORM\Mapping as ORM;
     #[ORM\Column(length: 255)]
     private ?string $weight = null;
 
-    #[ORM\Column]
-    private ?bool $IsInStock = null;
-
     public function __construct()
     {
         $this->category = new ArrayCollection();
@@ -536,18 +533,6 @@ use Doctrine\ORM\Mapping as ORM;
     public function setWeight(string $weight): static
     {
         $this->weight = $weight;
-
-        return $this;
-    }
-
-    public function isInStock(): ?bool
-    {
-        return $this->IsInStock;
-    }
-
-    public function setInStock(bool $IsInStock): static
-    {
-        $this->IsInStock = $IsInStock;
 
         return $this;
     }

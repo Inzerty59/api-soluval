@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Confirmation de commande
+{% endblock %}
+
+{% block body %}
+    <div class="min-h-screen bg-gray-50 py-6 px-8 text-gray-800">
+        <h1 class="text-2xl font-bold mb-6">Confirmation de commande</h1>
+        <p>{{ message }}</p>
+        <a href="{{ path('shop_index') }}" class="mt-4 inline-block bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+            Retour à l'accueil
+        </a>
+    </div>
+{% endblock %}

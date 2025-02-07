@@ -138,7 +138,7 @@
 
 		<!-- Bouton pour continuer -->
 		<div class="mt-8 text-right">
-			<form action="{{ path('order_create') }}" method="POST">
+			<form method="POST" action="{{ path('finalize_order') }}">
 				<button type="submit" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
 					Régler la commande
 				</button>
