@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Part;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
@@ -24,22 +25,23 @@ class Order
     #[ORM\Column]
     private ?bool $IsFreeShipping = null;
 
-    #[ORM\ManyToOne(inversedBy: 'category')]
+    #[ORM\ManyToOne(inversedBy: 'orders')]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'category')]
+    #[ORM\ManyToOne(inversedBy: 'orders')]
     private ?BillingAdress $billingAdress = null;
 
-    #[ORM\ManyToOne(inversedBy: 'category')]
+    #[ORM\ManyToOne(inversedBy: 'orders')]
     private ?DeliveryAdress $deliveryAdress = null;
 
-    #[ORM\ManyToOne(inversedBy: 'category')]
+    #[ORM\ManyToOne(inversedBy: 'orders')]
     private ?MangoPay $mangoPay = null;
 
     /**
      * @var Collection<int, Part>
      */
-    #[ORM\ManyToMany(targetEntity: Part::class, mappedBy: 'category')]
+    #[ORM\OneToMany(targetEntity: Part::class, mappedBy: 'order')]
+    #[ORM\ManyToOne(targetEntity: Part::class, cascade: ['persist'])]
     private Collection $parts;
 
     #[ORM\Column]
@@ -101,7 +103,7 @@ class Order
     {
         if (!$this->parts->contains($part)) {
             $this->parts->add($part);
-            $part->setCategory($this);
+            $part->setOrder($this);
         }
 
         return $this;
@@ -111,8 +113,8 @@ class Order
     {
         if ($this->parts->removeElement($part)) {
             // set the owning side to null (unless already changed)
-            if ($part->getCategory() === $this) {
-                $part->setCategory(null);
+            if ($part->getOrder() === $this) {
+                $part->setOrder(null);
             }
         }
 
