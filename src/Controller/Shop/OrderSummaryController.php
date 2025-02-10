@@ -161,11 +161,14 @@ class OrderSummaryController extends AbstractController
         $deliveryAdress = $order->getDeliveryAdress();
         $deliveryMode = $session->get('delivery_mode', 'comptoir');
 
+        $netToPay = $order->getNetToPay();
+
         return $this->render('order/confirmation.html.twig', [
             'order' => $order,
             'billingAdress' => $billingAdress,
             'deliveryAdress' => $deliveryAdress,
             'deliveryMode' => $deliveryMode,
+            'netToPay' => $netToPay,
         ]);
     }
 }

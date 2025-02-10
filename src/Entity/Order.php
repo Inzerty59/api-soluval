@@ -229,4 +229,39 @@ class Order
 
         return $this;
     }
+
+    public function getTotalShippingCostsTTC(): float
+    {
+        if ($this->IsFreeShipping) {
+            return 0.0;
+        }
+
+        $shipping = $this->getDeliveryAdress()?->getShipping();
+        if ($shipping) {
+            $shippingCosts = $shipping->getShippingCosts();
+            $totalShippingCost = 0.0;
+
+            foreach ($this->parts as $part) {
+                $totalShippingCost += $shippingCosts['TTC'];
+            }
+
+            return $totalShippingCost;
+        }
+
+        return 0.0;
+    }
+
+    public function getTotalPartsPrice(): float
+    {
+        $total = 0.0;
+        foreach ($this->parts as $part) {
+            $total += $part->getFinalPrice();
+        }
+        return $total;
+    }
+
+    public function getNetToPay(): float
+    {
+        return $this->getTotalPartsPrice() + $this->getTotalShippingCostsTTC();
+    }
 }

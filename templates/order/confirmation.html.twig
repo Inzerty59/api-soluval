@@ -22,7 +22,7 @@
 
         <h1 class="text-2xl font-bold mb-6">Confirmation de commande n° {{ order.orderNumber }}</h1>
 
-        <p>Cette commande de <b>105 €</b> vous sera expédiée à l'adresse-ci dessous.</p>
+        <p>Cette commande de <b>{{ netToPay }} €</b> vous sera expédiée à l'adresse-ci dessous.</p>
 
         <!-- Section des adresses et des paiements -->
         <div class="flex flex-col lg:flex-row justify-between gap-8 items-stretch mt-8">
