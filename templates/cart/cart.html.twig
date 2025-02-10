@@ -67,10 +67,10 @@
                     €
                 </p>
                 <div class="mt-4 sm:mt-0 flex gap-4">
-                    <a href="{{ path('shop_index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <a href="{{ path('shop_index') }}" id="purchase_Continue" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Continuer vos achats
                     </a>
-                    <button onclick="window.location.href='{{ path('cart_checkout') }}'" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                    <button onclick="window.location.href='{{ path('cart_checkout') }}'" id="finish_Order" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
                         Finaliser la commande
                     </button>
                 </div>
@@ -78,7 +78,7 @@
         {% else %}
             <div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-6 rounded-lg text-center">
                 <p class="text-lg font-medium">Votre panier est vide.</p>
-                <a href="{{ path('shop_index') }}" class="text-blue-500 hover:underline mt-4 inline-block">Retour à l'accueil</a>
+                <a href="{{ path('shop_index') }}" id="return_Shop" class="text-blue-500 hover:underline mt-4 inline-block">Retour à l'accueil</a>
             </div>
         {% endif %}
     </div>
