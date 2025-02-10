@@ -240,4 +240,22 @@ class BillingAdress
 
         return $this;
     }
+
+    public function getFullAddress(): string
+    {
+        $address = $this->getFirstname() . ' ' . $this->getLastname() . "\n";
+        $address .= $this->getStreet() . "\n";
+        if ($this->getStreetAdditionnal()) {
+            $address .= $this->getStreetAdditionnal() . "\n";
+        }
+        $address .= $this->getPostCode() . ' ' . $this->getCity() . "\n";
+        $address .= $this->getCountryName();
+
+        return $address;
+    }
+    
+    public function __toString(): string
+    {
+        return $this->getFullAddress();
+    }
 }

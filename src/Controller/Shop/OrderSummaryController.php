@@ -89,12 +89,19 @@ class OrderSummaryController extends AbstractController
     }
 
     #[Route('/finaliser-commande', name: 'finalize_order', methods: ['POST'])]
-    public function finalizeOrder(SessionInterface $session, EntityManagerInterface $entityManager): Response
+    public function finalizeOrder(SessionInterface $session, EntityManagerInterface $entityManager, OpistoStockChecker $stockChecker): Response
     {
         $cart = $session->get('cart', []);
 
         $billingAdressId = $session->get('billingAdress');
         $deliveryMode = $session->get('delivery_mode');
+
+        foreach ($cart as $item) {
+            if (!$stockChecker->checkStock($item['part']->getExternalId())) {
+                $this->addFlash('error', "La pièce {$item['part']->getName()} n'est plus disponible.");
+                return $this->redirectToRoute('orderSummary_page');
+            }
+        }
 
         if (!$billingAdressId) {
             $this->addFlash('error', 'L\'adresse de facturation est manquante.');
@@ -113,9 +120,11 @@ class OrderSummaryController extends AbstractController
 
         if ($deliveryMode !== 'comptoir') {
             $deliveryAdressId = $session->get('deliveryAdress');
-            $deliveryAdress = $deliveryAdressId ? $entityManager->getRepository(DeliveryAdress::class)->find($deliveryAdressId) : null;
-            if ($deliveryAdress) {
-                $order->setDeliveryAdress($deliveryAdress);
+            if ($deliveryAdressId) {
+                $deliveryAdress = $entityManager->getRepository(DeliveryAdress::class)->find($deliveryAdressId);
+                if ($deliveryAdress) {
+                    $order->setDeliveryAdress($deliveryAdress);
+                }
             }
         }
 
@@ -135,14 +144,28 @@ class OrderSummaryController extends AbstractController
 
         $session->remove('cart');
 
-        return $this->redirectToRoute('order_confirmation');
+        return $this->redirectToRoute('order_confirmation', ['orderNumber' => $order->getOrderNumber()]);
     }
 
     #[Route('/orders', name: 'order_confirmation')]
-    public function orderConfirmation(): Response
+    public function orderConfirmation(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $orderNumber = $request->query->get('orderNumber');
+        $order = $entityManager->getRepository(Order::class)->findOneBy(['orderNumber' => $orderNumber]);
+
+        if (!$order) {
+            throw $this->createNotFoundException('Order not found');
+        }
+
+        $billingAdress = $order->getBillingAdress();
+        $deliveryAdress = $order->getDeliveryAdress();
+        $deliveryMode = $order->isToSend() ? 'livraison' : 'comptoir';
+
         return $this->render('order/confirmation.html.twig', [
-            'message' => 'Votre commande a été finalisée avec succès.',
+            'order' => $order,
+            'billingAdress' => $billingAdress,
+            'deliveryAdress' => $deliveryAdress,
+            'deliveryMode' => $deliveryMode,
         ]);
     }
 }

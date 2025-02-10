@@ -11,7 +11,7 @@ use App\Entity\Part;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
-#[ORM\HasLifecycleCallbacks] // Ajout pour activer les callbacks
+#[ORM\HasLifecycleCallbacks]
 class Order
 {
     #[ORM\Id]
@@ -55,7 +55,6 @@ class Order
 
     #[ORM\Column(length: 255)]
     private ?string $orderNumber = null;
-
 
     public function __construct()
     {
@@ -230,5 +229,4 @@ class Order
 
         return $this;
     }
-
 }
