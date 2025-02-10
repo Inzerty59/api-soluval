@@ -105,21 +105,14 @@ use Doctrine\ORM\Mapping as ORM;
     #[ORM\Column]
     private ?int $Shipping_id = null;
 
-    /**
-     * @var Collection<int, Order>
-     */
-    #[ORM\ManyToMany(targetEntity: Order::class, inversedBy: 'parts')]
-    private Collection $category;
+    #[ORM\ManyToOne(inversedBy: 'parts')]
+    private ?Order $order = null;
 
     #[ORM\Column(length: 255)]
     private ?string $weight = null;
 
-    #[ORM\Column]
-    private ?bool $IsInStock = null;
-
     public function __construct()
     {
-        $this->category = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -500,30 +493,14 @@ use Doctrine\ORM\Mapping as ORM;
         return $this;
     }
 
-    public function getCategory(): ?Order
+    public function getOrder(): ?Order
     {
-        return $this->category;
+        return $this->order;
     }
 
-    public function setCategory(?Order $category): static
+    public function setOrder(?Order $order): static
     {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    public function addCategory(Order $category): static
-    {
-        if (!$this->category->contains($category)) {
-            $this->category->add($category);
-        }
-
-        return $this;
-    }
-
-    public function removeCategory(Order $category): static
-    {
-        $this->category->removeElement($category);
+        $this->order = $order;
 
         return $this;
     }
@@ -536,18 +513,6 @@ use Doctrine\ORM\Mapping as ORM;
     public function setWeight(string $weight): static
     {
         $this->weight = $weight;
-
-        return $this;
-    }
-
-    public function isInStock(): ?bool
-    {
-        return $this->IsInStock;
-    }
-
-    public function setInStock(bool $IsInStock): static
-    {
-        $this->IsInStock = $IsInStock;
 
         return $this;
     }
