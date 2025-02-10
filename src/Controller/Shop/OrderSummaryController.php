@@ -148,7 +148,7 @@ class OrderSummaryController extends AbstractController
     }
 
     #[Route('/orders', name: 'order_confirmation')]
-    public function orderConfirmation(Request $request, EntityManagerInterface $entityManager): Response
+    public function orderConfirmation(Request $request, EntityManagerInterface $entityManager, SessionInterface $session): Response
     {
         $orderNumber = $request->query->get('orderNumber');
         $order = $entityManager->getRepository(Order::class)->findOneBy(['orderNumber' => $orderNumber]);
@@ -159,7 +159,7 @@ class OrderSummaryController extends AbstractController
 
         $billingAdress = $order->getBillingAdress();
         $deliveryAdress = $order->getDeliveryAdress();
-        $deliveryMode = $order->isToSend() ? 'livraison' : 'comptoir';
+        $deliveryMode = $session->get('delivery_mode', 'comptoir');
 
         return $this->render('order/confirmation.html.twig', [
             'order' => $order,
