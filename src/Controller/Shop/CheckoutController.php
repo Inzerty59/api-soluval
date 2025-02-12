@@ -50,6 +50,7 @@ class CheckoutController extends AbstractController
             }
 
             $deliveryMode = $request->request->get('delivery_mode');
+            $session->set('delivery_mode', $deliveryMode);
 
             if ($deliveryMode === 'comptoir') {
                 $entityManager->persist($billingAdress);
