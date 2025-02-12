@@ -14,14 +14,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use GuzzleHttp\Client;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderSummaryController extends AbstractController
 {
     private $stockChecker;
+    private $params;
 
-    public function __construct(OpistoStockChecker $stockChecker)
+    public function __construct(OpistoStockChecker $stockChecker, ParameterBagInterface $params)
     {
         $this->stockChecker = $stockChecker;
+        $this->params = $params;
     }
 
     #[Route('/recapitulatif', name: 'orderSummary_page')]
@@ -89,12 +94,19 @@ class OrderSummaryController extends AbstractController
     }
 
     #[Route('/finaliser-commande', name: 'finalize_order', methods: ['POST'])]
-    public function finalizeOrder(SessionInterface $session, EntityManagerInterface $entityManager): Response
+    public function finalizeOrder(SessionInterface $session, EntityManagerInterface $entityManager, OpistoStockChecker $stockChecker): Response
     {
         $cart = $session->get('cart', []);
 
         $billingAdressId = $session->get('billingAdress');
         $deliveryMode = $session->get('delivery_mode');
+
+        foreach ($cart as $item) {
+            if (!$stockChecker->checkStock($item['part']->getExternalId())) {
+                $this->addFlash('error', "La pièce {$item['part']->getName()} n'est plus disponible.");
+                return $this->redirectToRoute('orderSummary_page');
+            }
+        }
 
         if (!$billingAdressId) {
             $this->addFlash('error', 'L\'adresse de facturation est manquante.');
@@ -113,9 +125,11 @@ class OrderSummaryController extends AbstractController
 
         if ($deliveryMode !== 'comptoir') {
             $deliveryAdressId = $session->get('deliveryAdress');
-            $deliveryAdress = $deliveryAdressId ? $entityManager->getRepository(DeliveryAdress::class)->find($deliveryAdressId) : null;
-            if ($deliveryAdress) {
-                $order->setDeliveryAdress($deliveryAdress);
+            if ($deliveryAdressId) {
+                $deliveryAdress = $entityManager->getRepository(DeliveryAdress::class)->find($deliveryAdressId);
+                if ($deliveryAdress) {
+                    $order->setDeliveryAdress($deliveryAdress);
+                }
             }
         }
 
@@ -135,14 +149,96 @@ class OrderSummaryController extends AbstractController
 
         $session->remove('cart');
 
-        return $this->redirectToRoute('order_confirmation');
+        return $this->redirectToRoute('order_confirmation', ['orderNumber' => $order->getOrderNumber()]);
     }
 
     #[Route('/orders', name: 'order_confirmation')]
-    public function orderConfirmation(): Response
+    public function orderConfirmation(Request $request, EntityManagerInterface $entityManager, SessionInterface $session): Response
     {
+        $orderNumber = $request->query->get('orderNumber');
+        $order = $entityManager->getRepository(Order::class)->findOneBy(['orderNumber' => $orderNumber]);
+
+        if (!$order) {
+            throw $this->createNotFoundException('Order not found');
+        }
+
+        $billingAdress = $order->getBillingAdress();
+        $deliveryAdress = $order->getDeliveryAdress();
+        $deliveryMode = $session->get('delivery_mode', 'comptoir');
+
+        $netToPay = $order->getNetToPay();
+
         return $this->render('order/confirmation.html.twig', [
-            'message' => 'Votre commande a été finalisée avec succès.',
+            'order' => $order,
+            'billingAdress' => $billingAdress,
+            'deliveryAdress' => $deliveryAdress,
+            'deliveryMode' => $deliveryMode,
+            'netToPay' => $netToPay,
         ]);
+    }
+
+    #[Route('/order/{orderNumber}/json', name: 'order_json')]
+    public function getOrderJson(string $orderNumber, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $order = $entityManager->getRepository(Order::class)->findOneBy(['orderNumber' => $orderNumber]);
+
+        if (!$order) {
+            return new JsonResponse(['error' => 'Order not found'], 404);
+        }
+
+        $user = $order->getUser();
+        $billingAddress = $order->getBillingAdress();
+        $deliveryAddress = $order->getDeliveryAdress();
+        $parts = $order->getParts();
+
+        $response = [
+            'OrderNumber' => $order->getOrderNumber(),
+            'ClientId' => $user->getId(),
+            'Status' => $order->getStatus(),
+            'ToSend' => $order->isToSend(),
+            'IsFreeShipping' => $order->isFreeShipping(),
+            'Parts' => array_map(function($part) {
+                return [
+                    'Id' => $part->getExternalId(),                
+                ];
+            }, $parts->toArray()),
+            'BillingAddress' => [
+                'Firstname' => $billingAddress->getFirstname(),
+                'Lastname' => $billingAddress->getLastname(),
+                'Phone' => $billingAddress->getPhone(),
+                'Street' => $billingAddress->getStreet(),
+                'PostCode' => $billingAddress->getPostCode(),
+                'City' => $billingAddress->getCity(),
+                'CountryId' => $billingAddress->getCountryId(),
+                'Email' => $billingAddress->getEmail(),
+            ],
+        ];
+
+        if ($deliveryAddress) {
+            $response['DeliveryAddress'] = [
+                'Firstname' => $deliveryAddress->getFirstname(),
+                'Lastname' => $deliveryAddress->getLastname(),
+                'Phone' => $deliveryAddress->getPhone(),
+                'Street' => $deliveryAddress->getStreet(),
+                'PostCode' => $deliveryAddress->getPostCode(),
+                'City' => $deliveryAddress->getCity(),
+                'CountryId' => $deliveryAddress->getCountryId(),
+                'Email' => $deliveryAddress->getEmail(),
+            ];
+        }
+
+        // TO DO : voir exactement ce qu'il faut envoyer et gérer le status 
+
+        // $client = new Client();
+        // $apiUrl = $this->params->get('API_ORDER_URL');
+        // $responseApi = $client->post($apiUrl, [
+        //     'json' => $response
+        // ]);
+
+        // if ($responseApi->getStatusCode() !== 200) {
+        //     return new JsonResponse(['error' => 'Failed to send order to external API'], 500);
+        // }
+
+        return new JsonResponse($response);
     }
 }
