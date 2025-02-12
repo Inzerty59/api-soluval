@@ -63,7 +63,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for label, value in {
                         'Référence constructeur': part.manufacturerReference|default('Non renseignée'),
-                        'Référence Opisto': part.id|default('Non renseignée'),
+                        'Référence Opisto': part.getExternalId()|default('Non renseignée'),
                         'Dénomination de la pièce': part.getName()|default('Non renseignée'),
                         'Catégorie du produit': part.categoryName|default('Non renseignée'),
                         'Description': part.description|default('Non renseignée'),

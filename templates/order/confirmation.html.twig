@@ -6,10 +6,73 @@
 
 {% block body %}
     <div class="min-h-screen bg-gray-50 py-6 px-8 text-gray-800">
-        <h1 class="text-2xl font-bold mb-6">Confirmation de commande</h1>
-        <p>{{ message }}</p>
-        <a href="{{ path('shop_index') }}" class="mt-4 inline-block bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
-            Retour à l'accueil
-        </a>
+
+        <!-- Bouton pour revenir en arrière -->
+        <div class="mb-6">
+            <button
+                type="button" onclick="history.back()" class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700
+                                           hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition">
+                <!-- Petite flèche gauche (SVG) -->
+                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Retour
+            </button>
+        </div>
+
+        <h1 class="text-2xl font-bold mb-6">Confirmation de commande n° {{ order.orderNumber }}</h1>
+
+        {% if deliveryMode == 'comptoir' %}
+            <p>Cette commande de <b>{{ netToPay }} €</b> sera à récupérer à l'adresse suivante :</p>
+        {% else %}
+            <p>Cette commande de <b>{{ netToPay }} €</b> vous sera expédiée à l'adresse suivante :</p>
+        {% endif %}
+
+        <!-- Section des adresses et des paiements -->
+        <div class="flex flex-col lg:flex-row justify-between gap-8 items-stretch mt-8">
+            <!-- Récapitulatif des adresses -->
+            <div class="w-full lg:w-1/2 p-6 border border-gray-300 bg-white rounded-md shadow-sm flex-grow">
+                <div class="mb-4">
+                    <p class="font-bold">Adresse de facturation :</p>
+                    <p>{{ billingAdress.Firstname }} {{ billingAdress.Lastname }}</p>
+                    <p>{{ billingAdress.Street }}</p>
+                    <p>{{ billingAdress.StreetAdditionnal }}</p>
+                    <p>{{ billingAdress.PostCode }} {{ billingAdress.City }}</p>
+                    <p>{{ billingAdress.getCountryName() }}</p>
+                </div>
+            </div>
+            {% if deliveryMode == 'comptoir' %}
+            <div class="w-full lg:w-1/2 p-6 border border-gray-300 bg-white rounded-md shadow-sm flex-grow">
+                <div>
+                    <p class="font-bold">Adresse du magasin :</p>
+                    <p>Soluval</p>
+                    <p>4 Rue des Frères Fâché</p>
+                    <p>59580 Aniche</p>
+                    <p>France</p>
+                </div>
+            </div>
+            {% elseif deliveryAdress is not null %}
+            <div class="w-full lg:w-1/2 p-6 border border-gray-300 bg-white rounded-md shadow-sm flex-grow">
+                <div>
+                    <p class="font-bold">Adresse de livraison :</p>
+                    <p>{{ deliveryAdress.Firstname }} {{ deliveryAdress.Lastname }}</p>
+                    <p>{{ deliveryAdress.Street }}</p>
+                    <p>{{ deliveryAdress.StreetAdditionnal }}</p>
+                    <p>{{ deliveryAdress.PostCode }} {{ deliveryAdress.City }}</p>
+                    <p>{{ deliveryAdress.getCountryName() }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Bouton pour continuer -->
+        <div class="mt-8 text-right">
+            <form action="{{ path('create_checkout_session', {'orderNumber': order.orderNumber}) }}" method="GET">
+                <input type="hidden" name="totalAmount" value="{{ order.NetToPay }}">
+                <button type="submit" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                    Procéder au paiement
+                </button>
+            </form>
+        </div>
     </div>
 {% endblock %}

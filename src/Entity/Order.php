@@ -11,7 +11,7 @@ use App\Entity\Part;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
-#[ORM\HasLifecycleCallbacks] // Ajout pour activer les callbacks
+#[ORM\HasLifecycleCallbacks]
 class Order
 {
     #[ORM\Id]
@@ -55,7 +55,6 @@ class Order
 
     #[ORM\Column(length: 255)]
     private ?string $orderNumber = null;
-
 
     public function __construct()
     {
@@ -231,4 +230,38 @@ class Order
         return $this;
     }
 
+    public function getTotalShippingCostsTTC(): float
+    {
+        if ($this->IsFreeShipping) {
+            return 0.0;
+        }
+
+        $shipping = $this->getDeliveryAdress()?->getShipping();
+        if ($shipping) {
+            $shippingCosts = $shipping->getShippingCosts();
+            $totalShippingCost = 0.0;
+
+            foreach ($this->parts as $part) {
+                $totalShippingCost += $shippingCosts['TTC'];
+            }
+
+            return $totalShippingCost;
+        }
+
+        return 0.0;
+    }
+
+    public function getTotalPartsPrice(): float
+    {
+        $total = 0.0;
+        foreach ($this->parts as $part) {
+            $total += $part->getFinalPrice();
+        }
+        return $total;
+    }
+
+    public function getNetToPay(): float
+    {
+        return $this->getTotalPartsPrice() + $this->getTotalShippingCostsTTC();
+    }
 }
