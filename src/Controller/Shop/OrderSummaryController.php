@@ -14,14 +14,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use GuzzleHttp\Client;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderSummaryController extends AbstractController
 {
     private $stockChecker;
+    private $params;
 
-    public function __construct(OpistoStockChecker $stockChecker)
+    public function __construct(OpistoStockChecker $stockChecker, ParameterBagInterface $params)
     {
         $this->stockChecker = $stockChecker;
+        $this->params = $params;
     }
 
     #[Route('/recapitulatif', name: 'orderSummary_page')]
@@ -170,5 +175,68 @@ class OrderSummaryController extends AbstractController
             'deliveryMode' => $deliveryMode,
             'netToPay' => $netToPay,
         ]);
+    }
+
+    #[Route('/order/{orderNumber}/json', name: 'order_json')]
+    public function getOrderJson(string $orderNumber, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $order = $entityManager->getRepository(Order::class)->findOneBy(['orderNumber' => $orderNumber]);
+
+        if (!$order) {
+            return new JsonResponse(['error' => 'Order not found'], 404);
+        }
+
+        $user = $order->getUser();
+        $billingAddress = $order->getBillingAdress();
+        $deliveryAddress = $order->getDeliveryAdress();
+        $parts = $order->getParts();
+
+        $response = [
+            'OrderNumber' => $order->getOrderNumber(),
+            'ClientId' => $user->getId(),
+            'Status' => $order->getStatus(),
+            'ToSend' => $order->isToSend(),
+            'IsFreeShipping' => $order->isFreeShipping(),
+            'Parts' => array_map(function($part) {
+                return [
+                    'Id' => $part->getExternalId(),                
+                ];
+            }, $parts->toArray()),
+            'BillingAddress' => [
+                'Firstname' => $billingAddress->getFirstname(),
+                'Lastname' => $billingAddress->getLastname(),
+                'Phone' => $billingAddress->getPhone(),
+                'Street' => $billingAddress->getStreet(),
+                'PostCode' => $billingAddress->getPostCode(),
+                'City' => $billingAddress->getCity(),
+                'CountryId' => $billingAddress->getCountryId(),
+                'Email' => $billingAddress->getEmail(),
+            ],
+        ];
+
+        if ($deliveryAddress) {
+            $response['DeliveryAddress'] = [
+                'Firstname' => $deliveryAddress->getFirstname(),
+                'Lastname' => $deliveryAddress->getLastname(),
+                'Phone' => $deliveryAddress->getPhone(),
+                'Street' => $deliveryAddress->getStreet(),
+                'PostCode' => $deliveryAddress->getPostCode(),
+                'City' => $deliveryAddress->getCity(),
+                'CountryId' => $deliveryAddress->getCountryId(),
+                'Email' => $deliveryAddress->getEmail(),
+            ];
+        }
+
+        $client = new Client();
+        $apiUrl = $this->params->get('API_ORDER_URL');
+        $responseApi = $client->post($apiUrl, [
+            'json' => $response
+        ]);
+
+        if ($responseApi->getStatusCode() !== 200) {
+            return new JsonResponse(['error' => 'Failed to send order to external API'], 500);
+        }
+
+        return new JsonResponse($response);
     }
 }
