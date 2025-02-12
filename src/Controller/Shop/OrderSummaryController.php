@@ -227,15 +227,17 @@ class OrderSummaryController extends AbstractController
             ];
         }
 
-        $client = new Client();
-        $apiUrl = $this->params->get('API_ORDER_URL');
-        $responseApi = $client->post($apiUrl, [
-            'json' => $response
-        ]);
+        // TO DO : voir exactement ce qu'il faut envoyer et gérer le status 
 
-        if ($responseApi->getStatusCode() !== 200) {
-            return new JsonResponse(['error' => 'Failed to send order to external API'], 500);
-        }
+        // $client = new Client();
+        // $apiUrl = $this->params->get('API_ORDER_URL');
+        // $responseApi = $client->post($apiUrl, [
+        //     'json' => $response
+        // ]);
+
+        // if ($responseApi->getStatusCode() !== 200) {
+        //     return new JsonResponse(['error' => 'Failed to send order to external API'], 500);
+        // }
 
         return new JsonResponse($response);
     }
