@@ -43,7 +43,7 @@
                                     </td>
                                     <td class="py-4 px-6 text-center text-gray-800 font-semibold">{{ item.part.getFinalPrice() }} €</td>
                                     <td class="py-4 px-6 text-center">
-                                        <a href="{{ path('cart_delete', { id: item.part.Id }) }}" 
+                                        <a href="{{ path('cart_delete', { id: item.part.Id }) }}" id="delete_Product" 
                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit du panier ?');"
                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                             Supprimer
