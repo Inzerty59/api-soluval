@@ -20,23 +20,23 @@
                 <div class="mb-4">
                     <label for="marque" class="block font-semibold mb-1">Marque</label>
                     <select id="marque" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-300">
-                        <option>Toutes marques</option>
+                        <option value="">Toutes marques</option>
                     </select>
                 </div>
                 <div class="mb-4">
                     <label for="modele" class="block font-semibold mb-1">Modèle</label>
                     <select id="modele" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-300">
-                        <option>Tous modèles</option>
+                        <option value="">Tous modèles</option>
                     </select>
                 </div>
 
                 <!-- Bouton pour afficher/masquer les filtres avancés -->
-                <button id="toggle-advanced-filters" class="w-full bg-gray-300 text-gray-700 p-2 rounded hover:bg-gray-400 transition">
+                {# <button id="toggle-advanced-filters" class="w-full bg-gray-300 text-gray-700 p-2 rounded hover:bg-gray-400 transition">
                     Recherche avancée
-                </button>
+                </button> #}
 
                 <!-- Filtres avancés -->
-                <div id="advanced-filters" class="hidden mt-4">
+                {# <div id="advanced-filters" class="hidden mt-4">
                     <div class="mb-4">
                         <label for="code-moteur" class="block font-semibold mb-1">Code moteur</label>
                         <input id="code-moteur" type="text" placeholder="Code moteur" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500">
@@ -53,7 +53,7 @@
                         <label for="ref-constructeur" class="block font-semibold mb-1">Référence constructeur</label>
                         <input id="ref-constructeur" type="text" placeholder="Référence constructeur" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500">
                     </div>
-                </div>
+                </div> #}
 
                 <!-- Bouton de recherche -->
                 <button class="w-full bg-customGreen text-white p-2 rounded hover:bg-gray-500 transition mt-4" id="search-button">
@@ -160,5 +160,92 @@
         });
 
         document.getElementById('search-button').addEventListener('click', searchParts);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Charger les marques
+            fetch('/shop/brands')
+                .then(response => response.json())
+                .then(data => {
+                    const marqueSelect = document.getElementById('marque');
+                    if (data.length > 0) {
+                        data.forEach(brand => {
+                            const option = document.createElement('option');
+                            option.value = brand;
+                            option.textContent = brand;
+                            marqueSelect.appendChild(option);
+                        });
+                        // Charger les modèles seulement si les marques existent
+                        fetch('/shop/models')
+                            .then(response => response.json())
+                            .then(data => {
+                                const modeleSelect = document.getElementById('modele');
+                                data.filter(model => model !== null).forEach(model => {
+                                    const option = document.createElement('option');
+                                    option.value = model;
+                                    option.textContent = model;
+                                    modeleSelect.appendChild(option);
+                                });
+                            });
+                    } else {
+                        // Cacher le sélecteur de modèle si aucune marque n'est disponible
+                        document.getElementById('modele').style.display = 'none';
+                    }
+                });
+
+            // Ajouter un événement de recherche
+            document.getElementById('toggle-advanced-filters').addEventListener('click', function() {
+                document.getElementById('advanced-filters').classList.toggle('hidden');
+            });
+
+            document.getElementById('marque').addEventListener('change', function() {
+                searchParts();
+            });
+
+            function searchParts() {
+                const query = document.getElementById('type-piece').value;
+                const marque = document.getElementById('marque').value;
+                const modele = document.getElementById('modele').value;
+                const url = new URL('/shop/search', window.location.origin);
+                url.searchParams.append('query', query);
+                if (marque) {
+                    url.searchParams.append('marque', marque);
+                }
+                if (modele) {
+                    url.searchParams.append('modele', modele);
+                }
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        const partsList = document.getElementById('parts-list');
+                        partsList.innerHTML = '';
+                        data.forEach(part => {
+                            const partElement = document.createElement('div');
+                            partElement.classList.add('flex', 'items-start', 'bg-white', 'border', 'border-gray-300', 'p-4', 'rounded', 'shadow-md', 'w-full');
+                            partElement.innerHTML = `
+                               <a href="/product/${part.id}" class="flex-1 flex items-start">
+                                <div class="w-36 h-36 flex-shrink-0">
+                                    <img src="${part.vignette}" alt="${part.name}" class="w-full h-full object-cover rounded">
+                                </div>
+                                <div class="flex-1 ml-4">   
+                                    <h3 class="text-lg font-semibold text-gray-800">${part.name}</h3>
+                                    <p class="text-sm text-gray-500">${part.model_name}</p>
+                                    <p class="text-lg font-bold text-gray-800 mt-2">${part.finalPrice ? part.finalPrice : 'N/A'} €</p>
+                                </div>
+                            </a>
+                            <div>
+                                <a href="/panier/ajouter-au-panier/${part.id}" class="bg-customGreen text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewbox="0 0 24 24">
+                                        <path fill="currentColor" d="M0 1h4.764l3 11h10.515l3.089-9.265l1.897.633L19.72 14H7.78l-.5 2H22v2H4.72l1.246-4.989L3.236 3H0zm14 1v3h3v2h-3v3h-2V7H9V5h3V2zM4 21a2 2 0 1 1 4 0a2 2 0 0 1-4 0m14 0a2 2 0 1 1 4 0a2 2 0 0 1-4 0"/>
+                                    </svg>
+                                    Ajouter au panier
+                                </a>
+                            </div>
+                        `;
+                            partsList.appendChild(partElement);
+                        });
+                    });
+            }
+        });
     </script>
 {% endblock %}
