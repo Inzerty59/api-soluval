@@ -30,4 +30,18 @@ class ShopController extends AbstractController
 
         return $this->json($parts, 200, [], [AbstractNormalizer::GROUPS => ['part:read']]);
     }
+
+    #[Route('/product/{id}', name: 'product_detail', methods: ['GET'])]
+    public function productDetail(int $id, PartRepository $partRepository): Response
+    {
+        $part = $partRepository->find($id);
+
+        if (!$part) {
+            throw $this->createNotFoundException('La pièce demandée n\'existe pas.');
+        }
+
+        return $this->render('product/detail.html.twig', [
+            'part' => $part,
+        ]);
+    }
 }
