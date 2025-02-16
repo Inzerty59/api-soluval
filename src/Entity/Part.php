@@ -10,105 +10,141 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: PartRepository::class)]
 #[ApiResource(
     operations: [
         new Get(),
         new GetCollection()
-    ]
-)]class Part
+    ],
+    normalizationContext: ['groups' => ['part:read']],
+    denormalizationContext: ['groups' => ['part:write']]
+)]
+class Part
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $external_id = null;
 
     #[ORM\Column(length: 40, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $manufacturer_reference = null;
 
     #[ORM\Column(length: 40, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $adaptable_reference = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $category_name = null;
 
     #[ORM\Column(length: 1000, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $part_condition = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $warranty = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $brand_name = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $range_name = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $model_name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $finish_name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $commercial_designation = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $vehicle_year = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $mileage = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?array $color_name = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $displacement = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $power = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $energy_name = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?array $gearbox_type = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $engine_code = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $gearbox_code = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $door_number = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $vignette = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?array $photos = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?array $Price = null;
 
     #[ORM\Column]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $casse_id = null;
 
     #[ORM\Column]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $Shipping_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'parts')]
+    #[Groups(['part:read', 'part:write'])]
+    #[MaxDepth(1)]
     private ?Order $order = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $weight = null;
 
     public function __construct()
@@ -422,6 +458,7 @@ use Doctrine\ORM\Mapping as ORM;
     }
 
     
+    #[Groups(['part:read'])]
     public function getName(): string
     {   
     $cleanCategoryName = preg_replace('/\s*\(.*?\)\s*/', '', $this->category_name);
@@ -434,6 +471,7 @@ use Doctrine\ORM\Mapping as ORM;
     ));
     }
 
+    #[Groups(['part:read'])]
     public function getFinalPrice(): ?string
     {
     if (is_array($this->Price) && isset($this->Price['OriginPrice'], $this->Price['VATRate'])) {

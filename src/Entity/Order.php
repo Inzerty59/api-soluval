@@ -7,7 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Part;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
@@ -17,24 +18,31 @@ class Order
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['order:read', 'order:write'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['order:read', 'order:write'])]
     private ?bool $ToSend = null;
 
     #[ORM\Column]
+    #[Groups(['order:read', 'order:write'])]
     private ?bool $IsFreeShipping = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[Groups(['order:read', 'order:write'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[Groups(['order:read', 'order:write'])]
     private ?BillingAdress $billingAdress = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[Groups(['order:read', 'order:write'])]
     private ?DeliveryAdress $deliveryAdress = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[Groups(['order:read', 'order:write'])]
     private ?MangoPay $mangoPay = null;
 
     /**
@@ -42,18 +50,24 @@ class Order
      */
     #[ORM\OneToMany(targetEntity: Part::class, mappedBy: 'order')]
     #[ORM\ManyToOne(targetEntity: Part::class, cascade: ['persist'])]
+    #[Groups(['order:read', 'order:write'])]
+    #[MaxDepth(1)]
     private Collection $parts;
 
     #[ORM\Column]
+    #[Groups(['order:read', 'order:write'])]
     private ?\DateTimeImmutable $CreatedAt = null;
 
     #[ORM\Column]
+    #[Groups(['order:read', 'order:write'])]
     private ?\DateTimeImmutable $UpdatedAt = null;
 
     #[ORM\Column(type: Types::ARRAY)]
+    #[Groups(['order:read', 'order:write'])]
     private array $status = [];
 
     #[ORM\Column(length: 255)]
+    #[Groups(['order:read', 'order:write'])]
     private ?string $orderNumber = null;
 
     public function __construct()
