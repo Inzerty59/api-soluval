@@ -44,4 +44,20 @@ class ShopController extends AbstractController
             'part' => $part,
         ]);
     }
+
+    #[Route('/shop/brands', name: 'shop_brands', methods: ['GET'])]
+    public function getBrands(PartRepository $partRepository): Response
+    {
+        $brands = $partRepository->findDistinctBrands();
+
+        return $this->json($brands);
+    }
+
+    #[Route('/shop/models', name: 'shop_models', methods: ['GET'])]
+    public function getModels(PartRepository $partRepository): Response
+    {
+        $models = $partRepository->findDistinctModels();
+
+        return $this->json($models);
+    }
 }

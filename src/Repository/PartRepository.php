@@ -33,6 +33,26 @@ class PartRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findDistinctBrands(): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('DISTINCT p.brand_name')
+            ->orderBy('p.brand_name', 'ASC');
+
+        $result = $qb->getQuery()->getResult();
+        return array_map(fn($brand) => $brand['brand_name'], $result);
+    }
+
+    public function findDistinctModels(): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('DISTINCT p.model_name')
+            ->orderBy('p.model_name', 'ASC');
+
+        $result = $qb->getQuery()->getResult();
+        return array_map(fn($model) => $model['model_name'], $result);
+    }
+
     //    /**
     //     * @return Part[] Returns an array of Part objects
     //     */
