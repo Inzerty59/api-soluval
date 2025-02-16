@@ -16,6 +16,23 @@ class PartRepository extends ServiceEntityRepository
         parent::__construct($registry, Part::class);
     }
 
+    public function searchParts(string $query): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.category_name LIKE :query')
+            ->orWhere('p.manufacturer_reference LIKE :query')
+            ->orWhere('p.adaptable_reference LIKE :query')
+            ->orWhere('p.description LIKE :query')
+            ->orWhere('p.brand_name LIKE :query')
+            ->orWhere('p.model_name LIKE :query')
+            ->orWhere('p.finish_name LIKE :query')
+            ->orWhere('p.commercial_designation LIKE :query')
+            ->orWhere('p.energy_name LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Part[] Returns an array of Part objects
     //     */
