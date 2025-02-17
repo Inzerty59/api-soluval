@@ -117,7 +117,18 @@
     <script>
         function searchParts() {
             const query = document.getElementById('type-piece').value;
-            fetch(`/shop/search?query=${query}`)
+            const brand = document.getElementById('marque').value;
+            const model = document.getElementById('modele').value;
+            const url = new URL('/shop/search', window.location.origin);
+            url.searchParams.append('query', query);
+            if (brand) {
+                url.searchParams.append('brand', brand);
+            }
+            if (model) {
+                url.searchParams.append('model', model);
+            }
+
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     const partsList = document.getElementById('parts-list');
@@ -197,9 +208,8 @@
                 document.getElementById('advanced-filters').classList.toggle('hidden');
             });
 
-            document.getElementById('marque').addEventListener('change', function() {
-                searchParts();
-            });
+            document.getElementById('marque').addEventListener('change', searchParts);
+            document.getElementById('modele').addEventListener('change', searchParts);
 
             function searchParts() {
                 const query = document.getElementById('type-piece').value;

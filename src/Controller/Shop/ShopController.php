@@ -26,7 +26,9 @@ class ShopController extends AbstractController
     public function search(Request $request, PartRepository $partRepository): Response
     {
         $query = $request->query->get('query');
-        $parts = $partRepository->searchParts($query);
+        $brand = $request->query->get('brand');
+        $model = $request->query->get('model');
+        $parts = $partRepository->searchParts($query, $brand, $model);
 
         return $this->json($parts, 200, [], [AbstractNormalizer::GROUPS => ['part:read']]);
     }
