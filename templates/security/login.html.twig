@@ -9,13 +9,6 @@
                 {% if error %}
                     <div class="bg-red-100 border border-red-400 text-red-400 px-4 py-3 rounded mb-4 shadow-sm" role="alert">Vos identifiants sont incorrects.</div>
                 {% endif %}
-
-                {% if app.user %}
-                    <div class="mb-3">
-                        You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
-                    </div>
-                {% endif %}
-
                 <h1 class="text-3xl font-bold mb-6 text-center">Connectez-vous</h1>
                 <div class="mb-4">
                     <label for="username" class="block font-semibold mb-1">E-mail</label>
