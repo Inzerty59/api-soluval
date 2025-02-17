@@ -16,7 +16,7 @@ class PartRepository extends ServiceEntityRepository
         parent::__construct($registry, Part::class);
     }
 
-    public function searchParts(string $query, ?string $brand = null, ?string $model = null): array
+    public function searchParts(string $query, ?string $brand = null, ?string $model = null, ?string $sort = null): array
     {
         $qb = $this->createQueryBuilder('p')
             ->where('p.category_name LIKE :query')
@@ -38,6 +38,14 @@ class PartRepository extends ServiceEntityRepository
         if ($model) {
             $qb->andWhere('p.model_name = :model')
                 ->setParameter('model', $model);
+        }
+
+        if ($sort) {
+            if ($sort === 'price_asc') {
+                $qb->orderBy('p.finalPrice', 'ASC');
+            } elseif ($sort === 'price_desc') {
+                $qb->orderBy('p.finalPrice', 'DESC');
+            }
         }
 
         return $qb->getQuery()->getResult();

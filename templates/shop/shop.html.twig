@@ -71,8 +71,10 @@
                         <button class="border border-gray-300 px-3 py-1 rounded hover:bg-gray-200">25</button>
                         <button class="border border-gray-300 px-3 py-1 rounded hover:bg-gray-200">50</button>
                     </div>
-                    <select class="border border-gray-300 p-2 rounded">
-                        <option>Trier par</option>
+                    <select id="sort" class="border border-gray-300 p-2 rounded">
+                        <option value="">Trier par</option>
+                        <option value="price_asc">Prix croissant</option>
+                        <option value="price_desc">Prix décroissant</option>
                     </select>
                 </div>
 
@@ -119,6 +121,7 @@
             const query = document.getElementById('type-piece').value;
             const brand = document.getElementById('marque').value;
             const model = document.getElementById('modele').value;
+            const sort = document.getElementById('sort').value;
             const url = new URL('/shop/search', window.location.origin);
             url.searchParams.append('query', query);
             if (brand) {
@@ -131,6 +134,18 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
+                    // Calculer le prix final pour chaque pièce
+                    data.forEach(part => {
+                        part.finalPrice = parseFloat(part.finalPrice);
+                    });
+
+                    // Trier les données en fonction du prix final
+                    if (sort === 'price_asc') {
+                        data.sort((a, b) => a.finalPrice - b.finalPrice);
+                    } else if (sort === 'price_desc') {
+                        data.sort((a, b) => b.finalPrice - a.finalPrice);
+                    }
+
                     const partsList = document.getElementById('parts-list');
                     const partsCount = document.getElementById('parts-count');
                     partsList.innerHTML = '';
@@ -144,10 +159,10 @@
                                 <div class="w-36 h-36 flex-shrink-0">
                                     <img src="${part.vignette}" alt="${part.name}" class="w-full h-full object-cover rounded">
                                 </div>
-                                <div class="flex-1 ml-4">   
+                                <div class="flex-1 ml-4">
                                     <h3 class="text-lg font-semibold text-gray-800">${part.name}</h3>
                                     <p class="text-sm text-gray-500">${part.model_name}</p>
-                                    <p class="text-lg font-bold text-gray-800 mt-2">${part.finalPrice ? part.finalPrice : 'N/A'} €</p>
+                                    <p class="text-lg font-bold text-gray-800 mt-2">${part.finalPrice ? part.finalPrice.toFixed(2) : 'N/A'} €</p>
                                 </div>
                             </a>
                             <div>
@@ -210,11 +225,14 @@
 
             document.getElementById('marque').addEventListener('change', searchParts);
             document.getElementById('modele').addEventListener('change', searchParts);
+            document.getElementById('sort').addEventListener('change', searchParts);
+            document.getElementById('sort').addEventListener('change', searchParts);
 
             function searchParts() {
                 const query = document.getElementById('type-piece').value;
                 const marque = document.getElementById('marque').value;
                 const modele = document.getElementById('modele').value;
+                const sort = document.getElementById('sort').value;
                 const url = new URL('/shop/search', window.location.origin);
                 url.searchParams.append('query', query);
                 if (marque) {
@@ -222,6 +240,9 @@
                 }
                 if (modele) {
                     url.searchParams.append('modele', modele);
+                }
+                if (sort) {
+                    url.searchParams.append('sort', sort);
                 }
 
                 fetch(url)
