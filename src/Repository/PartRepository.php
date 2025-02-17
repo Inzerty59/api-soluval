@@ -16,9 +16,9 @@ class PartRepository extends ServiceEntityRepository
         parent::__construct($registry, Part::class);
     }
 
-    public function searchParts(string $query): array
+    public function searchParts(string $query, ?string $brand = null, ?string $model = null): array
     {
-        return $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->where('p.category_name LIKE :query')
             ->orWhere('p.manufacturer_reference LIKE :query')
             ->orWhere('p.adaptable_reference LIKE :query')
@@ -28,9 +28,19 @@ class PartRepository extends ServiceEntityRepository
             ->orWhere('p.finish_name LIKE :query')
             ->orWhere('p.commercial_designation LIKE :query')
             ->orWhere('p.energy_name LIKE :query')
-            ->setParameter('query', '%' . $query . '%')
-            ->getQuery()
-            ->getResult();
+            ->setParameter('query', '%' . $query . '%');
+
+        if ($brand) {
+            $qb->andWhere('p.brand_name = :brand')
+                ->setParameter('brand', $brand);
+        }
+
+        if ($model) {
+            $qb->andWhere('p.model_name = :model')
+                ->setParameter('model', $model);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function findDistinctBrands(): array
