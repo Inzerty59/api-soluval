@@ -28,7 +28,8 @@ class ShopController extends AbstractController
         $query = $request->query->get('query');
         $brand = $request->query->get('brand');
         $model = $request->query->get('model');
-        $parts = $partRepository->searchParts($query, $brand, $model);
+        $sort = $request->query->get('sort');
+        $parts = $partRepository->searchParts($query, $brand, $model, $sort);
 
         return $this->json($parts, 200, [], [AbstractNormalizer::GROUPS => ['part:read']]);
     }
