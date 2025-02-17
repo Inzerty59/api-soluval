@@ -17,7 +17,7 @@ class Order
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     #[Groups(['order:read', 'order:write'])]
     private ?int $id = null;
 
@@ -29,7 +29,8 @@ class Order
     #[Groups(['order:read', 'order:write'])]
     private ?bool $IsFreeShipping = null;
 
-    #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
+    #[ORM\JoinColumn(nullable: false)]
     #[Groups(['order:read', 'order:write'])]
     private ?User $user = null;
 

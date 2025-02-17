@@ -60,7 +60,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Order>
      */
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'user')]
-    private Collection $category;
+    private Collection $orders;
 
     /**
      * @var Collection<int, BillingAdress>
@@ -79,7 +79,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->orders = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
-        $this->category = new ArrayCollection();
         $this->billingAdresses = new ArrayCollection();
         $this->deliveryAdresses = new ArrayCollection();
     }
@@ -200,27 +199,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Order>
      */
-    public function getCategory(): Collection
+    public function getOrders(): Collection
     {
-        return $this->category;
+        return $this->orders;
     }
 
-    public function addCategory(Order $category): static
+    public function addOrder(Order $order): self
     {
-        if (!$this->category->contains($category)) {
-            $this->category->add($category);
-            $category->setUser($this);
+        if (!$this->orders->contains($order)) {
+            $this->orders[] = $order;
+            $order->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeCategory(Order $category): static
+    public function removeOrder(Order $order): self
     {
-        if ($this->category->removeElement($category)) {
+        if ($this->orders->removeElement($order)) {
             // set the owning side to null (unless already changed)
-            if ($category->getUser() === $this) {
-                $category->setUser(null);
+            if ($order->getUser() === $this) {
+                $order->setUser(null);
             }
         }
 

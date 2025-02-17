@@ -134,12 +134,10 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    // Calculer le prix final pour chaque pièce
                     data.forEach(part => {
                         part.finalPrice = parseFloat(part.finalPrice);
                     });
 
-                    // Trier les données en fonction du prix final
                     if (sort === 'price_asc') {
                         data.sort((a, b) => a.finalPrice - b.finalPrice);
                     } else if (sort === 'price_desc') {
@@ -188,7 +186,6 @@
         document.getElementById('search-button').addEventListener('click', searchParts);
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Charger les marques
             fetch('/shop/brands')
                 .then(response => response.json())
                 .then(data => {
@@ -200,7 +197,6 @@
                             option.textContent = brand;
                             marqueSelect.appendChild(option);
                         });
-                        // Charger les modèles seulement si les marques existent
                         fetch('/shop/models')
                             .then(response => response.json())
                             .then(data => {
@@ -212,13 +208,9 @@
                                     modeleSelect.appendChild(option);
                                 });
                             });
-                    } else {
-                        // Cacher le sélecteur de modèle si aucune marque n'est disponible
-                        document.getElementById('modele').style.display = 'none';
-                    }
+                    } 
                 });
 
-            // Ajouter un événement de recherche
             document.getElementById('toggle-advanced-filters').addEventListener('click', function() {
                 document.getElementById('advanced-filters').classList.toggle('hidden');
             });
