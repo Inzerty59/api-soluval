@@ -64,10 +64,10 @@ class PasswordResetController extends AbstractController
         $user = $entityManager->getRepository(User::class)->findOneBy(['resetToken' => $token]);
 
         if (!$user || $user->getResetToken() === null) {
-            $this->addFlash('error', 'Lien invalide ou déjà utilisé.');
+            $this->addFlash('invalid_link', 'Lien invalide ou déjà utilisé.');
             return $this->redirectToRoute('shop_index');
         }
-
+        
         if ($request->isMethod('POST')) {
             $newPassword = $request->request->get('password');
             $confirmPassword = $request->request->get('confirm_password');
