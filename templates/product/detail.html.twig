@@ -6,6 +6,7 @@
 <div class="container mx-auto p-6 space-y-8">
     <button
         type="button"
+        id="back-Description"
         onclick="history.back()"
         class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700
                hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition"
@@ -22,9 +23,9 @@
         <!-- Image principale + Miniatures -->
         <div class="flex-shrink-0 w-full md:w-1/3 flex flex-col items-center bg-gray-100 rounded-lg shadow-md p-4 space-y-4">
             <!-- Image principale -->
-            <img src="{{ part.vignette }}" alt="{{ part.getName() }}" class="rounded-lg max-w-full max-h-64">
+            <img src="{{ part.vignette }}" id="image_Description" alt="{{ part.getName() }}" class="rounded-lg max-w-full max-h-64">
             <!-- Miniatures -->
-            <div class="flex flex-wrap space-x-2">
+            <div class="flex flex-wrap space-x-2" id="miniature_Description"> 
                 {% for photo in part.photos|slice(0, 5) %}
                     <img src="{{ photo }}" alt="{{ part.getName() }}" class="w-16 h-16 object-cover border rounded-lg">
                 {% endfor %}
@@ -43,13 +44,13 @@
 
         <!-- Détails produit -->
         <div class="w-full md:flex-1 space-y-4">
-            <h1 class="text-4xl font-extrabold text-gray-800">{{ part.getName() }}</h1>
-            <p class="text-2xl text-customGreen font-bold">Prix : {{ part.getFinalPrice() }} €</p>
-            <p class="text-lg text-gray-600">Livraison * : À partir de 1,00 €</p>
-            <p class="text-lg text-gray-600">Délais de livraison estimés entre 1 et 2 jours ouvrés.</p>
-            <p class="text-lg text-gray-600">Garantie : {{ part.warranty }} mois</p>
+            <h1 class="text-4xl font-extrabold text-gray-800" id="name_Description">{{ part.getName() }}</h1>
+            <p class="text-2xl text-customGreen font-bold" id="prix_Description">Prix : {{ part.getFinalPrice() }} €</p>
+            <p class="text-lg text-gray-600" id="livraison_Description">Livraison * : À partir de 1,00 €</p>
+            <p class="text-lg text-gray-600" id="delai_Livraison_Description">Délais de livraison estimés entre 1 et 2 jours ouvrés.</p>
+            <p class="text-lg text-gray-600" id="garantie_Description">Garantie : {{ part.warranty }} mois</p>
             <div class="flex space-x-4">
-                <a href="{{ path('cart_add', { id: part.id }) }}" class="bg-customGreen text-white px-6 py-3 rounded-lg hover:bg-green-700 inline-block">Ajouter au panier</a>
+                <a href="{{ path('cart_add', { id: part.id }) }}" href="{{ path('cart_add', { id: part.id }) }}" class="bg-customGreen text-white px-6 py-3 rounded-lg hover:bg-green-700 inline-block">Ajouter au panier</a>
             </div>
         </div>
     </div>

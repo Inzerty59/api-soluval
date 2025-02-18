@@ -43,7 +43,7 @@
                                     </td>
                                     <td class="py-4 px-6 text-center text-gray-800 font-semibold">{{ item.part.getFinalPrice() }} €</td>
                                     <td class="py-4 px-6 text-center">
-                                        <a href="{{ path('cart_delete', { id: item.part.Id }) }}" 
+                                        <a href="{{ path('cart_delete', { id: item.part.Id }) }}" id="delete_Product" 
                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit du panier ?');"
                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                             Supprimer
@@ -70,7 +70,7 @@
                     <a href="{{ path('shop_index') }}" id="purchase_Continue" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Continuer vos achats
                     </a>
-                    <button onclick="window.location.href='{{ path('cart_checkout') }}'" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                    <button onclick="window.location.href='{{ path('cart_checkout') }}'" id="delivery_Choice" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
                         Choix de la livraison
                     </button>
                 </div>
