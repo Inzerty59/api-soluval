@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const isComptoir = selectedMode === 'comptoir';
 
         deliveryFormFields.forEach(field => {
-            if (field.name !== 'streetAdditional') {
+            if (field.name !== 'delivery_adress[StreetAdditionnal]') {
                 field.required = !isComptoir;
             } else {
                 field.required = false;
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         billingFormFields.forEach(field => {
-            if (field.name !== 'streetAdditional') {
+            if (field.name !== 'billing_adress[StreetAdditionnal]') {
                 field.required = !isComptoir;
             } else {
                 field.required = false;
