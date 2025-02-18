@@ -12,21 +12,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\AbstractType;
 use App\Entity\User;
-use App\Validator\Constraints\ValidSiret;
+use App\Service\SiretVerificationService;
 
 class RegistrationFormType extends AbstractType
 {
+    private $siretVerificationService;
+
+    public function __construct(SiretVerificationService $siretVerificationService)
+    {
+        $this->siretVerificationService = $siretVerificationService;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', TextType::class, [
-                'label' => 'Nom',
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'Le nom ne doit pas être vide.',
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/^[A-Za-zÀ-ÿ]+$/',
                         'message' => 'Le nom ne doit contenir que des lettres.',
                     ]),
                 ],
@@ -81,6 +80,14 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('companyName', TextType::class, [
                 'label' => 'Nom de l\'entreprise',
+                'constraints' => [
+                    new Assert\Callback(function ($object, $context) {
+                        if ($context->getRoot()->get('accountType')->getData() === 'professionnel' && empty($object)) {
+                            $context->buildViolation('Le nom de l\'entreprise ne doit pas être vide.')
+                                ->addViolation();
+                        }
+                    }),
+                ],
                 'required' => false,
                 'error_bubbling' => true,
             ])
@@ -91,6 +98,12 @@ class RegistrationFormType extends AbstractType
                         'pattern' => '/^\d{14}$/',
                         'message' => 'Le numéro SIRET doit contenir exactement 14 chiffres.',
                     ]),
+                    new Assert\Callback(function ($object, $context) {
+                        if ($context->getRoot()->get('accountType')->getData() === 'professionnel' && empty($object)) {
+                            $context->buildViolation('Le numéro SIRET ne doit pas être vide.')
+                                ->addViolation();
+                        }
+                    }),
                 ],
                 'required' => false,
                 'error_bubbling' => true,
