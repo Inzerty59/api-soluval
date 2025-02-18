@@ -54,7 +54,24 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('email', RepeatedType::class, [
                 'type' => EmailType::class,
-                'first_options' => ['label' => 'Email'],
+                'first_options' => [
+                    'label' => 'Email',
+                    'constraints' => [
+                        new Assert\Callback(function ($object, $context) {
+                            if (!filter_var($object, FILTER_VALIDATE_EMAIL)) {
+                                $context->buildViolation('L\'adresse email n\'est pas valide.')
+                                    ->addViolation();
+                            } else {
+                                $domain = substr(strrchr($object, "@"), 1);
+                                if (strpos($domain, '.') === false) {
+                                    $context->buildViolation('L\'adresse email doit contenir un domaine de niveau supérieur.')
+                                        ->addViolation();
+                                }
+                            }
+                        }),
+                    ],
+                    'error_bubbling' => true,
+                ],
                 'second_options' => ['label' => 'Confirmer l\'email'],
                 'invalid_message' => 'Les adresses email doivent correspondre.',
                 'error_bubbling' => true,
@@ -109,9 +126,6 @@ class RegistrationFormType extends AbstractType
                     new Assert\Callback(function ($object, $context) {
                         if ($context->getRoot()->get('accountType')->getData() === 'professionnel' && empty($object)) {
                             $context->buildViolation('Le numéro SIRET ne doit pas être vide.')
-                                ->addViolation();
-                        } elseif (!$this->siretVerificationService->verifySiret($object)) {
-                            $context->buildViolation('Le numéro SIRET n\'est pas valide.')
                                 ->addViolation();
                         }
                     }),
