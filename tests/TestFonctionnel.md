@@ -4,7 +4,7 @@
 |                           | Visuel                                       | OK                     | Basse          | Bouton deconnexion        |
 |                           | Lien de connexion                            | Fonctionnel            | Haute          | Se connecter ?            |
 |                           | Bouton se connecter                          | Fonctionnel            | Haute          | /                         |
-|                           | Bouton se déconnecter                        | OK                     | Moyenne        | Peut être pas présent     |
+|                           | Bouton se déconnecter                        | OK                     | Basse          | Peut être pas présent     |
 |                           | Pas de Mail                                  | Fonctionnel            | Haute          | (1)                       |
 |                           | Pas de mot de passe                          | Fonctionnel            | Haute          | (1)                       |
 |                           | Affichage Mot de passe                       | Fonctionnel            | Moyenne        | /                         |
@@ -36,7 +36,7 @@
 |                           | Confirmation de Mot de passe ≠ Mot de passe  | Ok                     | Haute          | Pas de message *          |
 |                           | Confirmation Mot de passe peu de caractère   | OK                     | Haute          | Pas de message *          |
 |                           | Confirmation Mot de passe mauvaise forme     | OK                     | Haute          | Pas de message *          |
-|                           | Visualisation du Mot de passe                | Erreur                 | Basse          | Pas d'action              |
+|                           | Visualisation de la confirmation  Mdp        | Erreur                 | Basse          | Pas d'action              |
 |                           | Cas passant Particulier                      | Fonctionnel            | Haute          | /                         |
 |                           | Menu Type de compte                          | Fonctionnel            | Haute          | /                         |
 |                           |                                              |                        |                |                           |
@@ -52,7 +52,7 @@
 |                           | N° TVA incorrect                             | A faire                | Haute          |                           |
 |                           | N° SIRET ≠ N° TVA                            | A faire                | Haute          |                           |
 |                           | Cas passant Professionnel                    | Erreur                 | Haute          | Aucune action             |
-|                           | Créer un compte mais déja connecter          | A tester               |                | Compte Créer              | 
+|                           | Créer un compte mais déja connecter          | A tester               | Moyenne        | Compte Créer              | 
 | **C. BOUTIQUE**                                                                                                                                |
 | 1) Entête                                                                                                                                      |
 |                           | Logo Soluval                                 | Fonctionnel            | Moyenne        | /                         |
@@ -119,7 +119,7 @@
 |                           | Tableau des pièces commandées                | Fonctionnel            | Moyenne        | /                         |
 |                           | Mode de livraison                            | Fonctionnel            | Basse          | /                         |
 |                           | Recapitulatif des adresses                   | Fonctionnel            | Moyenne        | /                         |
-|                           | Bouton Régler la commande                    | A tester               | Haute          |                           |
+|                           | Bouton Régler la commande                    | Fonctionnel            | Haute          | /                         |
 |                           | Bouton Retour                                | Fonctionnel            | Haute          | /                         |
 | 4) Page Paiement CB (VISA ou Maesto)                                                                                                           |
 |                           | Visuel                                       | Fonctionnel            | Basse          | /                         |
