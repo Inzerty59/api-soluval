@@ -26,6 +26,14 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('name', TextType::class, [
+                'label' => 'Nom',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Le nom ne doit pas être vide.',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/^[A-Za-zÀ-ÿ]+$/',
                         'message' => 'Le nom ne doit contenir que des lettres.',
                     ]),
                 ],
@@ -101,6 +109,9 @@ class RegistrationFormType extends AbstractType
                     new Assert\Callback(function ($object, $context) {
                         if ($context->getRoot()->get('accountType')->getData() === 'professionnel' && empty($object)) {
                             $context->buildViolation('Le numéro SIRET ne doit pas être vide.')
+                                ->addViolation();
+                        } elseif (!$this->siretVerificationService->verifySiret($object)) {
+                            $context->buildViolation('Le numéro SIRET n\'est pas valide.')
                                 ->addViolation();
                         }
                     }),
