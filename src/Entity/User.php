@@ -56,6 +56,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'json')]
     private array $roles = ['ROLE_USER'];
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $resetToken;
+
     /**
      * @var Collection<int, Order>
      */
@@ -189,6 +192,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setVatNumber(?string $vatNumber): self
     {
         $this->vatNumber = $vatNumber;
+        return $this;
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(?string $resetToken): self
+    {
+        $this->resetToken = $resetToken;
+
         return $this;
     }
 
