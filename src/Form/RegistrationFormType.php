@@ -124,9 +124,17 @@ class RegistrationFormType extends AbstractType
                         'message' => 'Le numéro SIRET doit contenir exactement 14 chiffres.',
                     ]),
                     new Assert\Callback(function ($object, $context) {
-                        if ($context->getRoot()->get('accountType')->getData() === 'professionnel' && empty($object)) {
-                            $context->buildViolation('Le numéro SIRET ne doit pas être vide.')
-                                ->addViolation();
+                        if ($context->getRoot()->get('accountType')->getData() === 'professionnel') {
+                            if (empty($object)) {
+                                $context->buildViolation('Le numéro SIRET ne doit pas être vide.')
+                                    ->addViolation();
+                            } else {
+                                $siretVerificationService = $context->getRoot()->getConfig()->getOption('siret_verification_service');
+                                if (!$siretVerificationService->verifySiret($object)) {
+                                    $context->buildViolation('Le numéro SIRET est invalide.')
+                                        ->addViolation();
+                                }
+                            }
                         }
                     }),
                 ],
@@ -156,6 +164,7 @@ class RegistrationFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'siret_verification_service' => $this->siretVerificationService,
         ]);
     }
 }
