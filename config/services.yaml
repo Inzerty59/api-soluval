@@ -41,6 +41,13 @@ services:
     App\Twig\AppExtension:
         tags: ['twig.extension']
 
+    App\Twig\CartExtension:
+        arguments:
+            $cartController: '@App\Controller\Shop\CartController'
+            $sessionFactory: '@session.factory'
+        tags:
+            - { name: twig.extension }
+
     App\Form\DeliveryAdressType:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'

@@ -118,4 +118,10 @@ class CartController extends AbstractController
     }
     return $this->redirectToRoute('checkout_page');
     }
+
+    public function getCartCount(SessionInterface $session): int
+    {
+        $cart = $session->get('cart', []);
+        return count($cart);
+    }
 }
