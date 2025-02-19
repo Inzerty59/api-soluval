@@ -1,32 +1,34 @@
 <nav class="bg-white border-b border-gray-200 shadow-sm">
-	<div
-		class="container mx-auto px-4 flex justify-between items-center h-16">
-		<!-- Logo -->
-		<div class="flex items-center">
-			<a href="/" class="flex items-center">
-				<img src="{{ asset('images/LogoSoluval.jpg') }}" id="logo_Soluval" alt="Logo" class="h-16 w-auto">
-			</div>
+    <div class="container mx-auto px-4 flex justify-between items-center h-16">
+        <!-- Logo -->
+        <div class="flex items-center">
+            <a href="/" class="flex items-center">
+                <img src="{{ asset('images/LogoSoluval.jpg') }}" id="logo_Soluval" alt="Logo" class="h-16 w-auto">
+            </a>
+        </div>
 
-			<!-- Menu de navigation -->
-			<div
-				class="flex items-center space-x-6">
-				<!-- Mon compte -->
-				{% if app.user %}
-                        <a href="{{ path('app_logout') }}" class="text-gray-700 hover:text-customGreen transition">Se déconnecter</a>
-				{% else %}
-				<a href="/connexion" class="text-gray-700 hover:text-customGreen transition">Mon compte</a>
+        <!-- Menu de navigation -->
+        <div class="flex items-center space-x-6">
+            <!-- Mon compte -->
+            {% if app.user %}
+                <a href="{{ path('app_logout') }}" class="text-gray-700 hover:text-customGreen transition">Se déconnecter</a>
+            {% else %}
+                <a href="/connexion" class="text-gray-700 hover:text-customGreen transition">Mon compte</a>
+            {% endif %}
+
+            <!-- Panier -->
+            <a href="/panier" class="relative flex items-center text-gray-700 hover:text-customGreen transition">
+                <!-- Icône de panier -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewbox="0 0 24 24">
+                    <path fill="currentColor" d="M0 1h4.764l3 11h10.515l3.089-9.265l1.897.633L19.72 14H7.78l-.5 2H22v2H4.72l1.246-4.989L3.236 3H0zm14 1v3h3v2h-3v3h-2V7H9V5h3V2zM4 21a2 2 0 1 1 4 0a2 2 0 0 1-4 0m14 0a2 2 0 1 1 4 0a2 2 0 0 1-4 0"/>
+                </svg>
+                <!-- Badge pour le nombre d'articles -->
+                {% if cart_count() > 0 %}
+                    <span class="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-customGreen bg-opacity-75 text-white text-xs font-bold rounded-full px-2 py-0.5">
+                        {{ cart_count() }}
+                    </span>
                 {% endif %}
-
-				<!-- Panier -->
-				<a
-					href="/panier" class="relative flex items-center text-gray-700 hover:text-customGreen transition">
-					<!-- Icône de panier -->
-					<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewbox="0 0 24 24"><path fill="currentColor" d="M0 1h4.764l3 11h10.515l3.089-9.265l1.897.633L19.72 14H7.78l-.5 2H22v2H4.72l1.246-4.989L3.236 3H0zm14 1v3h3v2h-3v3h-2V7H9V5h3V2zM4 21a2 2 0 1 1 4 0a2 2 0 0 1-4 0m14 0a2 2 0 1 1 4 0a2 2 0 0 1-4 0"/></svg>
-					<!-- Badge pour le nombre d'articles -->
-					{# {% if cartCount > 0 %}
-										<span class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
-										</span>																																																																																																				{% endif %} #}
-				</a>
-			</div>
-		</div>
-	</nav>
+            </a>
+        </div>
+    </div>
+</nav>
