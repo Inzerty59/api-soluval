@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact{% endblock %}
+
+{% block body %}
+<div class="container mx-auto p-6 space-y-8">
+    <button
+        type="button"
+        id="back-Contact"
+        onclick="history.back()"
+        class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700
+               hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition"
+    >
+        <!-- Petite flèche gauche (SVG) -->
+        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Page Précédente
+    </button>
+
+    <div class="container mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <h1 class="text-2xl font-bold mb-4">Contact</h1>
+            <div>
+                <p><strong>ADRESSE :</strong><br>
+                4 rue des Frères Faches<br>
+                59580 Aniche</p>
+            </div>
+            <div>
+                <p><strong>TÉLÉPHONE :</strong><br>
+                Magasin : 03.27.90.38.08<br>
+                Administration : 03.27.90.39.45</p>
+            </div>
+            <div>
+                <p><strong>HORAIRES D’OUVERTURE :</strong><br>
+                Du lundi au vendredi<br>
+                de 9h à 12h et de 13h30 à 17h30<br>
+                Fermé samedi et dimanche</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
