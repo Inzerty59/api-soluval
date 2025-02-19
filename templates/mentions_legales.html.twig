@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block body %}
+<div class="container mx-auto p-6 space-y-8">
+    <button
+        type="button"
+        id="back-MentionsLegales"
+        onclick="history.back()"
+        class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700
+               hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition"
+    >
+        <!-- Petite flèche gauche (SVG) -->
+        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Page Précédente
+    </button>
+
+    <h1 class="text-2xl font-bold mb-4">Mentions légales</h1>
+    <div class="space-y-4">
+        <h2 class="text-xl font-semibold">Responsabilité éditoriale</h2>
+        <p>Le site www.groupevitaminet.fr est édité par :</p>
+        <p>
+            Groupe Vitamine T<br>
+            2 Boulevard Thomson<br>
+            59810 LESQUIN<br>
+            03 20 61 70 70
+        </p>
+        <p>
+            RCS LILLE 497 636 902<br>
+            Groupe Vitamine T au capital de 1 250 000 €<br>
+            TVA intracommunautaire FR 28 501 765 259
+        </p>
+        <p>Responsable de la publication : Mathieu LAGACHE</p>
+
+        <h2 class="text-xl font-semibold">Réalisation et Hébergement</h2>
+        <p>Soluval</p>
+
+        <h2 class="text-xl font-semibold">Propriété intellectuelle</h2>
+        <p>
+            Le contenu de ce site internet est protégé par les droits de propriété intellectuelle et notamment par le droit d’auteur. Toute reproduction de ces contenus est conditionnée à un accord explicite préalable, en vertu de l’article L.122-4 du Code de la Propriété Intellectuelle.
+        </p>
+        <p>Pour toute demande d’autorisation ou d’information, veuillez nous contacter.</p>
+
+        <h2 class="text-xl font-semibold">Informations et exclusions</h2>
+        <p>
+            L’éditeur de ce site met en œuvre tous les moyens dont il dispose pour assurer une information fiable et une mise à jour des contenus. Toutefois, des erreurs ou omissions peuvent survenir. L’internaute devra donc s’assurer de l’exactitude des informations auprès de l’éditeur et signaler toutes modifications du site qu’il jugerait utile. L’éditeur du site n’est en aucun cas responsable de l’utilisation faite de ces informations, et de tout préjudice direct ou indirect pouvant en découler.
+        </p>
+        <p>Les photos sont non contractuelles.</p>
+        <p>
+            Les liens hypertextes mis en place dans le cadre du présent site internet en direction d’autres ressources présentes sur le réseau Internet ne sauraient engager la responsabilité de l’éditeur de ce site.
+        </p>
+
+        <h2 class="text-xl font-semibold">Données personnelles</h2>
+        <p>
+            L’éditeur de ce site s’engage à ce que les traitements de données personnelles qui y sont effectués soient conformes au Règlement général sur la protection des données (RGPD) et à la loi Informatique et Libertés.
+        </p>
+        <p>Pour en savoir plus, consultez la page <a href="/politique-de-confidentialite" class="font-bold text-blue-500 hover:underline">Politique de confidentialité</a>.</p>
+    </div>
+</div>
+{% endblock %}
