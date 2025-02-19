@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Informations{% endblock %}
+
+{% block body %}
+<div class="container mx-auto p-6 space-y-8">
+    <h1 class="text-2xl font-bold mb-4">Mes Informations</h1>
+    <div class="space-y-4">
+        <p><strong>Nom :</strong> {{ user.surname }}</p>
+        <p><strong>Prénom :</strong> {{ user.name }}</p>
+        <p><strong>Email :</strong> {{ user.email }}</p>
+        {% if user.accountType == 'pro' %}
+            <p><strong>Nom d'entreprise :</strong> {{ user.companyName }}</p>
+            <p><strong>Numéro de SIRET :</strong> {{ user.siretNumber }}</p>
+            <p><strong>Numéro de TVA :</strong> {{ user.vatNumber }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

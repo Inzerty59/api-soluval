@@ -7,3 +7,7 @@ controllers:
 oauth2:
     resource: 'oauth2.php'
     type: php
+
+user_informations:
+    path: /mes-informations
+    controller: App\Controller\UserController::informations

@@ -35,6 +35,12 @@ class PageController extends AbstractController
         return $this->render('politique_confidentialite.html.twig');
     }
 
+    #[Route('/cgv', name: 'cgv')]
+    public function cgv(): Response
+    {
+        return $this->render('cgv.html.twig');
+    }
+
     public function someAction(SessionInterface $session): Response
     {
         $cartCount = $this->cartController->getCartCount($session);

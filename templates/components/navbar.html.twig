@@ -10,11 +10,16 @@
         <!-- Menu de navigation -->
         <div class="flex items-center space-x-6">
             <!-- Mon compte -->
-            {% if app.user %}
-                <a href="{{ path('app_logout') }}" class="text-gray-700 hover:text-customGreen transition">Se déconnecter</a>
-            {% else %}
-                <a href="/connexion" class="text-gray-700 hover:text-customGreen transition">Mon compte</a>
-            {% endif %}
+            <div class="relative">
+                <a href="/connexion" id="account-link" class="text-gray-700 hover:text-customGreen transition">Mon compte</a>
+                {% if app.user %}
+                    <div id="account-menu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-20">
+                        <a href="{{ path('user_informations') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Mes informations</a>
+                        <a href="{{ path('user_orders') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Mes commandes</a>
+                        <a href="{{ path('app_logout') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Se déconnecter</a>
+                    </div>
+                {% endif %}
+            </div>
 
             <!-- Panier -->
             <a href="/panier" class="relative flex items-center text-gray-700 hover:text-customGreen transition">
@@ -32,3 +37,23 @@
         </div>
     </div>
 </nav>
+
+<script>
+    document.getElementById('account-link').addEventListener('click', function(event) {
+        event.preventDefault();
+        {% if app.user %}
+            var menu = document.getElementById('account-menu');
+            menu.classList.toggle('hidden');
+        {% else %}
+            window.location.href = '/connexion';
+        {% endif %}
+    });
+
+    document.addEventListener('click', function(event) {
+        var accountLink = document.getElementById('account-link');
+        var accountMenu = document.getElementById('account-menu');
+        if (!accountLink.contains(event.target) && !accountMenu.contains(event.target)) {
+            accountMenu.classList.add('hidden');
+        }
+    });
+</script>
