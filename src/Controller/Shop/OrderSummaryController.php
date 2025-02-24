@@ -191,53 +191,60 @@ class OrderSummaryController extends AbstractController
         $deliveryAddress = $order->getDeliveryAdress();
         $parts = $order->getParts();
 
+        $billingCountry = $entityManager->getRepository(Shippings::class)->findOneBy(['CountryId' => $billingAddress->getCountryId()]);
+        $billingCountryName = $billingCountry ? $billingCountry->getTitle() : 'FRANCE';
+        $billingCountryISOCode = $billingCountry ? $billingCountry->getISOCode() : 'FR';
+
+        $deliveryCountry = $deliveryAddress ? $entityManager->getRepository(Shippings::class)->findOneBy(['CountryId' => $deliveryAddress->getCountryId()]) : null;
+        $deliveryCountryName = $deliveryCountry ? $deliveryCountry->getTitle() : 'FRANCE';
+        $deliveryCountryISOCode = $deliveryCountry ? $deliveryCountry->getISOCode() : 'FR';
+
+        $casseId = count($parts) > 0 ? $parts[0]->getCasseId() : null;
+        $origin = count($parts) > 0 ? $parts[0]->getOrigin() : null;
+
         $response = [
-            'OrderNumber' => $order->getOrderNumber(),
-            'ClientId' => $user->getId(),
-            'Status' => $order->getStatus(),
-            'ToSend' => $order->isToSend(),
-            'IsFreeShipping' => $order->isFreeShipping(),
-            'Parts' => array_map(function($part) {
-                return [
-                    'Id' => $part->getExternalId(),                
-                ];
-            }, $parts->toArray()),
             'BillingAddress' => [
+                'City' => $billingAddress->getCity(),
+                'Country' => [
+                    'Name' => $billingCountryName,
+                    'ISOCode' => $billingCountryISOCode,
+                ],
+                'Email' => $billingAddress->getEmail(),
                 'Firstname' => $billingAddress->getFirstname(),
                 'Lastname' => $billingAddress->getLastname(),
-                'Phone' => $billingAddress->getPhone(),
-                'Street' => $billingAddress->getStreet(),
+                'Phone1' => $billingAddress->getPhone(),
                 'PostCode' => $billingAddress->getPostCode(),
-                'City' => $billingAddress->getCity(),
-                'CountryId' => $billingAddress->getCountryId(),
-                'Email' => $billingAddress->getEmail(),
+                'Street' => $billingAddress->getStreet(),
+                'StreetAdditionnal' => $billingAddress->getStreetAdditionnal(),
             ],
-        ];
-
-        if ($deliveryAddress) {
-            $response['DeliveryAddress'] = [
+            'DeliveryAddress' => $deliveryAddress ? [
+                'City' => $deliveryAddress->getCity(),
+                'Country' => [
+                    'Name' => $deliveryCountryName,
+                    'ISOCode' => $deliveryCountryISOCode,
+                ],
+                'Email' => $deliveryAddress->getEmail(),
                 'Firstname' => $deliveryAddress->getFirstname(),
                 'Lastname' => $deliveryAddress->getLastname(),
-                'Phone' => $deliveryAddress->getPhone(),
-                'Street' => $deliveryAddress->getStreet(),
+                'Phone1' => $deliveryAddress->getPhone(),
                 'PostCode' => $deliveryAddress->getPostCode(),
-                'City' => $deliveryAddress->getCity(),
-                'CountryId' => $deliveryAddress->getCountryId(),
-                'Email' => $deliveryAddress->getEmail(),
-            ];
-        }
-
-        // TO DO : voir exactement ce qu'il faut envoyer et gérer le status 
-
-        // $client = new Client();
-        // $apiUrl = $this->params->get('API_ORDER_URL');
-        // $responseApi = $client->post($apiUrl, [
-        //     'json' => $response
-        // ]);
-
-        // if ($responseApi->getStatusCode() !== 200) {
-        //     return new JsonResponse(['error' => 'Failed to send order to external API'], 500);
-        // }
+                'Street' => $deliveryAddress->getStreet(),
+                'StreetAdditionnal' => $deliveryAddress->getStreetAdditionnal(),
+            ] : null,
+            'CasseId' => $casseId, // TODO
+            'ClientId' => $user->getId(),
+            'Comment' => null,
+            'Origin' => $origin,
+            'ShippingStatus' => $order->isFreeShipping(),
+            'Status' => $order->getStatus(), // TODO 
+            'ToSend' => $order->isToSend(),
+            'Parts' => array_map(function($part) {
+                return [
+                    'Key' => $part->getExternalId(),                
+                    'Value' => 0, // TODO
+                ];
+            }, $parts->toArray()),
+        ];
 
         return new JsonResponse($response);
     }

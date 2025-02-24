@@ -147,6 +147,9 @@ class Part
     #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $weight = null;
 
+    #[ORM\Column]
+    private ?int $origin = null;
+
     public function __construct()
     {
     }
@@ -551,6 +554,18 @@ class Part
     public function setWeight(string $weight): static
     {
         $this->weight = $weight;
+
+        return $this;
+    }
+
+    public function getOrigin(): ?int
+    {
+        return $this->origin;
+    }
+
+    public function setOrigin(int $origin): static
+    {
+        $this->origin = $origin;
 
         return $this;
     }
