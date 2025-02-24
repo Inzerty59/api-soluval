@@ -56,6 +56,7 @@ class OpistoController extends AbstractController
                 'casse_id' => $part->getCasseId(),
                 'shipping_id' => $part->getShippingId(),
                 'weight' => $part->getWeight(),
+                'origin' => $part->getOrigin(),
             ], $parts);
 
             return new JsonResponse($formattedParts);
