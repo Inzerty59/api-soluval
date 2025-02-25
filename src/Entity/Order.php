@@ -42,10 +42,6 @@ class Order
     #[Groups(['order:read', 'order:write'])]
     private ?DeliveryAdress $deliveryAdress = null;
 
-    #[ORM\ManyToOne(inversedBy: 'orders')]
-    #[Groups(['order:read', 'order:write'])]
-    private ?MangoPay $mangoPay = null;
-
     /**
      * @var Collection<int, Part>
      */
@@ -170,19 +166,6 @@ class Order
 
         return $this;
     }
-
-    public function getMangoPay(): ?MangoPay
-    {
-        return $this->mangoPay;
-    }
-
-    public function setMangoPay(?MangoPay $mangoPay): static
-    {
-        $this->mangoPay = $mangoPay;
-
-        return $this;
-    }
-
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
