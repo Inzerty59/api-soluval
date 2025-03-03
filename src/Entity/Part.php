@@ -118,7 +118,7 @@ class Part
     #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $door_number = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 512, nullable: true)]
     #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $vignette = null;
 
@@ -134,7 +134,7 @@ class Part
     #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $casse_id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $Shipping_id = null;
 
@@ -147,7 +147,7 @@ class Part
     #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $weight = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $origin = null;
 
     public function __construct()
@@ -338,7 +338,6 @@ class Part
 
         return $this;
     }
-    
 
     public function getDisplacement(): ?int
     {
@@ -460,56 +459,6 @@ class Part
         return $this;
     }
 
-    
-    #[Groups(['part:read'])]
-    public function getName(): string
-    {   
-    $cleanCategoryName = preg_replace('/\s*\(.*?\)\s*/', '', $this->category_name);
-    return trim(sprintf(
-        '%s %s %s %s',
-        $cleanCategoryName,
-        $this->brand_name,
-        $this->model_name,
-        $this->energy_name
-    ));
-    }
-
-    #[Groups(['part:read'])]
-    public function getFinalPrice(): ?string
-    {
-    if (is_array($this->Price) && isset($this->Price['OriginPrice'], $this->Price['VATRate'])) {
-        $originPrice = $this->Price['OriginPrice'];
-        $vatRate = $this->Price['VATRate'];
-        $finalPrice = $originPrice + ($originPrice * $vatRate / 100);
-        $finalPrice = floor($finalPrice * 100) / 100;
-        return number_format($finalPrice, 2, '.', '');
-    }
-    return null;
-    }
-
-    public function getPriceHT(): ?string
-    {
-    if (is_array($this->Price) && isset($this->Price['OriginPrice'])) {
-        $originPrice = $this->Price['OriginPrice'];
-        return number_format($originPrice, 2, '.', '');
-    }
-    return null;
-    }
-
-    public function getEstimatedVAT(): ?string
-    {
-    $finalPrice = $this->getFinalPrice();
-    $priceHT = $this->getPriceHT();
-
-    if ($finalPrice && $priceHT) {
-        $vatAmount = $finalPrice - $priceHT;
-
-        return number_format($vatAmount, 2, '.', '');
-    }
-    return null;
-    }
-
-
     public function getCasseId(): ?int
     {
         return $this->casse_id;
@@ -527,7 +476,7 @@ class Part
         return $this->Shipping_id;
     }
 
-    public function setShippingId(int $Shipping_id): static
+    public function setShippingId(?int $Shipping_id): static
     {
         $this->Shipping_id = $Shipping_id;
 
@@ -563,7 +512,7 @@ class Part
         return $this->origin;
     }
 
-    public function setOrigin(int $origin): static
+    public function setOrigin(?int $origin): static
     {
         $this->origin = $origin;
 
