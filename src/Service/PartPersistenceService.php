@@ -95,11 +95,14 @@ class PartPersistenceService
 
         $this->entityManager->flush(); // Persist et sauvegarde immédiatement
 
+        // Commenter la partie de persistance des données de shipping
+        /*
         if (isset($partData['Shippings']) && is_array($partData['Shippings'])) {
             foreach ($partData['Shippings'] as $shippingData) {
                 $this->persistShipping($shippingData);
             }
         }
+        */
     }
 
     /**

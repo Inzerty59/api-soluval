@@ -3,17 +3,27 @@
 namespace App\Service;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Psr\Log\LoggerInterface;
 
 class OpistoDataFetcher
 {
     private HttpClientInterface $client;
     private string $apiUrl;
     private AuthenticationService $authService;
+    private PartPersistenceService $persistenceService;
+    private LoggerInterface $logger;
 
-    public function __construct(HttpClientInterface $client, AuthenticationService $authService, string $apiUrl)
-    {
+    public function __construct(
+        HttpClientInterface $client,
+        AuthenticationService $authService,
+        PartPersistenceService $persistenceService,
+        LoggerInterface $logger,
+        string $apiUrl
+    ) {
         $this->client = $client;
         $this->authService = $authService;
+        $this->persistenceService = $persistenceService;
+        $this->logger = $logger;
         $this->apiUrl = $apiUrl;
     }
 
@@ -26,48 +36,83 @@ class OpistoDataFetcher
      */
     public function fetchParts(array $filters = []): array
     {
-        // Récupérer un token valide
+        // Augmenter la limite de mémoire et le temps d'exécution
+        ini_set('memory_limit', '4096M');
+        ini_set('max_execution_time', 0);
+
         $token = $this->authService->getValidToken();
 
-        // Définir les paramètres par défaut
         $queryParams = array_merge([
-            'itemsPerPage' => 40000,  // Nombre d'éléments par page
-            'page' => 0,          // Numéro de la page
-            'onlyParts' => "true",  // Limiter la recherche aux pièces
+            'onlyParts' => "true",
         ], $filters);
 
+        $allParts = [];
+        $page = 0;
+        $requestCount = 0;
+
         try {
-            // Appel API au point d'accès `/parts`
-            $response = $this->client->request('GET', $this->apiUrl . '/parts', [
-                'query' => $queryParams,
-                'headers' => [
-                    'Token' => $token,
-                    'Accept' => 'application/json; charset=utf-8', 
-                    'Content-Type' => 'application/json; charset=utf-8', 
-                ],
-            ]);
+            do {
+                $queryParams['page'] = $page;
+                $queryParams['itemsPerPage'] = 100; // Assurez-vous de définir la limite par page
 
-            // Récupérer le contenu brut pour inspection
-            $content = $response->getContent(false); // Récupère le contenu sans lever d'exception
-            $statusCode = $response->getStatusCode();
+                $response = $this->client->request('GET', $this->apiUrl . '/parts', [
+                    'query' => $queryParams,
+                    'headers' => [
+                        'Token' => $token,
+                        'Accept' => 'application/json; charset=utf-8', 
+                        'Content-Type' => 'application/json; charset=utf-8', 
+                    ],
+                ]);
 
-            // Vérification du statut HTTP
-            if ($statusCode !== 200) {
-                throw new \Exception("Erreur HTTP $statusCode : $content");
-            }
+                // Récupérer le contenu brut pour inspection
+                $content = $response->getContent(false); // Récupère le contenu sans lever d'exception
+                $statusCode = $response->getStatusCode();
 
-            // Décodage du contenu JSON
-            $data = json_decode($content, true);
+                // Vérification du statut HTTP
+                if ($statusCode !== 200) {
+                    throw new \Exception("Erreur HTTP $statusCode : $content");
+                }
 
-            // Vérification des erreurs de décodage JSON
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Exception('Erreur de décodage JSON : ' . json_last_error_msg());
-            }
+                // Décodage du contenu JSON
+                $data = json_decode($content, true);
 
-            return $data; // Retourne les données des pièces
+                // Vérification des erreurs de décodage JSON
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception('Erreur de décodage JSON : ' . json_last_error_msg());
+                }
+
+                if (isset($data['Parts']) && is_array($data['Parts'])) {
+                    $this->saveParts($data['Parts']); 
+                    $allParts = array_merge($allParts, $data['Parts']);
+                    $this->logger->info('Page ' . $page . ' : ' . count($data['Parts']) . ' pièces récupérées.');
+                } else {
+                    $this->logger->warning('Page ' . $page . ' : Aucune pièce récupérée.');
+                }
+
+                $page++;
+                $requestCount++;
+
+                if ($requestCount >= 500) {
+                    sleep(60);
+                }
+            } while (!empty($data['Parts']));
+
+            $this->logger->info('Total pièces récupérées : ' . count($allParts));
+            return $allParts;
         } catch (\Exception $e) {
-            // Lève une exception avec un message détaillé
             throw new \Exception('Erreur lors de la récupération des pièces : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Sauvegarde les pièces dans la base de données ou un fichier temporaire.
+     *
+     * @param array $parts Les pièces à sauvegarder.
+     */
+    private function saveParts(array $parts): void
+    {
+        foreach ($parts as $part) {
+            $this->persistenceService->persistPart($part);
         }
     }
 }
