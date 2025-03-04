@@ -7,52 +7,65 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
-#[ORM\HasLifecycleCallbacks] // Ajout pour activer les callbacks
+#[ORM\HasLifecycleCallbacks]
 class Order
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['order:read', 'order:write'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['order:read', 'order:write'])]
     private ?bool $ToSend = null;
 
     #[ORM\Column]
+    #[Groups(['order:read', 'order:write'])]
     private ?bool $IsFreeShipping = null;
 
-    #[ORM\ManyToOne(inversedBy: 'category')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order:read', 'order:write'])]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'category')]
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[Groups(['order:read', 'order:write'])]
     private ?BillingAdress $billingAdress = null;
 
-    #[ORM\ManyToOne(inversedBy: 'category')]
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[Groups(['order:read', 'order:write'])]
     private ?DeliveryAdress $deliveryAdress = null;
-
-    #[ORM\ManyToOne(inversedBy: 'category')]
-    private ?MangoPay $mangoPay = null;
 
     /**
      * @var Collection<int, Part>
      */
-    #[ORM\ManyToMany(targetEntity: Part::class, mappedBy: 'category')]
+    #[ORM\OneToMany(targetEntity: Part::class, mappedBy: 'order')]
+    #[ORM\ManyToOne(targetEntity: Part::class, cascade: ['persist'])]
+    #[Groups(['order:read', 'order:write'])]
+    #[MaxDepth(1)]
     private Collection $parts;
 
     #[ORM\Column]
+    #[Groups(['order:read', 'order:write'])]
     private ?\DateTimeImmutable $CreatedAt = null;
 
     #[ORM\Column]
+    #[Groups(['order:read', 'order:write'])]
     private ?\DateTimeImmutable $UpdatedAt = null;
 
-    private ?int $order_number = null;
-
     #[ORM\Column(type: Types::ARRAY)]
+    #[Groups(['order:read', 'order:write'])]
     private array $status = [];
 
+    #[ORM\Column(length: 255)]
+    #[Groups(['order:read', 'order:write'])]
+    private ?string $orderNumber = null;
 
     public function __construct()
     {
@@ -100,7 +113,7 @@ class Order
     {
         if (!$this->parts->contains($part)) {
             $this->parts->add($part);
-            $part->setCategory($this);
+            $part->setOrder($this);
         }
 
         return $this;
@@ -110,8 +123,8 @@ class Order
     {
         if ($this->parts->removeElement($part)) {
             // set the owning side to null (unless already changed)
-            if ($part->getCategory() === $this) {
-                $part->setCategory(null);
+            if ($part->getOrder() === $this) {
+                $part->setOrder(null);
             }
         }
 
@@ -154,19 +167,6 @@ class Order
         return $this;
     }
 
-    public function getMangoPay(): ?MangoPay
-    {
-        return $this->mangoPay;
-    }
-
-    public function setMangoPay(?MangoPay $mangoPay): static
-    {
-        $this->mangoPay = $mangoPay;
-
-        return $this;
-    }
-
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->CreatedAt;
@@ -178,19 +178,6 @@ class Order
 
         return $this;
     }
-
-    public function getOrderNumber(): ?int
-    {
-        return $this->order_number;
-    }
-
-    public function setOrderNumber(int $order_number): static
-    {
-        $this->order_number = $order_number;
-
-        return $this;
-    }
-
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
@@ -229,4 +216,50 @@ class Order
         return $this;
     }
 
+    public function getOrderNumber(): ?string
+    {
+        return $this->orderNumber;
+    }
+
+    public function setOrderNumber(string $orderNumber): static
+    {
+        $this->orderNumber = $orderNumber;
+
+        return $this;
+    }
+
+    public function getTotalShippingCostsTTC(): float
+    {
+        if ($this->IsFreeShipping) {
+            return 0.0;
+        }
+
+        $shipping = $this->getDeliveryAdress()?->getShipping();
+        if ($shipping) {
+            $shippingCosts = $shipping->getShippingCosts();
+            $totalShippingCost = 0.0;
+
+            foreach ($this->parts as $part) {
+                $totalShippingCost += $shippingCosts['TTC'];
+            }
+
+            return $totalShippingCost;
+        }
+
+        return 0.0;
+    }
+
+    public function getTotalPartsPrice(): float
+    {
+        $total = 0.0;
+        foreach ($this->parts as $part) {
+            $total += $part->getFinalPrice();
+        }
+        return $total;
+    }
+
+    public function getNetToPay(): float
+    {
+        return $this->getTotalPartsPrice() + $this->getTotalShippingCostsTTC();
+    }
 }

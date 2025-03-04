@@ -4,6 +4,19 @@ controllers:
         namespace: App\Controller
     type: attribute
 
-oauth2:
-    resource: 'oauth2.php'
-    type: php
+user_informations:
+    path: /mes-informations
+    controller: App\Controller\UserController::informations
+
+user_update_informations:
+    path: /update-informations
+    controller: App\Controller\UserController::updateInformations
+    methods: [POST]
+
+user_update_password:
+    path: /update-password
+    controller: App\Controller\UserController::updatePassword
+    methods: [POST]
+
+api_login_check:
+    path: /api/login_check

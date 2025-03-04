@@ -32,3 +32,10 @@ php bin/console doctrine:fixtures:load
 
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
+
+composer require stripe/stripe-php
+
+
+🚨 **Ce projet est sous licence propriétaire** 🚨  
+Toute utilisation, modification ou redistribution est **strictement interdite** sans autorisation.  
+Consultez le fichier `LICENCE` pour plus de détails.

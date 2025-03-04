@@ -43,7 +43,7 @@
                                     </td>
                                     <td class="py-4 px-6 text-center text-gray-800 font-semibold">{{ item.part.getFinalPrice() }} €</td>
                                     <td class="py-4 px-6 text-center">
-                                        <a href="{{ path('cart_delete', { id: item.part.Id }) }}" 
+                                        <a href="{{ path('cart_delete', { id: item.part.Id }) }}" id="delete_Product" 
                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit du panier ?');"
                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                             Supprimer
@@ -67,18 +67,18 @@
                     €
                 </p>
                 <div class="mt-4 sm:mt-0 flex gap-4">
-                    <a href="{{ path('shop_index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <a href="{{ path('shop_index') }}" id="purchase_Continue" class="bg-blue-500 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
                         Continuer vos achats
                     </a>
-                    <button onclick="window.location.href='{{ path('cart_checkout') }}'" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
-                        Finaliser la commande
+                    <button onclick="window.location.href='{{ path('cart_checkout') }}'" id="delivery_Choice" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                        Choix de la livraison
                     </button>
                 </div>
             </div>
         {% else %}
             <div class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-6 rounded-lg text-center">
                 <p class="text-lg font-medium">Votre panier est vide.</p>
-                <a href="{{ path('shop_index') }}" class="text-blue-500 hover:underline mt-4 inline-block">Retour à l'accueil</a>
+                <a href="{{ path('shop_index') }}" id="return_Shop" class="text-blue-500 hover:underline mt-4 inline-block">Retour à l'accueil</a>
             </div>
         {% endif %}
     </div>

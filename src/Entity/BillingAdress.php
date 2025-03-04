@@ -21,8 +21,8 @@ class BillingAdress
     #[ORM\Column(length: 255)]
     private ?string $Lastname = null;
 
-    #[ORM\Column]
-    private ?int $Phone = null;
+    #[ORM\Column(length: 255)]
+    private ?string $Phone = null;
 
     #[ORM\Column(length: 255)]
     private ?string $Street = null;
@@ -36,8 +36,8 @@ class BillingAdress
     #[ORM\Column(length: 255)]
     private ?string $City = null;
 
-    #[ORM\Column]
-    private ?int $CountryId = null;
+    #[ORM\Column(length: 255)]
+    private ?string $CountryId = null;
 
     #[ORM\Column(length: 255)]
     private ?string $Email = null;
@@ -51,6 +51,10 @@ class BillingAdress
     #[ORM\ManyToOne(inversedBy: 'billingAdresses')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Shippings::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Shippings $shipping = null;
 
     public function __construct()
     {
@@ -86,12 +90,12 @@ class BillingAdress
         return $this;
     }
 
-    public function getPhone(): ?int
+    public function getPhone(): ?string
     {
         return $this->Phone;
     }
 
-    public function setPhone(int $Phone): static
+    public function setPhone(string $Phone): static
     {
         $this->Phone = $Phone;
 
@@ -115,7 +119,7 @@ class BillingAdress
         return $this->StreetAdditionnal;
     }
 
-    public function setStreetAdditionnal(string $StreetAdditionnal): static
+    public function setStreetAdditionnal(?string $StreetAdditionnal): static
     {
         $this->StreetAdditionnal = $StreetAdditionnal;
 
@@ -146,12 +150,12 @@ class BillingAdress
         return $this;
     }
 
-    public function getCountryId(): ?int
+    public function getCountryId(): ?string
     {
         return $this->CountryId;
     }
 
-    public function setCountryId(int $CountryId): static
+    public function setCountryId(string $CountryId): static
     {
         $this->CountryId = $CountryId;
 
@@ -202,37 +206,9 @@ class BillingAdress
 
     public function getCountryName(): string
     {
-        $countries = [
-            32 => 'Algérie',
-            5 => 'Allemagne',
-            6 => 'Autriche',
-            1 => 'Belgique',
-            206 => 'Corse',
-            9 => 'Danemark',
-            3 => 'Espagne',
-            11 => 'Finlande',
-            0 => 'France',
-            12 => 'Grèce',
-            68 => 'Guadeloupe',
-            96 => 'Guyane Française',
-            77 => 'Ile de la Réunion',
-            4 => 'Italie',
-            17 => 'Luxembourg',
-            31 => 'Maroc',
-            69 => 'Martinique',
-            83 => 'Mayotte',
-            110 => 'Monaco',
-            72 => 'Norvège',
-            19 => 'Pays-Bas',
-            113 => 'Polynésie Française',
-            21 => 'Portugal',
-            115 => 'Saint-Barthélemy',
-            117 => 'Saint-Martin',
-            119 => 'Saint-Pierre-et-Miquelon',
-            27 => 'Suède',
-            28 => 'Suisse',
-            120 => 'Wallis et Futuna',
-        ];
+        if ($this->shipping) {
+            return $this->shipping->getTitle();
+        }
 
         return $countries[$this->CountryId] ?? 'Inconnu';
     }
@@ -247,5 +223,39 @@ class BillingAdress
         $this->user = $user;
 
         return $this;
+    }
+
+    public function getShipping(): ?Shippings
+    {
+        return $this->shipping;
+    }
+
+    public function setShipping(?Shippings $shipping): static
+    {
+        $this->shipping = $shipping;
+
+        if ($shipping) {
+            $this->CountryId = $shipping->getCountryId();
+        }
+
+        return $this;
+    }
+
+    public function getFullAddress(): string
+    {
+        $address = $this->getFirstname() . ' ' . $this->getLastname() . "\n";
+        $address .= $this->getStreet() . "\n";
+        if ($this->getStreetAdditionnal()) {
+            $address .= $this->getStreetAdditionnal() . "\n";
+        }
+        $address .= $this->getPostCode() . ' ' . $this->getCity() . "\n";
+        $address .= $this->getCountryName();
+
+        return $address;
+    }
+    
+    public function __toString(): string
+    {
+        return $this->getFullAddress();
     }
 }

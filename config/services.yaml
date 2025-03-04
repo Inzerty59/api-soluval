@@ -30,6 +30,43 @@ services:
     App\Service\SiretVerificationService:
         arguments:
             $httpClient: '@http_client'
+            $apiKey: '%insee_api_key%'
+            $logger: '@logger'
+
+    App\Service\OpistoStockChecker:
+        arguments:
+            $authUrlApi: '%env(AUTH_URL_API)%'
+            $logger: '@logger'
+
+    App\Service\QuotaService:
+        arguments:
+            $minuteLimiter: '@limiter.api_minute'
+            $hourLimiter: '@limiter.api_hour'
+            $dayLimiter: '@limiter.api_day'
 
     App\Twig\AppExtension:
         tags: ['twig.extension']
+
+    App\Twig\CartExtension:
+        arguments:
+            $cartController: '@App\Controller\Shop\CartController'
+            $sessionFactory: '@session.factory'
+        tags:
+            - { name: twig.extension }
+
+    App\Form\DeliveryAdressType:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+
+    App\Form\BillingAdressType:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+
+    App\EventListener\RateLimiterListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+parameters:
+    stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
+    stripe_public_key: '%env(STRIPE_PUBLIC_KEY)%'
+    insee_api_key: '%env(INSEE_API_KEY)%'

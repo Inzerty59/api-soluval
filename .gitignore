@@ -26,11 +26,6 @@
 ###< symfony/asset-mapper ###
 
 .env
-###> league/oauth2-server-bundle ###
-/config/keys/*
-!/config/keys/.gitkeep
-
-###< league/oauth2-server-bundle ###
 
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
@@ -38,3 +33,7 @@
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###

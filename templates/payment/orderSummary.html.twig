@@ -33,16 +33,34 @@
                     <th class="px-4 py-3 font-semibold">Dénomination de la pièce</th>
                     <th class="px-4 py-3 font-semibold">Quantité</th>
                     <th class="px-4 py-3 font-semibold">Prix</th>
+                    <th class="px-4 py-3 font-semibold">Prix de la livraison</th>
                     <th class="px-4 py-3 font-semibold">Mode de récupération</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
+                {% set totalShippingCostsHT = 0 %}
+                {% set totalShippingCostsTTC = 0 %}
                 {% for item in cart %}
                     <tr>
                         <td class="px-4 py-3">{{ item.part.getName() }}</td>
                         <td class="px-4 py-3">{{ item.quantity|default(1) }}</td>
                         <td class="px-4 py-3">{{ item.part.getFinalPrice() }} €</td>
-                        <td class="px-4 py-3">{{ deliveryMode == 'comptoir' ? 'Récupération au comptoir' : 'Livraison' }}</td>
+                        <td class="px-4 py-3">
+                            {% if deliveryMode != 'comptoir' %}
+                                {% set totalShippingCostsHT = totalShippingCostsHT + shippingCosts.HT %}
+                                {% set totalShippingCostsTTC = totalShippingCostsTTC + shippingCosts.TTC %}
+                                {{ shippingCosts.TTC }} €
+                            {% else %}
+                                Gratuit
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if deliveryMode == 'comptoir' %}
+                                Récupération au comptoir
+                            {% else %}
+                               Livraison en {{ deliveryMinTime }} à {{ deliveryMaxTime }} jours
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -62,7 +80,15 @@
                 <p>{{ billingAdress.PostCode }} {{ billingAdress.City }}</p>
                 <p>{{ billingAdress.getCountryName() }}</p>
             </div>
-            {% if deliveryMode != 'comptoir' and deliveryAdress is not null %}
+            {% if deliveryMode == 'comptoir' %}
+            <div>
+                <p class="font-bold">Adresse du magasin :</p>
+                <p>Soluval</p>
+                <p>4 Rue des Frères Fâché</p>
+                <p>59580 Aniche</p>
+                <p>France</p>
+            </div>
+            {% elseif deliveryAdress is not null %}
             <div>
                 <p class="font-bold">Adresse de livraison :</p>
                 <p>{{ deliveryAdress.Firstname }} {{ deliveryAdress.Lastname }}</p>
@@ -94,16 +120,16 @@
                     </tr>
                     <tr>
                         <td class="py-3 px-4 font-medium">Frais de port HT</td>
-                        <td class="py-3 px-4 text-right">{{ shippingCosts.HT }} €</td>
+                        <td class="py-3 px-4 text-right">{{ totalShippingCostsHT }} €</td>
                     </tr>
                     <tr>
                         <td class="py-3 px-4 font-medium">Frais de port TTC</td>
-                        <td class="py-3 px-4 text-right">{{ shippingCosts.TTC }} €</td>
+                        <td class="py-3 px-4 text-right">{{ totalShippingCostsTTC }} €</td>
                     </tr>
                     {% endif %}
                     <tr>
                         <td class="py-3 px-4 font-bold text-base">Net à payer TTC</td>
-                        <td class="py-3 px-4 font-bold text-base text-right">{{ total + (deliveryMode != 'comptoir' ? shippingCosts.TTC : 0) }} €</td>
+                        <td class="py-3 px-4 font-bold text-base text-right">{{ total + (deliveryMode != 'comptoir' ? totalShippingCostsTTC : 0) }} €</td>
                     </tr>
                 </tbody>
             </table>
@@ -112,9 +138,9 @@
 
 		<!-- Bouton pour continuer -->
 		<div class="mt-8 text-right">
-			<form action="{{ path('order_create') }}" method="POST">
+			<form method="POST" action="{{ path('finalize_order') }}">
 				<button type="submit" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
-					Régler la commande
+					Confirmer ma commande
 				</button>
 			</form>
 		</div>

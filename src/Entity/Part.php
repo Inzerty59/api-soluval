@@ -10,110 +10,151 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: PartRepository::class)]
 #[ApiResource(
     operations: [
         new Get(),
         new GetCollection()
-    ]
-)]class Part
+    ],
+    normalizationContext: ['groups' => ['part:read']],
+    denormalizationContext: ['groups' => ['part:write']]
+)]
+class Part
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $external_id = null;
 
     #[ORM\Column(length: 40, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $manufacturer_reference = null;
 
     #[ORM\Column(length: 40, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $adaptable_reference = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $category_name = null;
 
     #[ORM\Column(length: 1000, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $part_condition = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $warranty = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $brand_name = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $range_name = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $model_name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $finish_name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $commercial_designation = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $vehicle_year = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $mileage = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?array $color_name = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $displacement = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $power = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $energy_name = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?array $gearbox_type = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $engine_code = null;
 
     #[ORM\Column(length: 80, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $gearbox_code = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $door_number = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 512, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $vignette = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?array $photos = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?array $Price = null;
 
     #[ORM\Column]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $casse_id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $Shipping_id = null;
 
-    /**
-     * @var Collection<int, Order>
-     */
-    #[ORM\ManyToMany(targetEntity: Order::class, inversedBy: 'parts')]
-    private Collection $category;
+    #[ORM\ManyToOne(inversedBy: 'parts')]
+    #[Groups(['part:read', 'part:write'])]
+    #[MaxDepth(1)]
+    private ?Order $order = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
+    private ?string $weight = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $origin = null;
+
+    #[ORM\Column]
+    private ?bool $available = null;
 
     public function __construct()
     {
-        $this->category = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -300,7 +341,6 @@ use Doctrine\ORM\Mapping as ORM;
 
         return $this;
     }
-    
 
     public function getDisplacement(): ?int
     {
@@ -422,67 +462,6 @@ use Doctrine\ORM\Mapping as ORM;
         return $this;
     }
 
-    
-    public function getName(): string
-    {   
-    $cleanCategoryName = preg_replace('/\s*\(.*?\)\s*/', '', $this->category_name);
-    return trim(sprintf(
-        '%s %s %s %s',
-        $cleanCategoryName,
-        $this->brand_name,
-        $this->model_name,
-        $this->energy_name
-    ));
-    }
-
-    public function getFinalPrice(): ?string
-    {
-    if (is_array($this->Price) && isset($this->Price['OriginPrice'], $this->Price['VATRate'])) {
-        $originPrice = $this->Price['OriginPrice'];
-        $vatRate = $this->Price['VATRate'];
-        $finalPrice = $originPrice + ($originPrice * $vatRate / 100);
-        $finalPrice = floor($finalPrice * 100) / 100;
-        return number_format($finalPrice, 2, '.', '');
-    }
-    return null;
-    }
-
-    public function getPriceHT(): ?string
-    {
-    if (is_array($this->Price) && isset($this->Price['OriginPrice'])) {
-        $originPrice = $this->Price['OriginPrice'];
-        return number_format($originPrice, 2, '.', '');
-    }
-    return null;
-    }
-
-    public function getEstimatedVAT(): ?string
-    {
-    $finalPrice = $this->getFinalPrice();
-    $priceHT = $this->getPriceHT();
-
-    if ($finalPrice && $priceHT) {
-        $vatAmount = $finalPrice - $priceHT;
-
-        return number_format($vatAmount, 2, '.', '');
-    }
-    return null;
-    }
-
-    public function getStock(): int
-    {
-        $data = json_decode($this->price, true); // Décoder le JSON
-        return $data['quantity'] ?? 0; // Retourner la quantité ou 0 si non défini
-    }
-
-    public function setStock(int $quantity): self
-    {
-        $data = json_decode($this->price, true);
-        $data['quantity'] = $quantity; // Mettre à jour la quantité
-        $this->price = json_encode($data); // Réencoder en JSON
-
-        return $this;
-    }
     public function getCasseId(): ?int
     {
         return $this->casse_id;
@@ -500,37 +479,57 @@ use Doctrine\ORM\Mapping as ORM;
         return $this->Shipping_id;
     }
 
-    public function setShippingId(int $Shipping_id): static
+    public function setShippingId(?int $Shipping_id): static
     {
         $this->Shipping_id = $Shipping_id;
 
         return $this;
     }
 
-    public function getCategory(): ?Order
+    public function getOrder(): ?Order
     {
-        return $this->category;
+        return $this->order;
     }
 
-    public function setCategory(?Order $category): static
+    public function setOrder(?Order $order): static
     {
-        $this->category = $category;
+        $this->order = $order;
 
         return $this;
     }
 
-    public function addCategory(Order $category): static
+    public function getWeight(): ?string
     {
-        if (!$this->category->contains($category)) {
-            $this->category->add($category);
-        }
+        return $this->weight;
+    }
+
+    public function setWeight(string $weight): static
+    {
+        $this->weight = $weight;
 
         return $this;
     }
 
-    public function removeCategory(Order $category): static
+    public function getOrigin(): ?int
     {
-        $this->category->removeElement($category);
+        return $this->origin;
+    }
+
+    public function setOrigin(?int $origin): static
+    {
+        $this->origin = $origin;
+
+        return $this;
+    }
+
+    public function isAvailable(): ?bool
+    {
+        return $this->available;
+    }
+
+    public function setAvailable(bool $available): static
+    {
+        $this->available = $available;
 
         return $this;
     }
