@@ -2,6 +2,15 @@
 
 {% block body %}
     <div class="container mx-auto mt-6 px-4">
+        {% for label, messages in app.flashes %}
+            {% if label == 'invalid_link' %}
+                <div class="bg-red-100 border border-red-400 text-black-400 px-4 py-3 rounded mb-4 shadow-sm text-center" role="alert">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
         <!-- Titre principal -->
         <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Nos pièces détachées</h1>
 
@@ -20,23 +29,23 @@
                 <div class="mb-4">
                     <label for="marque" class="block font-semibold mb-1">Marque</label>
                     <select id="marque" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-300">
-                        <option>Toutes marques</option>
+                        <option value="">Toutes marques</option>
                     </select>
                 </div>
                 <div class="mb-4">
                     <label for="modele" class="block font-semibold mb-1">Modèle</label>
                     <select id="modele" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-300">
-                        <option>Tous modèles</option>
+                        <option value="">Tous modèles</option>
                     </select>
                 </div>
 
                 <!-- Bouton pour afficher/masquer les filtres avancés -->
-                <button id="toggle-advanced-filters" class="w-full bg-gray-300 text-gray-700 p-2 rounded hover:bg-gray-400 transition">
+                {# <button id="toggle-advanced-filters" class="w-full bg-gray-300 text-gray-700 p-2 rounded hover:bg-gray-400 transition">
                     Recherche avancée
-                </button>
+                </button> #}
 
                 <!-- Filtres avancés -->
-                <div id="advanced-filters" class="hidden mt-4">
+                {# <div id="advanced-filters" class="hidden mt-4">
                     <div class="mb-4">
                         <label for="code-moteur" class="block font-semibold mb-1">Code moteur</label>
                         <input id="code-moteur" type="text" placeholder="Code moteur" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500">
@@ -53,10 +62,10 @@
                         <label for="ref-constructeur" class="block font-semibold mb-1">Référence constructeur</label>
                         <input id="ref-constructeur" type="text" placeholder="Référence constructeur" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500">
                     </div>
-                </div>
+                </div> #}
 
                 <!-- Bouton de recherche -->
-                <button class="w-full bg-customGreen text-white p-2 rounded hover:bg-gray-500 transition mt-4">
+                <button class="w-full bg-customGreen text-white p-2 rounded hover:bg-gray-500 transition mt-4" id="search-button">
                     Lancer la recherche
                 </button>
             </aside>
@@ -65,24 +74,26 @@
             <main class="lg:w-3/4">
                 <!-- Résultats de recherche -->
                 <div class="flex justify-between items-center mb-4">
-                    <p class="text-lg font-semibold">{{ parts|length }} pièces trouvées</p>
+                    <p class="text-lg font-semibold" id="parts-count">{{ parts|length }} pièces trouvées</p>
                     <div class="flex items-center gap-2">
                         <button class="border border-gray-300 px-3 py-1 rounded hover:bg-gray-200">10</button>
                         <button class="border border-gray-300 px-3 py-1 rounded hover:bg-gray-200">25</button>
                         <button class="border border-gray-300 px-3 py-1 rounded hover:bg-gray-200">50</button>
                     </div>
-                    <select class="border border-gray-300 p-2 rounded">
-                        <option>Trier par</option>
+                    <select id="sort" class="border border-gray-300 p-2 rounded">
+                        <option value="">Trier par</option>
+                        <option value="price_asc">Prix croissant</option>
+                        <option value="price_desc">Prix décroissant</option>
                     </select>
                 </div>
 
                 <!-- Liste des produits -->
-                <div class="space-y-6">
+                <div class="space-y-6" id="parts-list">
                     {% for part in parts %}
                         <!-- Carte produit -->
                         <div class="flex items-start bg-white border border-gray-300 p-4 rounded shadow-md w-full">
                             <!-- Lien autour de toute la carte pour rediriger vers les détails -->
-                            <a href="{{ path('product_detail', { id: part.id }) }}" class="flex-1 flex items-start">
+                            <a href="{{ path('product_detail', { id: part.id }) }}" id="{{ path('product_detail', { id: part.id }) }}" class="flex-1 flex items-start">
                                 <!-- Image vignette du produit -->
                                 <div class="w-36 h-36 flex-shrink-0">
                                     <img src="{{ part.vignette }}" alt="{{ part.getName() }}" class="w-full h-full object-cover rounded">
@@ -98,7 +109,7 @@
 
                             <!-- Bouton d'ajout au panier qui reste à l'intérieur de la carte -->
                             <div>
-                                <a href="{{ path('cart_add', { id: part.id }) }}" class="bg-customGreen text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center gap-2">
+                                <a href="{{ path('cart_add', { id: part.id }) }}" id="{{ path('cart_add', { id: part.id }) }}" class="bg-customGreen text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewbox="0 0 24 24">
                                         <path fill="currentColor" d="M0 1h4.764l3 11h10.515l3.089-9.265l1.897.633L19.72 14H7.78l-.5 2H22v2H4.72l1.246-4.989L3.236 3H0zm14 1v3h3v2h-3v3h-2V7H9V5h3V2zM4 21a2 2 0 1 1 4 0a2 2 0 0 1-4 0m14 0a2 2 0 1 1 4 0a2 2 0 0 1-4 0"/>
                                     </svg>
@@ -114,4 +125,159 @@
 
     <!-- Inclusion des scripts -->
     {{ encore_entry_script_tags('filters') }}
+    <script>
+        function searchParts() {
+            const query = document.getElementById('type-piece').value;
+            const brand = document.getElementById('marque').value;
+            const model = document.getElementById('modele').value;
+            const sort = document.getElementById('sort').value;
+            const url = new URL('/shop/search', window.location.origin);
+            url.searchParams.append('query', query);
+            if (brand) {
+                url.searchParams.append('brand', brand);
+            }
+            if (model) {
+                url.searchParams.append('model', model);
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(part => {
+                        part.finalPrice = parseFloat(part.finalPrice);
+                    });
+
+                    if (sort === 'price_asc') {
+                        data.sort((a, b) => a.finalPrice - b.finalPrice);
+                    } else if (sort === 'price_desc') {
+                        data.sort((a, b) => b.finalPrice - a.finalPrice);
+                    }
+
+                    const partsList = document.getElementById('parts-list');
+                    const partsCount = document.getElementById('parts-count');
+                    partsList.innerHTML = '';
+                    partsCount.textContent = `${data.length} pièces trouvées`;
+
+                    data.forEach(part => {
+                        const partElement = document.createElement('div');
+                        partElement.classList.add('flex', 'items-start', 'bg-white', 'border', 'border-gray-300', 'p-4', 'rounded', 'shadow-md', 'w-full');
+                        partElement.innerHTML = `
+                            <a href="/product/${part.id}" class="flex-1 flex items-start">
+                                <div class="w-36 h-36 flex-shrink-0">
+                                    <img src="${part.vignette}" alt="${part.name}" class="w-full h-full object-cover rounded">
+                                </div>
+                                <div class="flex-1 ml-4">
+                                    <h3 class="text-lg font-semibold text-gray-800">${part.name}</h3>
+                                    <p class="text-sm text-gray-500">${part.model_name}</p>
+                                    <p class="text-lg font-bold text-gray-800 mt-2">${part.finalPrice ? part.finalPrice.toFixed(2) : 'N/A'} €</p>
+                                </div>
+                            </a>
+                            <div>
+                                <a href="/panier/ajouter-au-panier/${part.id}" class="bg-customGreen text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewbox="0 0 24 24">
+                                        <path fill="currentColor" d="M0 1h4.764l3 11h10.515l3.089-9.265l1.897.633L19.72 14H7.78l-.5 2H22v2H4.72l1.246-4.989L3.236 3H0zm14 1v3h3v2h-3v3h-2V7H9V5h3V2zM4 21a2 2 0 1 1 4 0a2 2 0 0 1-4 0m14 0a2 2 0 1 1 4 0a2 2 0 0 1-4 0"/>
+                                    </svg>
+                                    Ajouter au panier
+                                </a>
+                            </div>
+                        `;
+                        partsList.appendChild(partElement);
+                    });
+                });
+        }
+
+        document.getElementById('type-piece').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                searchParts();
+            }
+        });
+
+        document.getElementById('search-button').addEventListener('click', searchParts);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/shop/brands')
+                .then(response => response.json())
+                .then(data => {
+                    const marqueSelect = document.getElementById('marque');
+                    if (data.length > 0) {
+                        data.forEach(brand => {
+                            const option = document.createElement('option');
+                            option.value = brand;
+                            option.textContent = brand;
+                            marqueSelect.appendChild(option);
+                        });
+                        fetch('/shop/models')
+                            .then(response => response.json())
+                            .then(data => {
+                                const modeleSelect = document.getElementById('modele');
+                                data.filter(model => model !== null).forEach(model => {
+                                    const option = document.createElement('option');
+                                    option.value = model;
+                                    option.textContent = model;
+                                    modeleSelect.appendChild(option);
+                                });
+                            });
+                    } 
+                });
+
+            document.getElementById('toggle-advanced-filters').addEventListener('click', function() {
+                document.getElementById('advanced-filters').classList.toggle('hidden');
+            });
+
+            document.getElementById('marque').addEventListener('change', searchParts);
+            document.getElementById('modele').addEventListener('change', searchParts);
+            document.getElementById('sort').addEventListener('change', searchParts);
+            document.getElementById('sort').addEventListener('change', searchParts);
+
+            function searchParts() {
+                const query = document.getElementById('type-piece').value;
+                const marque = document.getElementById('marque').value;
+                const modele = document.getElementById('modele').value;
+                const sort = document.getElementById('sort').value;
+                const url = new URL('/shop/search', window.location.origin);
+                url.searchParams.append('query', query);
+                if (marque) {
+                    url.searchParams.append('marque', marque);
+                }
+                if (modele) {
+                    url.searchParams.append('modele', modele);
+                }
+                if (sort) {
+                    url.searchParams.append('sort', sort);
+                }
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        const partsList = document.getElementById('parts-list');
+                        partsList.innerHTML = '';
+                        data.forEach(part => {
+                            const partElement = document.createElement('div');
+                            partElement.classList.add('flex', 'items-start', 'bg-white', 'border', 'border-gray-300', 'p-4', 'rounded', 'shadow-md', 'w-full');
+                            partElement.innerHTML = `
+                               <a href="/product/${part.id}" class="flex-1 flex items-start">
+                                <div class="w-36 h-36 flex-shrink-0">
+                                    <img src="${part.vignette}" alt="${part.name}" class="w-full h-full object-cover rounded">
+                                </div>
+                                <div class="flex-1 ml-4">   
+                                    <h3 class="text-lg font-semibold text-gray-800">${part.name}</h3>
+                                    <p class="text-sm text-gray-500">${part.model_name}</p>
+                                    <p class="text-lg font-bold text-gray-800 mt-2">${part.finalPrice ? part.finalPrice : 'N/A'} €</p>
+                                </div>
+                            </a>
+                            <div>
+                                <a href="/panier/ajouter-au-panier/${part.id}" class="bg-customGreen text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewbox="0 0 24 24">
+                                        <path fill="currentColor" d="M0 1h4.764l3 11h10.515l3.089-9.265l1.897.633L19.72 14H7.78l-.5 2H22v2H4.72l1.246-4.989L3.236 3H0zm14 1v3h3v2h-3v3h-2V7H9V5h3V2zM4 21a2 2 0 1 1 4 0a2 2 0 0 1-4 0m14 0a2 2 0 1 1 4 0a2 2 0 0 1-4 0"/>
+                                    </svg>
+                                    Ajouter au panier
+                                </a>
+                            </div>
+                        `;
+                            partsList.appendChild(partElement);
+                        });
+                    });
+            }
+        });
+    </script>
 {% endblock %}

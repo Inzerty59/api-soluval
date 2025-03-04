@@ -4,6 +4,7 @@ namespace App\Controller\Shop;
 
 use App\Entity\DeliveryAdress;
 use App\Entity\BillingAdress;
+use App\Entity\Shippings;
 use App\Form\DeliveryAdressType;
 use App\Form\BillingAdressType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -49,6 +50,7 @@ class CheckoutController extends AbstractController
             }
 
             $deliveryMode = $request->request->get('delivery_mode');
+            $session->set('delivery_mode', $deliveryMode);
 
             if ($deliveryMode === 'comptoir') {
                 $entityManager->persist($billingAdress);
@@ -64,13 +66,28 @@ class CheckoutController extends AbstractController
                     $deliveryAdress->setUser($user);
                 }
 
+                $deliveryShipping = $deliveryForm->get('shipping')->getData();
+                $billingShipping = $billingForm->get('shipping')->getData();
+
+                if ($deliveryShipping) {
+                    $deliveryAdress->setShipping($deliveryShipping);
+                } else {
+                    throw new \Exception('Delivery shipping not found');
+                }
+
+                if ($billingShipping) {
+                    $billingAdress->setShipping($billingShipping);
+                } else {
+                    throw new \Exception('Billing shipping not found');
+                }
+
                 $entityManager->persist($deliveryAdress);
                 $entityManager->persist($billingAdress);
                 $entityManager->flush();
 
                 return $this->redirectToRoute('orderSummary_page', [
-                    'deliveryAdress' => $deliveryAdress->getId(),
                     'billingAdress' => $billingAdress->getId(),
+                    'deliveryAdress' => $deliveryAdress->getId(),
                     'delivery_mode' => $deliveryMode,
                 ]);
             }

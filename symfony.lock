@@ -27,6 +27,15 @@
             "./src/ApiResource/.gitignore"
         ]
     },
+    "doctrine/annotations": {
+        "version": "2.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.10",
+            "ref": "64d8583af5ea57b7afa4aba4b159907f3a148b05"
+        }
+    },
     "doctrine/doctrine-bundle": {
         "version": "2.13",
         "recipe": {
@@ -75,17 +84,16 @@
             "ref": "b131e6cbfe1b898a508987851963fff485986285"
         }
     },
-    "league/oauth2-server-bundle": {
-        "version": "0.9",
+    "lexik/jwt-authentication-bundle": {
+        "version": "3.1",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
-            "version": "0.4",
-            "ref": "7f26963037fce3b69c1b3f6a75a3265edb1e1caa"
+            "version": "2.5",
+            "ref": "e9481b233a11ef7e15fe055a2b21fd3ac1aa2bb7"
         },
         "files": [
-            "config/packages/league_oauth2_server.yaml",
-            "config/routes/league_oauth2_server.yaml"
+            "config/packages/lexik_jwt_authentication.yaml"
         ]
     },
     "nelmio/cors-bundle": {
@@ -98,18 +106,6 @@
         },
         "files": [
             "./config/packages/nelmio_cors.yaml"
-        ]
-    },
-    "nyholm/psr7": {
-        "version": "1.8",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "1.0",
-            "ref": "4a8c0345442dcca1d8a2c65633dcf0285dd5a5a2"
-        },
-        "files": [
-            "config/packages/nyholm_psr7.yaml"
         ]
     },
     "phpunit/phpunit": {
@@ -194,6 +190,18 @@
             "public/index.php",
             "src/Controller/.gitignore",
             "src/Kernel.php"
+        ]
+    },
+    "symfony/lock": {
+        "version": "7.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.2",
+            "ref": "8e937ff2b4735d110af1770f242c1107fdab4c8e"
+        },
+        "files": [
+            "config/packages/lock.yaml"
         ]
     },
     "symfony/mailer": {
