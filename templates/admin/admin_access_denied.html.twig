@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accès refusé{% endblock %}
+
+{% block body %}
+
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Accès refusé</h1>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 shadow-sm" role="alert">
+            Ce compte n'a pas les droits administrateurs pour accéder à cette page.
+        </div>
+        <div class="text-center">
+            <a href="/" class="bg-customGreen text-white px-6 py-3 rounded-lg hover:bg-gray-500 inline-block">
+                Retour à l'accueil
+            </a>
+        </div>
+    </div>
+{% endblock %}
