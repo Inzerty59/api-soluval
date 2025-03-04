@@ -31,6 +31,10 @@ class OpistoController extends AbstractController
                 'id' => $part->getId(),
                 'manufacturer_reference' => $part->getManufacturerReference(),
                 'adaptable_reference' => $part->getAdaptableReference(),
+                'available' => $part->isAvailable(),
+                'casse_id' => $part->getCasseId(),
+                'shipping_id' => $part->getShippingId(),
+                'weight' => $part->getWeight(),
                 'category_name' => $part->getCategoryName(),
                 'description' => $part->getDescription(),
                 'part_condition' => $part->getPartCondition(),
@@ -53,9 +57,6 @@ class OpistoController extends AbstractController
                 'vignette' => $part->getVignette(),
                 'photos' => $part->getPhotos(),
                 'price' => $part->getPrice(),
-                'casse_id' => $part->getCasseId(),
-                'shipping_id' => $part->getShippingId(),
-                'weight' => $part->getWeight(),
                 'origin' => $part->getOrigin(),
             ], $parts);
 
