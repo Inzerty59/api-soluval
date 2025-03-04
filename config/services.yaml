@@ -38,6 +38,12 @@ services:
             $authUrlApi: '%env(AUTH_URL_API)%'
             $logger: '@logger'
 
+    App\Service\QuotaService:
+        arguments:
+            $minuteLimiter: '@limiter.api_minute'
+            $hourLimiter: '@limiter.api_hour'
+            $dayLimiter: '@limiter.api_day'
+
     App\Twig\AppExtension:
         tags: ['twig.extension']
 
@@ -55,6 +61,10 @@ services:
     App\Form\BillingAdressType:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
+
+    App\EventListener\RateLimiterListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
 parameters:
     stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'

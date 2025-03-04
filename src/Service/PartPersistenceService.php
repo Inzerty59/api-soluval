@@ -53,7 +53,8 @@ class PartPersistenceService
             ->setCasseId($partData['Casse']['Id'] ?? null)
             ->setShippingId($partData['Shipping']['ShippingId'] ?? null)
             ->SetWeight($partData['Weight'] ?? null)
-            ->setOrigin($partData['Category']['DataOrigin'] ?? null);
+            ->setOrigin($partData['Category']['DataOrigin'] ?? null)
+            ->setAvailable($partData['Available'] ?? null);
 
         // Vérifier l'existence pour éviter les doublons
         $existingPart = $this->entityManager->getRepository(Part::class)
@@ -88,14 +89,15 @@ class PartPersistenceService
                 ->setCasseId($partData['Casse']['Id'] ?? null)
                 ->setShippingId($partData['Shipping']['ShippingId'] ?? null)
                 ->SetWeight($partData['Weight'] ?? null)
-                ->setOrigin($partData['Category']['DataOrigin'] ?? null);
+                ->setOrigin($partData['Category']['DataOrigin'] ?? null)
+                ->setAvailable($partData['Available'] ?? null);
+
         } else {
             $this->entityManager->persist($part);
         }
 
         $this->entityManager->flush(); // Persist et sauvegarde immédiatement
 
-        // Commenter la partie de persistance des données de shipping
         /*
         if (isset($partData['Shippings']) && is_array($partData['Shippings'])) {
             foreach ($partData['Shippings'] as $shippingData) {

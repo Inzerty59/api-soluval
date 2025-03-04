@@ -36,7 +36,6 @@ class OpistoDataFetcher
      */
     public function fetchParts(array $filters = []): array
     {
-        // Augmenter la limite de mémoire et le temps d'exécution
         ini_set('memory_limit', '4096M');
         ini_set('max_execution_time', 0);
 
@@ -52,48 +51,54 @@ class OpistoDataFetcher
 
         try {
             do {
-                $queryParams['page'] = $page;
-                $queryParams['itemsPerPage'] = 100; // Assurez-vous de définir la limite par page
+                $promises = [];
+                for ($i = 0; $i < 20; $i++) {
+                    $queryParams['page'] = $page + $i;
+                    $queryParams['itemsPerPage'] = 100;
 
-                $response = $this->client->request('GET', $this->apiUrl . '/parts', [
-                    'query' => $queryParams,
-                    'headers' => [
-                        'Token' => $token,
-                        'Accept' => 'application/json; charset=utf-8', 
-                        'Content-Type' => 'application/json; charset=utf-8', 
-                    ],
-                ]);
-
-                // Récupérer le contenu brut pour inspection
-                $content = $response->getContent(false); // Récupère le contenu sans lever d'exception
-                $statusCode = $response->getStatusCode();
-
-                // Vérification du statut HTTP
-                if ($statusCode !== 200) {
-                    throw new \Exception("Erreur HTTP $statusCode : $content");
+                    $promises[] = $this->client->request('GET', $this->apiUrl . '/parts', [
+                        'query' => $queryParams,
+                        'headers' => [
+                            'Token' => $token,
+                            'Accept' => 'application/json; charset=utf-8',
+                            'Content-Type' => 'application/json; charset=utf-8',
+                        ],
+                    ]);
                 }
 
-                // Décodage du contenu JSON
-                $data = json_decode($content, true);
+                foreach ($promises as $response) {
+                    // Récupérer le contenu brut pour inspection
+                    $content = $response->getContent(false); 
+                    $statusCode = $response->getStatusCode();
 
-                // Vérification des erreurs de décodage JSON
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    throw new \Exception('Erreur de décodage JSON : ' . json_last_error_msg());
+                    // Vérification du statut HTTP
+                    if ($statusCode !== 200) {
+                        throw new \Exception("Erreur HTTP $statusCode : $content");
+                    }
+
+                    // Décodage du contenu JSON
+                    $data = json_decode($content, true);
+
+                    // Vérification des erreurs de décodage JSON
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        throw new \Exception('Erreur de décodage JSON : ' . json_last_error_msg());
+                    }
+
+                    if (isset($data['Parts']) && is_array($data['Parts'])) {
+                        $this->saveParts($data['Parts']);
+                        $allParts = array_merge($allParts, $data['Parts']);
+                        $this->logger->info('Page ' . $page . ' : ' . count($data['Parts']) . ' pièces récupérées.');
+                    } else {
+                        $this->logger->warning('Page ' . $page . ' : Aucune pièce récupérée.');
+                    }
                 }
 
-                if (isset($data['Parts']) && is_array($data['Parts'])) {
-                    $this->saveParts($data['Parts']); 
-                    $allParts = array_merge($allParts, $data['Parts']);
-                    $this->logger->info('Page ' . $page . ' : ' . count($data['Parts']) . ' pièces récupérées.');
-                } else {
-                    $this->logger->warning('Page ' . $page . ' : Aucune pièce récupérée.');
-                }
+                $page += 20;
+                $requestCount += 20;
 
-                $page++;
-                $requestCount++;
-
-                if ($requestCount >= 500) {
+                if ($requestCount >= 1000) {
                     sleep(60);
+                    $requestCount = 0;
                 }
             } while (!empty($data['Parts']));
 

@@ -150,6 +150,9 @@ class Part
     #[ORM\Column(nullable: true)]
     private ?int $origin = null;
 
+    #[ORM\Column]
+    private ?bool $available = null;
+
     public function __construct()
     {
     }
@@ -515,6 +518,18 @@ class Part
     public function setOrigin(?int $origin): static
     {
         $this->origin = $origin;
+
+        return $this;
+    }
+
+    public function isAvailable(): ?bool
+    {
+        return $this->available;
+    }
+
+    public function setAvailable(bool $available): static
+    {
+        $this->available = $available;
 
         return $this;
     }
