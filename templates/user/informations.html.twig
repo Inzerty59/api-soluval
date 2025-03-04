@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Informations{% endblock %}
+
+{% block body %}
+    <h1 class="text-2xl font-bold mb-4">Mes Informations</h1>
+
+    {% if errors is defined and errors|length > 0 %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 shadow-sm" role="alert">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% for message in app.flashes('error') %}
+        <div class="bg-red-100 border border-red-400 text-black-400 px-4 py-3 rounded mb-4 shadow-sm" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div id="info-display" class="space-y-4">
+        <p><strong>Nom :</strong> {{ user.surname }}</p>
+        <p><strong>Prénom :</strong> {{ user.name }}</p>
+        <p><strong>Email :</strong> {{ user.email }}</p>
+        {% if user.accountType == 'professionnel' %}
+            <p><strong>Nom d'entreprise :</strong> {{ user.companyName }}</p>
+            <p><strong>Numéro de SIRET :</strong> {{ user.siretNumber }}</p>
+            <p><strong>Numéro de TVA :</strong> {{ user.vatNumber }}</p>
+        {% endif %}
+        <button id="edit-button" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+            Modifier mes informations
+        </button>
+        <button id="change-password-button" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+            Modifier le mot de passe
+        </button>
+    </div>
+
+    <form id="info-form" method="post" action="{{ path('user_update_informations') }}" class="hidden space-y-4">
+        <div>
+            <label for="surname" class="block text-sm font-medium text-gray-700">Nom</label>
+            <input type="text" name="surname" id="surname" value="{{ user.surname }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Prénom</label>
+            <input type="text" name="name" id="name" value="{{ user.name }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" name="email" id="email" value="{{ user.email }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+        {% if user.accountType == 'professionnel' %}
+            <div>
+                <label for="companyName" class="block text-sm font-medium text-gray-700">Nom d'entreprise</label>
+                <input type="text" name="companyName" id="companyName" value="{{ user.companyName }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            </div>
+            <div>
+                <label for="siretNumber" class="block text-sm font-medium text-gray-700">Numéro de SIRET</label>
+                <input type="text" name="siretNumber" id="siretNumber" value="{{ user.siretNumber }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            </div>
+            <div>
+                <label for="vatNumber" class="block text-sm font-medium text-gray-700">Numéro de TVA</label>
+                <input type="text" name="vatNumber" id="vatNumber" value="{{ user.vatNumber }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            </div>
+        {% endif %}
+        <div class="flex space-x-4">
+            <button type="submit" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                Enregistrer les modifications
+            </button>
+            <button type="button" id="cancel-button" class="bg-blue-500 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                Annuler
+            </button>
+        </div>
+    </form>
+
+    <form id="password-form" method="post" action="{{ path('user_update_password') }}" class="hidden space-y-4">
+        <div>
+            <label for="new_password" class="block text-sm font-medium text-gray-700">Nouveau mot de passe</label>
+            <input type="password" name="new_password" id="new_password" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div>
+            <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirmez le mot de passe</label>
+            <input type="password" name="confirm_password" id="confirm_password" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div class="flex space-x-4">
+            <button type="submit" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                Enregistrer le mot de passe
+            </button>
+            <button type="button" id="cancel-password-button" class="bg-blue-500 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                Annuler
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('edit-button').addEventListener('click', function() {
+        document.getElementById('info-display').classList.add('hidden');
+        document.getElementById('info-form').classList.remove('hidden');
+    });
+
+    document.getElementById('cancel-button').addEventListener('click', function() {
+        document.getElementById('info-form').classList.add('hidden');
+        document.getElementById('info-display').classList.remove('hidden');
+    });
+
+    document.getElementById('change-password-button').addEventListener('click', function() {
+        document.getElementById('info-display').classList.add('hidden');
+        document.getElementById('password-form').classList.remove('hidden');
+    });
+
+    document.getElementById('cancel-password-button').addEventListener('click', function() {
+        document.getElementById('password-form').classList.add('hidden');
+        document.getElementById('info-display').classList.remove('hidden');
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,14 @@
+framework:
+    rate_limiter:
+        api_minute:
+            policy: 'fixed_window'
+            limit: 500
+            interval: '1 minute'
+        api_hour:
+            policy: 'fixed_window'
+            limit: 5000
+            interval: '1 hour'
+        api_day:
+            policy: 'fixed_window'
+            limit: 10000
+            interval: '1 day'
