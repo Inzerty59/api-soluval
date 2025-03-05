@@ -10,7 +10,7 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
-                property: email    
+                property: name
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -28,9 +28,9 @@ security:
             provider: app_user_provider
             json_login:
                 check_path: /api/login_check
-                username_path: email
+                username_path: name
                 password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
+                success_handler: App\Security\AuthenticationSuccessHandler
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
         api:
@@ -58,9 +58,11 @@ security:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/admin/access-denied, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/paiement, roles: IS_AUTHENTICATED_FULLY }
-        # - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        # - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
-        # - { path: ^/api/parts, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+        - { path: ^/api/quotas, roles: PUBLIC_ACCESS}
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        
 
 when@test:
     security:
