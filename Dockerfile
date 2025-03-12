@@ -9,8 +9,8 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && echo "fr_FR.UTF-8 UTF-8" >> /etc/locale.gen \
     && locale-gen
 
-# Activer le module rewrite pour Symfony
-RUN a2enmod rewrite
+# Activer les modules nécessaires pour Symfony et SSL
+RUN a2enmod rewrite ssl
 
 # Installer Composer
 RUN curl -sS https://getcomposer.org/installer | php -- \
@@ -38,3 +38,6 @@ COPY . /var/www/api-soluval
 
 # Régler les permissions pour Apache
 RUN chown -R www-data:www-data /var/www/api-soluval
+
+# Activer le site par défaut
+RUN a2ensite 000-default.conf
