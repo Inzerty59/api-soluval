@@ -36,7 +36,7 @@ class OpistoDataFetcher
      */
     public function fetchParts(array $filters = []): array
     {
-        ini_set('memory_limit', '4096M');
+        ini_set('memory_limit', '-1');
         ini_set('max_execution_time', 0);
 
         $token = $this->authService->getValidToken();
@@ -51,50 +51,45 @@ class OpistoDataFetcher
 
         try {
             do {
-                $promises = [];
-                for ($i = 0; $i < 20; $i++) {
-                    $queryParams['page'] = $page + $i;
-                    $queryParams['itemsPerPage'] = 100;
+                $queryParams['page'] = $page;
+                $queryParams['itemsPerPage'] = 100;
 
-                    $promises[] = $this->client->request('GET', $this->apiUrl . '/parts', [
-                        'query' => $queryParams,
-                        'headers' => [
-                            'Token' => $token,
-                            'Accept' => 'application/json; charset=utf-8',
-                            'Content-Type' => 'application/json; charset=utf-8',
-                        ],
-                    ]);
+                $response = $this->client->request('GET', $this->apiUrl . '/parts', [
+                    'query' => $queryParams,
+                    'headers' => [
+                        'Token' => $token,
+                        'Accept' => 'application/json; charset=utf-8',
+                        'Content-Type' => 'application/json; charset=utf-8',
+                    ],
+                ]);
+
+                // Récupérer le contenu brut pour inspection
+                $content = $response->getContent(false); 
+                $statusCode = $response->getStatusCode();
+
+                // Vérification du statut HTTP
+                if ($statusCode !== 200) {
+                    throw new \Exception("Erreur HTTP $statusCode : $content");
                 }
 
-                foreach ($promises as $response) {
-                    // Récupérer le contenu brut pour inspection
-                    $content = $response->getContent(false); 
-                    $statusCode = $response->getStatusCode();
+                // Décodage du contenu JSON
+                $data = json_decode($content, true);
 
-                    // Vérification du statut HTTP
-                    if ($statusCode !== 200) {
-                        throw new \Exception("Erreur HTTP $statusCode : $content");
-                    }
-
-                    // Décodage du contenu JSON
-                    $data = json_decode($content, true);
-
-                    // Vérification des erreurs de décodage JSON
-                    if (json_last_error() !== JSON_ERROR_NONE) {
-                        throw new \Exception('Erreur de décodage JSON : ' . json_last_error_msg());
-                    }
-
-                    if (isset($data['Parts']) && is_array($data['Parts'])) {
-                        $this->saveParts($data['Parts']);
-                        $allParts = array_merge($allParts, $data['Parts']);
-                        $this->logger->info('Page ' . $page . ' : ' . count($data['Parts']) . ' pièces récupérées.');
-                    } else {
-                        $this->logger->warning('Page ' . $page . ' : Aucune pièce récupérée.');
-                    }
+                // Vérification des erreurs de décodage JSON
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception('Erreur de décodage JSON : ' . json_last_error_msg());
                 }
 
-                $page += 20;
-                $requestCount += 20;
+                if (isset($data['Parts']) && is_array($data['Parts'])) {
+                    $this->saveParts($data['Parts']);
+                    $allParts = array_merge($allParts, $data['Parts']);
+                    $this->logger->info('Page ' . $page . ' : ' . count($data['Parts']) . ' pièces récupérées.');
+                } else {
+                    $this->logger->warning('Page ' . $page . ' : Aucune pièce récupérée.');
+                }
+
+                $page++;
+                $requestCount++;
 
                 if ($requestCount >= 1000) {
                     sleep(60);
