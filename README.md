@@ -9,7 +9,7 @@ Créer le fichier public.key + private.key dans le config/keys
    ```
    2. Accéder au conteneur
    ```bash
-   docker exec -it www_api-soluval bash
+   docker exec -it www-api bash
    ```
    3. Installer les dépendances Composer
    ```bash
@@ -35,6 +35,10 @@ php bin/console doctrine:migrations:migrate
 
 composer require stripe/stripe-php
 
+# Si erreur cache
+chown -R www-data:www-data /var/www/api-soluval/var/cache
+chmod -R 775 /var/www/api-soluval/var/cache
+php bin/console cache:clear --env=prod
 
 🚨 **Ce projet est sous licence propriétaire** 🚨  
 Toute utilisation, modification ou redistribution est **strictement interdite** sans autorisation.  
