@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+Résumé de la commande
+{% endblock %}
+
+{% block body %}
+<!-- Page en pleine largeur, fond gris -->
+<div class="min-h-screen bg-gray-100 p-8 text-gray-800">
+
+    <!-- Bouton pour revenir en arrière -->
+    <div class="mb-6">
+        <button
+            type="button"
+            onclick="history.back()"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+        >
+            <!-- Petite flèche gauche optionnelle (SVG) -->
+            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Retour
+        </button>
+    </div>
+
+    <!-- Titre principal -->
+    <h1 class="text-2xl font-bold mb-6">Résumé de la commande</h1>
+
+    <!-- Récapitulatif de la commande -->
+    <div class="mb-8">
+        <ul class="space-y-2">
+            {% for item in cart %}
+                <li class="flex justify-between">
+                    <span>{{ item.part.getName() }}</span>
+                    <span>{{ item.part.getFinalPrice() }} €</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="flex justify-between font-bold border-t pt-2 mt-2">
+            <span>Total</span>
+            <span>{{ total }} €</span>
+        </div>
+    </div>
+
+    <!-- Formulaire de livraison et de facturation -->
+    <form method="post">
+        <!-- Choix du mode de livraison -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-2">Choix du mode de livraison</h2>
+            <div class="space-y-2">
+                <label class="flex items-center">
+                    <input type="radio" name="delivery_mode" value="comptoir" class="mr-2" onclick="toggleDeliveryAddress()">
+                    <span>Récupérer la commande au comptoir (Gratuit)</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="radio" name="delivery_mode" value="livraison" class="mr-2" onclick="toggleDeliveryAddress()">
+                    <span>Livraison (Calculée à l’étape suivante)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Formulaires : adresses de livraison et de facturation -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Adresse de livraison -->
+            <div id="delivery-address">
+                <h2 class="text-xl font-semibold mb-2">Adresse de livraison</h2>
+                <div class="space-y-4 mb-6">
+                    {{ form_row(deliveryForm.Firstname, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Prénom'}}) }}
+                    {{ form_row(deliveryForm.Lastname, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Nom'}}) }}
+                    {{ form_row(deliveryForm.Phone, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Téléphone'}}) }}
+                    {{ form_row(deliveryForm.Street, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Adresse'}}) }}
+                    {{ form_row(deliveryForm.StreetAdditionnal, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Adresse Complémentaire'}}) }}
+                    {{ form_row(deliveryForm.City, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Ville'}}) }}
+                    {{ form_row(deliveryForm.PostCode, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Code postal'}}) }}
+                    {{ form_row(deliveryForm.shipping, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded bg-white'}}) }}
+                    {{ form_row(deliveryForm._token) }}
+                </div>
+            </div>
+
+            <!-- Adresse de facturation -->
+            <div id="billing-address">
+                <h2 class="text-xl font-semibold mb-2">Adresse de facturation</h2>
+                <div class="space-y-4 mb-6">
+                    {{ form_row(billingForm.Firstname, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Prénom'}}) }}
+                    {{ form_row(billingForm.Lastname, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Nom'}}) }}
+                    {{ form_row(billingForm.Phone, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Téléphone'}}) }}
+                    {{ form_row(billingForm.Street, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Adresse'}}) }}
+                    {{ form_row(billingForm.StreetAdditionnal, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Adresse Complémentaire'}}) }}
+                    {{ form_row(billingForm.City, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Ville'}}) }}
+                    {{ form_row(billingForm.PostCode, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded', 'placeholder': 'Code postal'}}) }}
+                    {{ form_row(billingForm.shipping, {'attr': {'class': 'w-full p-2 border border-gray-300 rounded bg-white'}}) }}
+                    {{ form_row(billingForm._token) }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Bouton de confirmation -->
+        <div class="mt-8" style="text-align: right;">
+            <button type="submit" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                Résumé de la commande
+            </button>
+        </div>
+    </form>
+    {{ encore_entry_script_tags('toggleDeliveryAdress') }}
+</div>
+
+<script>
+
+//TODO placer le script dans assets/js et l'appeler avec encore_entry_script_tags
+
+document.addEventListener('DOMContentLoaded', function () {
+    const deliveryModeInputs = document.querySelectorAll('input[name="delivery_mode"]');
+    const deliveryFormFields = document.querySelectorAll('#delivery-address input, #delivery-address select, #delivery-address textarea');
+    const billingFormFields = document.querySelectorAll('#billing-address input, #billing-address select, #billing-address textarea');
+
+    function toggleRequiredFields() {
+        const selectedMode = document.querySelector('input[name="delivery_mode"]:checked').value;
+        const isComptoir = selectedMode === 'comptoir';
+
+        deliveryFormFields.forEach(field => {
+            if (field.name !== 'delivery_adress[StreetAdditionnal]') {
+                field.required = !isComptoir;
+            } else {
+                field.required = false;
+            }
+        });
+
+        billingFormFields.forEach(field => {
+            if (field.name !== 'billing_adress[StreetAdditionnal]') {
+                field.required = !isComptoir;
+            } else {
+                field.required = false;
+            }
+        });
+    }
+
+    deliveryModeInputs.forEach(input => {
+        input.addEventListener('change', toggleRequiredFields);
+    });
+
+    toggleRequiredFields();
+});
+</script>
+{% endblock %}

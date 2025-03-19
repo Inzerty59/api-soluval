@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Paiement Annulé
+{% endblock %}
+
+{% block body %}
+    <div class="min-h-screen bg-gray-50 py-6 px-8 text-gray-800">
+        <h1 class="text-2xl font-bold mb-6">Paiement Annulé</h1>
+        <p>Une erreur est survenue pendant le paiement.</p>
+        <div class="mt-8">
+            <a href="{{ path('shop_index') }}" class="bg-customGreen hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                Retour à l'accueil
+            </a>
+        </div>
+    </div>
+{% endblock %}

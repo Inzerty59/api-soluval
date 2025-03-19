@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+    <div class="flex justify-center items-center min-h-screen bg-gray-100">
+        <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+            <h1 class="text-3xl font-bold mb-6 text-center">Inscription</h1>
+            {{ form_start(registrationForm) }}
+            
+            {% if registrationForm.vars.errors|length > 0 %}
+                <div class="bg-red-100 border border-red-400 text-black-400 px-4 py-3 rounded mb-4 shadow-sm" role="alert">
+                    <ul>
+                        {% for error in registrationForm.vars.errors %}
+                            <li>{{ error.message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <div class="mb-4">
+                {{ form_label(registrationForm.name, 'Nom', {'label_attr': {'class': 'block font-semibold mb-1'}}) }}
+                {{ form_widget(registrationForm.name, {'attr': {'class': 'w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500'}}) }}
+                {{ form_errors(registrationForm.name) }}
+            </div>
+            <div class="mb-4">
+                {{ form_label(registrationForm.surname, 'Prénom', {'label_attr': {'class': 'block font-semibold mb-1'}}) }}
+                {{ form_widget(registrationForm.surname, {'attr': {'class': 'w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500'}}) }}
+                {{ form_errors(registrationForm.surname) }}
+            </div>
+            <div class="mb-6">
+                {{ form_label(registrationForm.email.first, 'E-mail', {'label_attr': {'class': 'block font-semibold mb-1'}}) }}
+                {{ form_widget(registrationForm.email.first, {'attr': {'class': 'w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500'}}) }}
+                {{ form_errors(registrationForm.email.first) }}
+            </div>
+            <div class="mb-6">
+                {{ form_label(registrationForm.email.second, 'Confirmation d\'e-mail', {'label_attr': {'class': 'block font-semibold mb-1'}}) }}
+                {{ form_widget(registrationForm.email.second, {'attr': {'class': 'w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500'}}) }}
+                {{ form_errors(registrationForm.email.second) }}
+            </div>
+            <div class="mb-6 relative">
+                {{ form_label(registrationForm.password.first, 'Mot de passe', {'label_attr': {'class': 'block font-semibold mb-1'}}) }}
+                <div class="relative">
+                    {{ form_widget(registrationForm.password.first, {'attr': {'class': 'w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500', 'id': 'registration_form_password_first', 'name': 'registration_form[password][first]'}}) }}
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onclick="togglePasswordVisibility('registration_form_password_first', 'eye-icon1')">
+                        <svg id="eye-icon1" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" onclick="togglePasswordVisibility('registration_form_password_first', 'eye-icon1')">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.478 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </div>
+                </div>
+                {{ form_errors(registrationForm.password.first) }}
+            </div>
+            <div class="mb-6 relative">
+                {{ form_label(registrationForm.password.second, 'Confirmation de mot de passe', {'label_attr': {'class': 'block font-semibold mb-1'}}) }}
+                <div class="relative">
+                    {{ form_widget(registrationForm.password.second, {'attr': {'class': 'w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500', 'id': 'registration_form_password_second', 'name': 'registration_form[password][second]'}}) }}
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onclick="togglePasswordVisibility('registration_form_password_second', 'eye-icon2')">
+                        <svg id="eye-icon2" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" onclick="togglePasswordVisibility('registration_form_password_second', 'eye-icon2')">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.478 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </div>
+                </div>
+                {{ form_errors(registrationForm.password.second) }}
+            </div>
+            <div class="mb-4">
+                {{ form_label(registrationForm.accountType, 'Type de compte', {'label_attr': {'class': 'block font-semibold mb-1'}}) }}
+                {{ form_widget(registrationForm.accountType, {'attr': {'class': 'w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500'}}) }}
+                {{ form_errors(registrationForm.accountType) }}
+            </div>
+
+            <div id="professional-fields" style="display: none;">
+                <div class="mb-4">
+                    {{ form_label(registrationForm.companyName, 'Nom de l\'entreprise', {'label_attr': {'class': 'block font-semibold mb-1'}}) }}
+                    {{ form_widget(registrationForm.companyName, {'attr': {'class': 'w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500'}}) }}
+                    {{ form_errors(registrationForm.companyName) }}
+                </div>
+                <div class="mb-4">
+                    {{ form_label(registrationForm.siretNumber, 'Numéro SIRET', {'label_attr': {'class': 'block font-semibold mb-1'}}) }}
+                    {{ form_widget(registrationForm.siretNumber, {'attr': {'class': 'w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500'}}) }}
+                    {{ form_errors(registrationForm.siretNumber) }}
+                </div>
+                <div class="mb-4">
+                    {{ form_label(registrationForm.vatNumber, 'Numéro de TVA', {'label_attr': {'class': 'block font-semibold mb-1'}}) }}
+                    {{ form_widget(registrationForm.vatNumber, {'attr': {'class': 'w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-gray-500'}}) }}
+                    {{ form_errors(registrationForm.vatNumber) }}
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-customGreen text-white p-2 rounded hover:bg-gray-500 transition mt-4">S'inscrire</button>
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+
+        {{ encore_entry_script_tags('toggleAccountType') }}
+
+    <script>
+        function togglePasswordVisibility(passwordFieldId, eyeIconId) {
+            const passwordField = document.getElementById(passwordFieldId);
+            const eyeIcon = document.getElementById(eyeIconId);
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.478 0 2.875.325 4.125.825M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4.5 4.5l15 15" />';
+            } else {
+                passwordField.type = 'password';
+                eyeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M2.458 12C3.732 7.943 7.522 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.478 0-8.268-2.943-9.542-7z" />';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const eyeIcon1 = document.getElementById('eye-icon1');
+            const eyeIcon2 = document.getElementById('eye-icon2');
+
+            if (eyeIcon1) {
+                eyeIcon1.addEventListener('click', () => togglePasswordVisibility('registration_form_password_first', 'eye-icon1'));
+            }
+
+            if (eyeIcon2) {
+                eyeIcon2.addEventListener('click', () => togglePasswordVisibility('registration_form_password_second', 'eye-icon2'));
+            }
+        });
+    </script>
+{% endblock %}
