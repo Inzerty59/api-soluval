@@ -1,0 +1,76 @@
+services:
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    restart: always
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.le.acme.httpchallenge=true"
+      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.le.acme.email=ton@email.com"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "81:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    networks:
+      - prod
+
+  db:
+    image: mysql:8.0
+    container_name: db-api
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - prod
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: pma-api
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8090:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    networks:
+      - prod
+
+  www:
+    build: .
+    container_name: www-api
+    ports:
+      - "9000:80" # Apache écoute sur le port 80
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.www.rule=Host(`api.soluval.fr`)"
+      - "traefik.http.routers.www.entrypoints=websecure"
+      - "traefik.http.routers.www.tls=true"
+      - "traefik.http.routers.www.tls.certresolver=le"
+    volumes:
+      - ./vhosts:/etc/apache2/sites-enabled
+      - ./:/var/www/api-soluval
+    environment:
+      - PHP_MEMORY_LIMIT=-1
+    networks:
+      - prod
+
+networks:
+  prod:
+
+volumes:
+  db-data:
