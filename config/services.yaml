@@ -43,6 +43,11 @@ services:
             $minuteLimiter: '@limiter.api_minute'
             $hourLimiter: '@limiter.api_hour'
             $dayLimiter: '@limiter.api_day'
+            
+    App\Service\Ovoko\CheckCarService:
+        arguments:
+            $httpClient: '@http_client'
+            $params: '@parameter_bag'
 
     App\Twig\AppExtension:
         tags: ['twig.extension']
