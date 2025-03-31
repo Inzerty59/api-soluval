@@ -5,21 +5,25 @@ namespace App\Service\Ovoko;
 use App\Entity\Part;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Psr\Log\LoggerInterface;
 
 class CheckCarService
 {
     private HttpClientInterface $httpClient;
     private ParameterBagInterface $params;
     private ImportCarService $importCarService;
+    private LoggerInterface $logger;
 
     public function __construct(
         ImportCarService $importCarService,
         HttpClientInterface $httpClient,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        LoggerInterface $logger
     ) {
         $this->importCarService = $importCarService;
         $this->httpClient = $httpClient;
         $this->params = $params;
+        $this->logger = $logger;
     }
 
     /**
@@ -48,7 +52,7 @@ class CheckCarService
 
         return [
             'brand_id' => $brandId,
-            'model_id' => $modelId,
+            'car_id' => $modelId,
         ];
     }
 
@@ -99,7 +103,7 @@ class CheckCarService
 
         foreach ($carBrands as $brand) {
             if (strcasecmp($brand['name'], $brandName) === 0) {
-                return $brand['id'];
+                return (int) $brand['id'];
             }
         }
 
@@ -123,6 +127,12 @@ class CheckCarService
             'user_token' => $this->params->get('OVOKO_API_USER_TOKEN'),
         ];
 
+        // Log de la requête
+        $this->logger->info('Requête envoyée à l\'API Ovoko pour récupérer les modèles', [
+            'url' => $url,
+            'form_data' => $formData,
+        ]);
+
         try {
             $response = $this->httpClient->request('POST', $url, [
                 'body' => $formData,
@@ -136,9 +146,13 @@ class CheckCarService
 
             $data = $response->toArray();
 
+            // Log de la réponse
+            $this->logger->info('Réponse de l\'API Ovoko pour les modèles', ['response' => $data]);
+
             return $data['list'] ?? [];
         } catch (\Exception $e) {
-            throw new \Exception("Erreur lors de la récupération des modèles : " . $e->getMessage());
+            $this->logger->error('Erreur lors de la récupération des modèles', ['error' => $e->getMessage()]);
+            throw $e;
         }
     }
 
@@ -155,10 +169,12 @@ class CheckCarService
 
         foreach ($carModels as $model) {
             if (strcasecmp($model['name'], $modelName) === 0) {
-                return $model['id'];
+                $this->logger->info('Modèle correspondant trouvé', ['model_id' => $model['id']]);
+                return (int) $model['id']; // Conversion explicite en entier
             }
         }
 
+        $this->logger->warning('Aucun modèle correspondant trouvé', ['part_model_name' => $modelName]);
         return null;
     }
 }

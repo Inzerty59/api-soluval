@@ -6,21 +6,25 @@ use App\Entity\Part;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use App\Repository\OvokoCarRepository;
+use Psr\Log\LoggerInterface;
 
 class ImportCarService
 {
     private HttpClientInterface $httpClient;
     private ParameterBagInterface $params;
     private OvokoCarRepository $ovokoCarRepository;
+    private LoggerInterface $logger;
 
     public function __construct(
         HttpClientInterface $httpClient,
         ParameterBagInterface $params,
-        OvokoCarRepository $ovokoCarRepository
+        OvokoCarRepository $ovokoCarRepository,
+        LoggerInterface $logger
     ) {
         $this->httpClient = $httpClient;
         $this->params = $params;
         $this->ovokoCarRepository = $ovokoCarRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -38,6 +42,10 @@ class ImportCarService
         $carModelId = $this->ovokoCarRepository->findOvokoModelIdByModelName($part->getModelName());
 
         if (!$carModelId) {
+            $this->logger->warning('Modèle de voiture introuvable', [
+                'model_name' => $part->getModelName(),
+                'brand_id' => $brandId,
+            ]);
             return null;
         }
 
@@ -64,11 +72,25 @@ class ImportCarService
             $data = $response->toArray();
 
             if (isset($data['status_code']) && $data['status_code'] === 'R200') {
+                // Log des informations sur la voiture importée
+                $this->logger->info('Voiture importée avec succès', [
+                    'car_id' => $data['car_id'] ?? null,
+                    'model_name' => $part->getModelName(),
+                    'brand_id' => $brandId,
+                    'car_years' => $part->getVehicleYear(),
+                ]);
+
                 return $data['car_id'] ?? null;
             }
 
             throw new \Exception("Le modèle n'a pas pu être importé.");
         } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de l\'importation du modèle', [
+                'model_name' => $part->getModelName(),
+                'brand_id' => $brandId,
+                'error' => $e->getMessage(),
+            ]);
+
             throw new \Exception("Erreur lors de l'importation du modèle : " . $e->getMessage());
         }
     }
