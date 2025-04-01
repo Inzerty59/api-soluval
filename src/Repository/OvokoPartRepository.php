@@ -21,11 +21,11 @@ class OvokoPartRepository
      */
     public function findOvokoPartIdByCategoryName(string $categoryName): ?int
     {
-        $query = 'SELECT ovoko_part_id FROM ovoko_part WHERE opisto_category_name = :categoryName';
+        $query = 'SELECT ovoko_part_id FROM ovoko_part WHERE opisto_category_name = :categoryName LIMIT 1';
         $result = $this->connection->fetchAssociative($query, [
             'categoryName' => $categoryName,
         ]);
 
-        return $result['ovoko_part_id'] ?? null;
+        return $result ? (int) $result['ovoko_part_id'] : null;
     }
 }

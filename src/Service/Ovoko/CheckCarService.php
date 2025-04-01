@@ -39,7 +39,15 @@ class CheckCarService
             return null;
         }
 
-        $modelId = $this->checkModelExists($brandId, $part->getModelName());
+        $modelName = $part->getModelName();
+        if (is_null($modelName) || trim($modelName) === '') {
+            $this->logger->warning('Modèle null ou vide détecté, passage à l\'élément suivant.', [
+                'external_id' => $part->getExternalId(),
+            ]);
+            return null;
+        }
+
+        $modelId = $this->checkModelExists($brandId, $modelName);
 
         if ($modelId === null) {
             $carId = $this->importCarService->importCarModel($part, $brandId);
@@ -127,7 +135,6 @@ class CheckCarService
             'user_token' => $this->params->get('OVOKO_API_USER_TOKEN'),
         ];
 
-        // Log de la requête
         $this->logger->info('Requête envoyée à l\'API Ovoko pour récupérer les modèles', [
             'url' => $url,
             'form_data' => $formData,
@@ -146,7 +153,6 @@ class CheckCarService
 
             $data = $response->toArray();
 
-            // Log de la réponse
             $this->logger->info('Réponse de l\'API Ovoko pour les modèles', ['response' => $data]);
 
             return $data['list'] ?? [];
@@ -170,7 +176,7 @@ class CheckCarService
         foreach ($carModels as $model) {
             if (strcasecmp($model['name'], $modelName) === 0) {
                 $this->logger->info('Modèle correspondant trouvé', ['model_id' => $model['id']]);
-                return (int) $model['id']; // Conversion explicite en entier
+                return (int) $model['id'];
             }
         }
 
