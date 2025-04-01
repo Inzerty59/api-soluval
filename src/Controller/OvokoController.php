@@ -36,56 +36,76 @@ class OvokoController extends AbstractController
     public function importParts(): JsonResponse
     {
         try {
+            ini_set('memory_limit', '-1');
+
             $parts = $this->entityManager->getRepository(Part::class)->findAll();
 
             if (empty($parts)) {
                 return new JsonResponse(['error' => 'Aucune pièce à importer.'], 404);
             }
 
-            $username = $this->params->get('OVOKO_API_USERNAME');
-            $password = $this->params->get('OVOKO_API_PASSWORD');
-            $userToken = $this->params->get('OVOKO_API_USER_TOKEN');
-
             $results = [];
+            $batchSize = 50; // Taille du lot
+            $totalParts = count($parts);
 
-            foreach ($parts as $part) {
-                try {
-                    if (!$part->getExternalId() || !$part->getCategoryName()) {
+            for ($i = 0; $i < $totalParts; $i += $batchSize) {
+                $batchParts = array_slice($parts, $i, $batchSize);
+
+                foreach ($batchParts as $part) {
+                    try {
+                        if (!$part->getExternalId() || !$part->getCategoryName()) {
+                            $results[] = [
+                                'external_id' => $part->getExternalId() ?? 'unknown',
+                                'error' => 'Données de la pièce manquantes ou invalides.',
+                                'status' => 'error',
+                            ];
+                            continue;
+                        }
+
+                        if (is_null($part->getModelName()) || trim($part->getModelName()) === '') {
+                            $results[] = [
+                                'external_id' => $part->getExternalId(),
+                                'error' => 'Modèle null ou vide, pièce ignorée.',
+                                'status' => 'skipped',
+                            ];
+                            continue;
+                        }
+
+                        $carData = $this->checkCarService->checkPart($part);
+                        if (!$carData || !isset($carData['car_id'])) {
+                            $results[] = [
+                                'external_id' => $part->getExternalId(),
+                                'error' => 'Modèle non trouvé ou null, passage à la pièce suivante.',
+                                'status' => 'skipped',
+                            ];
+                            continue;
+                        }
+
+                        $carId = (int) $carData['car_id'];
+
+                        $partId = $this->importPartService->importPart(
+                            $carId,
+                            $part->getExternalId(),
+                            $part->getVignette(),
+                            $part->getPhotos(),
+                            $part->getCategoryName()
+                        );
+
                         $results[] = [
-                            'external_id' => $part->getExternalId() ?? 'unknown',
-                            'error' => 'Données de la pièce manquantes ou invalides.',
+                            'external_id' => $part->getExternalId(),
+                            'part_id' => $partId,
+                            'status' => 'success',
+                        ];
+                    } catch (\Exception $e) {
+                        $results[] = [
+                            'external_id' => $part->getExternalId(),
+                            'error' => $e->getMessage(),
                             'status' => 'error',
                         ];
-                        continue;
                     }
-
-                    $carData = $this->checkCarService->checkPart($part);
-                    if (!$carData || !isset($carData['car_id'])) {
-                        throw new \Exception("Impossible de trouver ou de créer le véhicule pour la pièce avec l'ID externe : {$part->getExternalId()}");
-                    }
-
-                    $carId = (int) $carData['car_id'];
-
-                    $partId = $this->importPartService->importPart(
-                        $carId,
-                        $part->getExternalId(),
-                        $part->getVignette(),
-                        $part->getPhotos(),
-                        $part->getCategoryName()
-                    );
-
-                    $results[] = [
-                        'external_id' => $part->getExternalId(),
-                        'part_id' => $partId,
-                        'status' => 'success',
-                    ];
-                } catch (\Exception $e) {
-                    $results[] = [
-                        'external_id' => $part->getExternalId(),
-                        'error' => $e->getMessage(),
-                        'status' => 'error',
-                    ];
                 }
+
+                $this->entityManager->clear();
             }
 
             $successCount = count(array_filter($results, fn($result) => $result['status'] === 'success'));
