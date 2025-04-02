@@ -74,6 +74,10 @@ services:
     App\Command\ExportOvokoCommand:
         tags: ['console.command']
 
+    App\Repository\OvokoExportRepository:
+        arguments:
+            $connection: '@doctrine.dbal.default_connection'
+
 parameters:
     stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
     stripe_public_key: '%env(STRIPE_PUBLIC_KEY)%'
