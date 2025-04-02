@@ -20,13 +20,13 @@ class OvokoExportController extends AbstractController
             throw $this->createAccessDeniedException('Token invalide');
         }
 
-        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/ovoko_export_test.csv';
+        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/ovoko_export.csv';
 
         if (!file_exists($filePath)) {
             throw $this->createNotFoundException('Fichier non trouvé.');
         }
 
         return (new BinaryFileResponse($filePath))
-            ->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'ovoko_export_test.csv');
+            ->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'ovoko_export.csv');
     }
 }
