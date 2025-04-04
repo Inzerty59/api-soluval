@@ -78,6 +78,9 @@ services:
         arguments:
             $connection: '@doctrine.dbal.default_connection'
 
+    App\Controller\CallbackController:
+        tags: ['controller.service_arguments']
+
 parameters:
     stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
     stripe_public_key: '%env(STRIPE_PUBLIC_KEY)%'
@@ -89,3 +92,6 @@ parameters:
     OVOKO_API_URL_MODEL: '%env(OVOKO_API_URL_MODEL)%'
     OVOKO_API_URL_IMPORT_CAR: '%env(OVOKO_API_URL_IMPORT_CAR)%'
     OVOKO_API_URL_IMPORT_PART: '%env(OVOKO_API_URL_IMPORT_PART)%'
+    OVOKO_API_URL_DELETE_PART: '%env(OVOKO_API_URL_DELETE_PART)%'
+    CALLBACK_HEADER_NAME: '%env(CALLBACK_HEADER_NAME)%'
+    CALLBACK_HEADER_VALUE: '%env(CALLBACK_HEADER_VALUE)%'
