@@ -71,6 +71,63 @@ class PartRepository extends ServiceEntityRepository
         return array_map(fn($model) => $model['model_name'], $result);
     }
 
+    public function findExternalIdByOvokoPartId(int $ovokoPartId): ?string
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('p.external_id')
+            ->where('p.ovoko_part_id = :ovokoPartId')
+            ->setParameter('ovokoPartId', $ovokoPartId)
+            ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult()['external_id'] ?? null;
+    }
+
+    public function findExternalIdByOvokoExternalId(string $ovokoExternalId): ?string
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('p.external_id')
+            ->where('p.external_id = :ovokoExternalId')
+            ->setParameter('ovokoExternalId', $ovokoExternalId)
+            ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult()['external_id'] ?? null;
+    }
+
+    public function isAvailable(string $externalId): bool
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('p.available')
+            ->where('p.external_id = :externalId')
+            ->setParameter('externalId', $externalId)
+            ->setMaxResults(1);
+
+        return (bool) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function updateAvailability(string $externalId, int $available): void
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->update()
+            ->set('p.available', ':available')
+            ->where('p.external_id = :externalId')
+            ->setParameter('available', $available)
+            ->setParameter('externalId', $externalId);
+
+        $qb->getQuery()->execute();
+    }
+
+    public function updateStatus(string $externalId, string $status): void
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->update()
+            ->set('p.status', ':status')
+            ->where('p.external_id = :externalId')
+            ->setParameter('status', $status)
+            ->setParameter('externalId', $externalId);
+
+        $qb->getQuery()->execute();
+    }
+
     //    /**
     //     * @return Part[] Returns an array of Part objects
     //     */
