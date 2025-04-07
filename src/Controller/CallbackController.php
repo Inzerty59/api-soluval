@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\PartRepository;
 use App\Service\OpistoStockChecker;
 use App\Service\Ovoko\DeletePartService;
+use App\Service\Ovoko\OrderSyncService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,13 +20,15 @@ class CallbackController
     private PartRepository $partRepository;
     private OpistoStockChecker $opistoStockChecker;
     private DeletePartService $deletePartService;
+    private OrderSyncService $orderSyncService;
 
     public function __construct(
         LoggerInterface $logger,
         ParameterBagInterface $params,
         PartRepository $partRepository,
         OpistoStockChecker $opistoStockChecker,
-        DeletePartService $deletePartService
+        DeletePartService $deletePartService,
+        OrderSyncService $orderSyncService
     ) {
         $this->logger = $logger;
         $this->headerName = $params->get('CALLBACK_HEADER_NAME');
@@ -33,6 +36,7 @@ class CallbackController
         $this->partRepository = $partRepository;
         $this->opistoStockChecker = $opistoStockChecker;
         $this->deletePartService = $deletePartService;
+        $this->orderSyncService = $orderSyncService;
     }
 
     /**
@@ -91,7 +95,18 @@ class CallbackController
 
         if ($orderId) {
             $this->logger->info('Nouvelle commande créée.', ['order_id' => $orderId]);
-            // TODO: Ajouter la logique pour traiter une nouvelle commande
+
+            try {
+                $this->orderSyncService->syncOrderToOpisto($orderId);
+                $this->logger->info('Commande synchronisée avec succès vers Opisto.', ['order_id' => $orderId]);
+            } catch (\Exception $e) {
+                $this->logger->error('Erreur lors de la synchronisation de la commande avec Opisto.', [
+                    'order_id' => $orderId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        } else {
+            $this->logger->warning('Aucun ID de commande fourni dans l\'événement.', ['event_data' => $eventData]);
         }
     }
 
