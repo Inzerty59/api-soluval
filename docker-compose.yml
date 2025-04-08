@@ -19,7 +19,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./letsencrypt:/letsencrypt"
     networks:
-      - preprod
+      - prod
 
   db:
     image: mysql:8.0
@@ -33,7 +33,7 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     networks:
-      - preprod
+      - prod
 
   phpmyadmin:
     image: phpmyadmin
@@ -47,13 +47,13 @@ services:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     networks:
-      - preprod
+      - prod
 
   www:
     build: .
     container_name: www-api
     ports:
-      - "9000:80" # Apache écoute sur le port 80
+      - "9000:80"
     restart: always
     labels:
       - "traefik.enable=true"
@@ -67,10 +67,10 @@ services:
     environment:
       - PHP_MEMORY_LIMIT=-1
     networks:
-      - preprod
+      - prod
 
 networks:
-  preprod:
+  prod:
 
 volumes:
   db-data:
