@@ -1,3 +1,4 @@
+# Si erreur cache ( Si erreur 500 ) voir plus bas
 # API Soluval
 Créer le .env
 Créer le fichier public.key + private.key dans le config/keys
@@ -14,6 +15,8 @@ Créer le fichier public.key + private.key dans le config/keys
    3. Installer les dépendances Composer
    ```bash
    composer install
+   si connextion refuse database : chercher ip du conteneur
+   docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nom_ou_id_du_conteneur
    ```
    4. Installer webpack et tailwind 
    ```bash
@@ -35,7 +38,7 @@ php bin/console doctrine:migrations:migrate
 
 composer require stripe/stripe-php
 
-# Si erreur cache
+# Si erreur cache ( Si erreur 500 )
 chown -R www-data:www-data /var/www/api-soluval/var/cache
 chmod -R 775 /var/www/api-soluval/var/cache
 php bin/console cache:clear --env=prod

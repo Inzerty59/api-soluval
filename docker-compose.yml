@@ -13,7 +13,7 @@ services:
       - "--certificatesresolvers.le.acme.email=ton@email.com"
       - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
     ports:
-      - "81:80"
+      - "80:80"
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -50,7 +50,10 @@ services:
       - prod
 
   www:
-    build: .
+    build:
+      context: .
+      args:
+        PHP_MEMORY_LIMIT: ${PHP_MEMORY_LIMIT:-"-1"}
     container_name: www-api
     ports:
       - "9000:80"
@@ -71,6 +74,7 @@ services:
 
 networks:
   prod:
+    driver: bridge
 
 volumes:
   db-data:
