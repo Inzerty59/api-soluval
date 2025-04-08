@@ -19,7 +19,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./letsencrypt:/letsencrypt"
     networks:
-      - prod
+      - preprod
 
   db:
     image: mysql:8.0
@@ -33,7 +33,7 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     networks:
-      - prod
+      - preprod
 
   phpmyadmin:
     image: phpmyadmin
@@ -47,7 +47,7 @@ services:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     networks:
-      - prod
+      - preprod
 
   www:
     build: .
@@ -67,10 +67,10 @@ services:
     environment:
       - PHP_MEMORY_LIMIT=-1
     networks:
-      - prod
+      - preprod
 
 networks:
-  prod:
+  preprod:
 
 volumes:
   db-data:
