@@ -102,10 +102,10 @@ class OrderSyncService
                 "Street" => $orderData['client_address_street'] ?? '',
                 "StreetAdditionnal" => "",
             ],
-            "CasseId" => $this->params->get('CASSE_ID'), //TODO
-            "ClientId" => 3833241, //TODO
+            "CasseId" => 4672,
+            "ClientId" => 6842533,
             "Comment" => null,
-            "Origin" => 2, // TODO
+            "Origin" => 2,
             "ShippingStatus" => 1,
             "Status" => 1,
             "ToSend" => true,
