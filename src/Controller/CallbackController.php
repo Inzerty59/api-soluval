@@ -6,6 +6,7 @@ use App\Repository\PartRepository;
 use App\Service\OpistoStockChecker;
 use App\Service\Ovoko\DeletePartService;
 use App\Service\Ovoko\OrderSyncService;
+use App\Service\Ovoko\OrderPaymentService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,6 +22,7 @@ class CallbackController
     private OpistoStockChecker $opistoStockChecker;
     private DeletePartService $deletePartService;
     private OrderSyncService $orderSyncService;
+    private OrderPaymentService $orderPaymentService;
 
     public function __construct(
         LoggerInterface $logger,
@@ -28,7 +30,8 @@ class CallbackController
         PartRepository $partRepository,
         OpistoStockChecker $opistoStockChecker,
         DeletePartService $deletePartService,
-        OrderSyncService $orderSyncService
+        OrderSyncService $orderSyncService,
+        OrderPaymentService $orderPaymentService
     ) {
         $this->logger = $logger;
         $this->headerName = $params->get('CALLBACK_HEADER_NAME');
@@ -37,6 +40,7 @@ class CallbackController
         $this->opistoStockChecker = $opistoStockChecker;
         $this->deletePartService = $deletePartService;
         $this->orderSyncService = $orderSyncService;
+        $this->orderPaymentService = $orderPaymentService;
     }
 
     /**
@@ -92,6 +96,7 @@ class CallbackController
     private function handleOrderCreated(array $eventData): void
     {
         $orderId = $eventData['order_id'] ?? null;
+        $totalAmount = $eventData['total_amount'] ?? null;
 
         if ($orderId) {
             $this->logger->info('Nouvelle commande créée.', ['order_id' => $orderId]);
@@ -99,8 +104,15 @@ class CallbackController
             try {
                 $this->orderSyncService->syncOrderToOpisto($orderId);
                 $this->logger->info('Commande synchronisée avec succès vers Opisto.', ['order_id' => $orderId]);
+
+                if ($totalAmount !== null) {
+                    $this->orderPaymentService->handleOrderPayment($orderId, (float) $totalAmount);
+                    $this->logger->info('Paiement traité avec succès pour la commande.', ['order_id' => $orderId]);
+                } else {
+                    $this->logger->warning('Montant total non fourni pour la commande.', ['order_id' => $orderId]);
+                }
             } catch (\Exception $e) {
-                $this->logger->error('Erreur lors de la synchronisation de la commande avec Opisto.', [
+                $this->logger->error('Erreur lors de la synchronisation ou du traitement du paiement.', [
                     'order_id' => $orderId,
                     'error' => $e->getMessage(),
                 ]);
