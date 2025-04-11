@@ -11,7 +11,7 @@ class OrderSyncService
     private HttpClientInterface $httpClient;
     private LoggerInterface $logger;
     private ParameterBagInterface $params;
-    private array $exchangeRateCache = []; // Cache local pour les taux de change
+    private array $exchangeRateCache = [];
 
     public function __construct(HttpClientInterface $httpClient, LoggerInterface $logger, ParameterBagInterface $params)
     {
@@ -41,18 +41,28 @@ class OrderSyncService
 
             $orderData = $ovokoData['list'][0];
 
-            $opistoPayload = $this->transformOrderDataForOpisto($orderData);
+            $amount = (float) ($orderData['part_total_price']['buyer']['amount'] ?? 0);
 
+            $opistoPayload = $this->transformOrderDataForOpisto($orderData);
             $opistoOrderUrl = $this->params->get('API_ORDER_URL');
 
             $opistoResponse = $this->httpClient->request('POST', $opistoOrderUrl, [
                 'json' => $opistoPayload,
             ]);
 
+            $opistoResponseData = $opistoResponse->toArray();
+            $opistoOrderId = $opistoResponseData['id'] ?? null;
+
             $this->logger->info('Commande synchronisée avec succès vers Opisto.', [
-                'order_id' => $orderId,
+                'order_id_ovoko' => $orderId,
+                'order_id_opisto' => $opistoOrderId,
                 'opisto_response' => $opistoResponse->getContent(),
             ]);
+
+            if ($opistoOrderId) {
+                $orderPaymentService = new OrderPaymentService($this->httpClient, $this->logger, $this->params);
+                $orderPaymentService->handleOrderPayment($opistoOrderId, $amount);
+            }
         } catch (\Exception $e) {
             $this->logger->error('Erreur lors de la synchronisation de la commande.', [
                 'order_id' => $orderId,
