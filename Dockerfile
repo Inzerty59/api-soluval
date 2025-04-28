@@ -1,5 +1,8 @@
 FROM php:8.2-apache
 
+# Déclaration de l'argument de build PHP_MEMORY_LIMIT avec une valeur par défaut (-1 ici)
+ARG PHP_MEMORY_LIMIT=-1
+
 # Configurer Apache et installer les dépendances
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && apt-get update \
@@ -29,7 +32,7 @@ RUN docker-php-ext-configure intl \
     && docker-php-ext-install pdo_mysql opcache intl zip calendar dom mbstring gd xsl \
     && pecl install apcu && docker-php-ext-enable apcu
 
-# Définir la limite de mémoire PHP
+# Définir la limite de mémoire PHP en utilisant l'argument de build
 RUN echo "memory_limit=${PHP_MEMORY_LIMIT}" > /usr/local/etc/php/conf.d/memory-limit.ini
 
 # Activation du site par défaut (la configuration sera remplacée par le volume monté)

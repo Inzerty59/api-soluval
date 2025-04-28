@@ -26,3 +26,8 @@ ovoko_import_parts:
     path: /api/ovoko/import-parts
     controller: App\Controller\OvokoController::importParts
     methods: [POST]
+
+api_callback:
+    path: /api/callback
+    controller: App\Controller\CallbackController::handleCallback
+    methods: [POST]
