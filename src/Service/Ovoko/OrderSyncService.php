@@ -2,6 +2,7 @@
 
 namespace App\Service\Ovoko;
 
+use App\Service\AuthenticationService;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Psr\Log\LoggerInterface;
@@ -11,52 +12,124 @@ class OrderSyncService
     private HttpClientInterface $httpClient;
     private LoggerInterface $logger;
     private ParameterBagInterface $params;
-    private array $exchangeRateCache = []; // Cache local pour les taux de change
+    private AuthenticationService $authService;
 
-    public function __construct(HttpClientInterface $httpClient, LoggerInterface $logger, ParameterBagInterface $params)
-    {
+    private const CASSE_ID = 4672;
+    private const ORIGIN = 2;
+    private const SHIPPING_STATUS = 1;
+    private const STATUS = 1;
+    private const TO_SEND = true;
+    private const IS_FREE_SHIPPING = true;
+
+    public function __construct(
+        HttpClientInterface $httpClient,
+        LoggerInterface $logger,
+        ParameterBagInterface $params,
+        AuthenticationService $authService
+    ) {
         $this->httpClient = $httpClient;
         $this->logger = $logger;
         $this->params = $params;
+        $this->authService = $authService;
     }
 
     /**
      * Synchronise une commande d'Ovoko vers Opisto.
      *
-     * @param string $orderId
+     * @param array $orderDetails Les détails de la commande reçus d'Ovoko.
+     * @param int $clientId L'ID du client récupéré ou créé chez Opisto.
      * @return void
      */
-    public function syncOrderToOpisto(string $orderId): void
+    public function syncOrderToOpisto(array $orderDetails, int $clientId): void
     {
         try {
-            $ovokoOrderUrl = $this->params->get('OVOKO_API_URL_ORDER') . "/{$orderId}";
+            $opistoPayload = $this->transformOrderDataForOpisto($orderDetails, $clientId);
 
-            $ovokoResponse = $this->httpClient->request('GET', $ovokoOrderUrl);
-            $ovokoData = $ovokoResponse->toArray();
+            $this->logger->info('Données transformées pour Opisto.', ['payload' => $opistoPayload]);
 
-            if (!isset($ovokoData['list'][0])) {
-                $this->logger->error('Aucune commande trouvée sur Ovoko.', ['order_id' => $orderId]);
-                return;
-            }
+            $opistoOrderUrl = 'https://api-preprod.opisto.fr:8443/v2.15/orders';
 
-            $orderData = $ovokoData['list'][0];
+            $token = $this->authService->getValidToken();
 
-            $opistoPayload = $this->transformOrderDataForOpisto($orderData);
-
-            $opistoOrderUrl = $this->params->get('API_ORDER_URL');
-
-            $opistoResponse = $this->httpClient->request('POST', $opistoOrderUrl, [
+            $response = $this->httpClient->request('POST', $opistoOrderUrl, [
+                'headers' => [
+                    'Token' => $token,
+                ],
                 'json' => $opistoPayload,
             ]);
 
-            $this->logger->info('Commande synchronisée avec succès vers Opisto.', [
-                'order_id' => $orderId,
-                'opisto_response' => $opistoResponse->getContent(),
-            ]);
+            $responseContent = $response->getContent(false);
+            $this->logger->info('Réponse brute de l\'API Opisto.', ['response' => $responseContent]);
+
+            if (is_numeric($responseContent)) {
+                $opistoOrderId = $responseContent;
+                $this->logger->info('Commande envoyée avec succès à Opisto.', [
+                    'order_id' => $orderDetails['order_id'],
+                    'opisto_order_id' => $opistoOrderId,
+                ]);
+
+                $orderDetailsUrl = "https://api-preprod.opisto.fr:8443/v2.15/orders/{$opistoOrderId}";
+                $orderDetailsResponse = $this->httpClient->request('GET', $orderDetailsUrl, [
+                    'headers' => [
+                        'Token' => $token,
+                    ],
+                ]);
+
+                $orderDetailsContent = $orderDetailsResponse->toArray();
+                if (isset($orderDetailsContent['Payment']['Id'])) {
+                    $paymentId = $orderDetailsContent['Payment']['Id'];
+                    $this->logger->info('Payment.Id récupéré pour la commande Opisto.', [
+                        'opisto_order_id' => $opistoOrderId,
+                        'payment_id' => $paymentId,
+                    ]);
+
+                    if (isset($orderDetails['total_price']['buyer']['amount'])) {
+                        $amount = (float) $orderDetails['total_price']['buyer']['amount'];
+                        $paymentUpdateUrl = "https://api-preprod.opisto.fr:8443/v2.15/orders/{$opistoOrderId}/payments/{$paymentId}";
+
+                        $paymentPayload = [
+                            "Amount" => $amount,
+                            "TypePayment" => 10,
+                        ];
+
+                        try {
+                            $paymentResponse = $this->httpClient->request('PUT', $paymentUpdateUrl, [
+                                'headers' => [
+                                    'Token' => $token,
+                                    'Content-Type' => 'application/json',
+                                ],
+                                'json' => $paymentPayload,
+                            ]);
+
+                            $this->logger->info('Paiement mis à jour avec succès.', [
+                                'opisto_order_id' => $opistoOrderId,
+                                'payment_id' => $paymentId,
+                                'response' => $paymentResponse->getContent(false),
+                            ]);
+                        } catch (\Exception $e) {
+                            $this->logger->error('Erreur lors de la mise à jour du paiement.', [
+                                'opisto_order_id' => $opistoOrderId,
+                                'payment_id' => $paymentId,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    } else {
+                        $this->logger->warning('Montant du paiement non trouvé dans les détails de la commande Ovoko.', [
+                            'order_id' => $orderDetails['order_id'],
+                        ]);
+                    }
+                } else {
+                    $this->logger->warning('Payment.Id non trouvé dans les détails de la commande Opisto.', [
+                        'opisto_order_id' => $opistoOrderId,
+                    ]);
+                }
+            } else {
+                $this->logger->error('Réponse inattendue de l\'API Opisto.', ['response' => $responseContent]);
+            }
         } catch (\Exception $e) {
-            $this->logger->error('Erreur lors de la synchronisation de la commande.', [
-                'order_id' => $orderId,
+            $this->logger->error('Erreur lors de la synchronisation de la commande avec Opisto.', [
                 'error' => $e->getMessage(),
+                'order_details' => $orderDetails,
             ]);
         }
     }
@@ -64,65 +137,59 @@ class OrderSyncService
     /**
      * Transforme les données de commande Ovoko pour correspondre au format Opisto.
      *
-     * @param array $orderData
-     * @return array
+     * @param array $orderDetails Les détails de la commande reçus d'Ovoko.
+     * @param int $clientId L'ID du client récupéré ou créé chez Opisto.
+     * @return array Les données transformées au format attendu par Opisto.
      */
-    private function transformOrderDataForOpisto(array $orderData): array
+    private function transformOrderDataForOpisto(array $orderDetails, int $clientId): array
     {
-        $clientNameParts = explode(' ', $orderData['client_name'] ?? '');
+        $clientNameParts = explode(' ', $orderDetails['client_name'] ?? '');
         $firstName = $clientNameParts[0] ?? 'N/A';
         $lastName = isset($clientNameParts[1]) ? implode(' ', array_slice($clientNameParts, 1)) : 'N/A';
 
         return [
             "BillingAddress" => [
-                "City" => $orderData['client_address_city'] ?? '',
+                "City" => $orderDetails['client_address_city'] ?? '',
                 "Country" => [
-                    "Name" => $this->getCountryName($orderData['client_address_country'] ?? 'FR'),
-                    "ISOCode" => $orderData['client_address_country'] ?? 'FR',
+                    "Name" => $this->getCountryName($orderDetails['client_address_country'] ?? 'FR'),
+                    "ISOCode" => $orderDetails['client_address_country'] ?? 'FR',
                 ],
-                "Email" => $orderData['client_email'] ?? '',
+                "Email" => $orderDetails['client_email'] ?? '',
                 "Firstname" => $firstName,
                 "Lastname" => $lastName,
-                "Phone1" => $orderData['client_phone'] ?? '',
-                "PostCode" => $orderData['client_address_zip_code'] ?? '',
-                "Street" => $orderData['client_address_street'] ?? '',
+                "Phone1" => $orderDetails['client_phone'] ?? '',
+                "PostCode" => $orderDetails['client_address_zip_code'] ?? '',
+                "Street" => $orderDetails['client_address_street'] ?? '',
                 "StreetAdditionnal" => "",
             ],
             "DeliveryAddress" => [
-                "City" => $orderData['client_address_city'] ?? '',
+                "City" => $orderDetails['client_address_city'] ?? '',
                 "Country" => [
-                    "Name" => $this->getCountryName($orderData['client_address_country'] ?? 'FR'),
-                    "ISOCode" => $orderData['client_address_country'] ?? 'FR',
+                    "Name" => $this->getCountryName($orderDetails['client_address_country'] ?? 'FR'),
+                    "ISOCode" => $orderDetails['client_address_country'] ?? 'FR',
                 ],
-                "Email" => $orderData['client_email'] ?? '',
+                "Email" => $orderDetails['client_email'] ?? '',
                 "Firstname" => $firstName,
                 "Lastname" => $lastName,
-                "Phone1" => $orderData['client_phone'] ?? '',
-                "PostCode" => $orderData['client_address_zip_code'] ?? '',
-                "Street" => $orderData['client_address_street'] ?? '',
+                "Phone1" => $orderDetails['client_phone'] ?? '',
+                "PostCode" => $orderDetails['client_address_zip_code'] ?? '',
+                "Street" => $orderDetails['client_address_street'] ?? '',
                 "StreetAdditionnal" => "",
             ],
-            "CasseId" => 4672,
-            "ClientId" => 6842533,
+            "CasseId" => self::CASSE_ID,
+            "ClientId" => $clientId,
             "Comment" => null,
-            "Origin" => 2,
-            "ShippingStatus" => 1,
-            "Status" => 1,
-            "ToSend" => true,
+            "Origin" => self::ORIGIN,
+            "ShippingStatus" => self::SHIPPING_STATUS,
+            "Status" => self::STATUS,
+            "ToSend" => self::TO_SEND,
+            "IsFreeShipping" => self::IS_FREE_SHIPPING,
             "Parts" => array_map(function ($item) {
-                $currency = $item['sell_price']['buyer']['currency'] ?? 'EUR';
-                $amount = $item['sell_price']['buyer']['amount'] ?? 0;
-
-                $exchangeRate = $this->getExchangeRate($currency);
-                $priceInEuro = $exchangeRate > 0 ? $amount * $exchangeRate : 0;
-
                 return [
                     "Key" => $item['external_id'],
-                    "Value" => round($priceInEuro, 2),
+                    "Value" => 0.00,
                 ];
-            }, array_filter($orderData['item_list'] ?? [], function ($item) {
-                return isset($item['external_id']);
-            })),
+            }, $orderDetails['item_list'] ?? []),
         ];
     }
 
@@ -187,46 +254,5 @@ class OrderSyncService
         ];
 
         return $countries[strtoupper($isoCode)] ?? 'UNKNOWN';
-    }
-
-    /**
-     * Récupère le taux de change pour une devise donnée.
-     *
-     * @param string $currency
-     * @return float
-     */
-    private function getExchangeRate(string $currency): float
-    {
-        $currency = strtoupper($currency);
-
-        if ($currency === 'EUR') {
-            return 1.0;
-        }
-
-        if (isset($this->exchangeRateCache[$currency])) {
-            return $this->exchangeRateCache[$currency];
-        }
-
-        try {
-            $exchangeRateApiUrl = $this->params->get('EXCHANGE_RATE_API_URL');
-
-            $response = $this->httpClient->request('GET', $exchangeRateApiUrl);
-            $data = $response->toArray();
-
-            if (isset($data['conversion_rates'][$currency])) {
-                $rate = $data['conversion_rates'][$currency];
-                $this->exchangeRateCache[$currency] = $rate;
-                return $rate;
-            }
-
-            $this->logger->error('Taux de change introuvable pour la devise.', ['currency' => $currency]);
-            return 0.0;
-        } catch (\Exception $e) {
-            $this->logger->error('Erreur lors de la récupération des taux de change.', [
-                'currency' => $currency,
-                'error' => $e->getMessage(),
-            ]);
-            return 0.0;
-        }
     }
 }

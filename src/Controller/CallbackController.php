@@ -201,6 +201,8 @@ class CallbackController
                     ]);
                 }
 
+                $this->orderSyncService->syncOrderToOpisto($orderDetails['list'][0], $clientId);
+
             } catch (\Exception $e) {
                 $this->logger->error('Erreur lors de la récupération des détails de la commande.', [
                     'error' => $e->getMessage(),
