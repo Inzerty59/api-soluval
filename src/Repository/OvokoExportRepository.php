@@ -23,7 +23,7 @@ class OvokoExportRepository
         $query = <<<SQL
 SELECT 
     p.external_id AS part_external_id, 
-    MAX(op.ovoko_part_id) AS part_ovoko_id, 
+    MAX(op.ovoko_part_id) AS part_ovoko_category_id, 
     TRIM(BOTH ',' FROM REPLACE(
         CONCAT(
             MAX(p.vignette), 
@@ -42,21 +42,30 @@ SELECT
         ), 
         ',,', ','
     )) AS part_photo_urls, 
-    TRUNCATE(
-        CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(MAX(p.price), 's:11:"OriginPrice";d:', -1), ';', 1) AS DECIMAL(10,2)) * 
-        (1 + CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(MAX(p.price), 's:7:"VATRate";d:', -1), ';', 1) AS DECIMAL(10,2)) / 100), 
-        2 
+    REPLACE(
+        FORMAT(
+            ROUND(
+                CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(MAX(p.price), 's:11:"OriginPrice";d:', -1), ';', 1) AS DECIMAL(10,2)) * 
+                (1 + CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(MAX(p.price), 's:7:"VATRate";d:', -1), ';', 1) AS DECIMAL(10,2)) / 100), 
+                0
+            ), 
+            2
+        ), 
+        ',', ''
     ) AS part_price, 
     MAX(p.manufacturer_reference) AS part_manufacturer_code, 
     1 AS part_quality, 
     1 AS part_status, 
-    MAX(oc.ovoko_model_id) AS car_ovoko_model 
+    MAX(oc.ovoko_model_id) AS car_ovoko_model_id, 
+    MAX(p.vehicle_year) AS car_year 
 FROM part p 
 LEFT JOIN ovoko_part op ON op.opisto_category_name = p.category_name 
 LEFT JOIN ovoko_car oc ON oc.opisto_model_name = p.model_name
 WHERE op.ovoko_part_id NOT IN ('Opisto one option in Ovoko more options', 'no category on Ovoko')
   AND p.available = 1
+  AND p.vehicle_year IS NOT NULL
 GROUP BY p.external_id;
+
 SQL;
 
         return $this->connection->fetchAllAssociative($query);

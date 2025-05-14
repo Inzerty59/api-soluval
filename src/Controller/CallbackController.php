@@ -7,11 +7,13 @@ use App\Service\OpistoStockChecker;
 use App\Service\Ovoko\DeletePartService;
 use App\Service\Ovoko\OrderSyncService;
 use App\Service\Ovoko\OrderPaymentService;
+use App\Service\AuthenticationService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class CallbackController
 {
@@ -23,17 +25,24 @@ class CallbackController
     private DeletePartService $deletePartService;
     private OrderSyncService $orderSyncService;
     private OrderPaymentService $orderPaymentService;
+    private HttpClientInterface $httpClient;
+    private ParameterBagInterface $params;
+    private AuthenticationService $authService;
 
     public function __construct(
         LoggerInterface $logger,
         ParameterBagInterface $params,
+        HttpClientInterface $httpClient,
         PartRepository $partRepository,
         OpistoStockChecker $opistoStockChecker,
         DeletePartService $deletePartService,
         OrderSyncService $orderSyncService,
-        OrderPaymentService $orderPaymentService
+        OrderPaymentService $orderPaymentService,
+        AuthenticationService $authService
     ) {
         $this->logger = $logger;
+        $this->params = $params;
+        $this->httpClient = $httpClient;
         $this->headerName = $params->get('CALLBACK_HEADER_NAME');
         $this->headerValue = $params->get('CALLBACK_HEADER_VALUE');
         $this->partRepository = $partRepository;
@@ -41,6 +50,7 @@ class CallbackController
         $this->deletePartService = $deletePartService;
         $this->orderSyncService = $orderSyncService;
         $this->orderPaymentService = $orderPaymentService;
+        $this->authService = $authService;
     }
 
     /**
@@ -96,15 +106,78 @@ class CallbackController
     private function handleOrderCreated(array $eventData): void
     {
         $orderId = $eventData['order_id'] ?? null;
-        $totalAmount = $eventData['total_amount'] ?? null;
 
         if ($orderId) {
             $this->logger->info('Nouvelle commande créée.', ['order_id' => $orderId]);
 
             try {
+                $apiUrl = "https://api.rrr.lt/v2/get/order/{$orderId}";
+                $response = $this->httpClient->request('POST', $apiUrl, [
+                    'body' => [
+                        'username' => $this->params->get('OVOKO_API_USERNAME'),
+                        'password' => $this->params->get('OVOKO_API_PASSWORD'),
+                        'user_token' => $this->params->get('OVOKO_API_USER_TOKEN'),
+                    ],
+                ]);
+
+                $orderDetails = $response->toArray();
+
+                $this->logger->info('Détails de la commande récupérés.', [
+                    'order_id' => $orderId,
+                    'order_details' => $orderDetails,
+                ]);
+
+                $clientEmail = $orderDetails['list'][0]['client_email'] ?? 'Email non disponible';
+                $this->logger->info('Email du client récupéré.', [
+                   $clientEmail,
+                ]);
+
+                if ($clientEmail !== 'Email non disponible') {
+                    try {
+                        $token = $this->authService->getValidToken();
+                        $opistoApiUrl = "https://api-preprod.opisto.fr:8443/v2.15/clients?email={$clientEmail}";
+                        $opistoResponse = $this->httpClient->request('GET', $opistoApiUrl, [
+                            'headers' => [
+                                'Token' => $token,
+                            ],
+                        ]);
+
+                        $responseContent = $opistoResponse->getContent(false);
+                        $this->logger->info('Réponse Opisto.', ['response' => $responseContent]);
+
+                        $opistoClientData = json_decode($responseContent, true);
+
+                        if (isset($opistoClientData['Clients']) && count($opistoClientData['Clients']) > 0) {
+                            $clientData = $opistoClientData['Clients'][0];
+                            $clientId = $clientData['Id'] ?? null;
+
+                            $this->logger->info('Client trouvé chez Opisto.', [
+                                $clientEmail,
+                                $clientId,
+                            ]);
+
+                        } else {
+                            $this->logger->info('Aucun client trouvé chez Opisto.', [
+                                'client_email' => $clientEmail,
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        $this->logger->error('Erreur lors de la vérification du client chez Opisto.', [
+                            'error' => $e->getMessage(),
+                            'client_email' => $clientEmail,
+                        ]);
+                    }
+                } else {
+                    $this->logger->warning('Impossible de vérifier le client chez Opisto : email non disponible.', [
+                        'order_id' => $orderId,
+                    ]);
+                }
+
+                // Synchronisation de la commande avec Opisto
                 $this->orderSyncService->syncOrderToOpisto($orderId);
                 $this->logger->info('Commande synchronisée avec succès vers Opisto.', ['order_id' => $orderId]);
 
+                $totalAmount = $eventData['total_amount'] ?? null;
                 if ($totalAmount !== null) {
                     $this->orderPaymentService->handleOrderPayment($orderId, (float) $totalAmount);
                     $this->logger->info('Paiement traité avec succès pour la commande.', ['order_id' => $orderId]);
@@ -112,7 +185,7 @@ class CallbackController
                     $this->logger->warning('Montant total non fourni pour la commande.', ['order_id' => $orderId]);
                 }
             } catch (\Exception $e) {
-                $this->logger->error('Erreur lors de la synchronisation ou du traitement du paiement.', [
+                $this->logger->error('Erreur lors de la récupération ou du traitement de la commande.', [
                     'order_id' => $orderId,
                     'error' => $e->getMessage(),
                 ]);
