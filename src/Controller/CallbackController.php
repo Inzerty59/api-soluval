@@ -111,6 +111,7 @@ class CallbackController
             $this->logger->info('Nouvelle commande créée.', ['order_id' => $orderId]);
 
             try {
+                // Récupération des détails de la commande depuis l'API externe
                 $apiUrl = "https://api.rrr.lt/v2/get/order/{$orderId}";
                 $response = $this->httpClient->request('POST', $apiUrl, [
                     'body' => [
@@ -129,12 +130,14 @@ class CallbackController
 
                 $clientEmail = $orderDetails['list'][0]['client_email'] ?? 'Email non disponible';
                 $this->logger->info('Email du client récupéré.', [
-                   $clientEmail,
+                    'order_id' => $orderId,
+                    'client_email' => $clientEmail,
                 ]);
 
                 if ($clientEmail !== 'Email non disponible') {
                     try {
                         $token = $this->authService->getValidToken();
+
                         $opistoApiUrl = "https://api-preprod.opisto.fr:8443/v2.15/clients?email={$clientEmail}";
                         $opistoResponse = $this->httpClient->request('GET', $opistoApiUrl, [
                             'headers' => [
@@ -152,46 +155,58 @@ class CallbackController
                             $clientId = $clientData['Id'] ?? null;
 
                             $this->logger->info('Client trouvé chez Opisto.', [
-                                $clientEmail,
-                                $clientId,
+                                'client_email' => $clientEmail,
+                                'client_id' => $clientId,
                             ]);
-
                         } else {
-                            $this->logger->info('Aucun client trouvé chez Opisto.', [
+                            $this->logger->info('Aucun client trouvé chez Opisto. Création en cours.', [
                                 'client_email' => $clientEmail,
                             ]);
+
+                            // Création du client chez Opisto
+                            $createClientResponse = $this->httpClient->request('POST', 'https://api-preprod.opisto.fr:8443/v2.15/clients', [
+                                'headers' => [
+                                    'Token' => $token,
+                                ],
+                                'json' => [
+                                    'Email' => $clientEmail,
+                                ],
+                            ]);
+
+                            $createClientContent = $createClientResponse->toArray();
+                            $this->logger->info('Réponse de la création du client.', ['response' => $createClientContent]);
+
+                            if (isset($createClientContent['ObjectCreated']) && $createClientContent['ObjectCreated'] === true) {
+                                $clientId = $createClientContent['ObjectIdCreated'] ?? null;
+                                $this->logger->info('Client créé avec succès chez Opisto.', [
+                                    'client_email' => $clientEmail,
+                                    'client_id' => $clientId,
+                                ]);
+                            } else {
+                                $this->logger->error('Échec de la création du client chez Opisto.', [
+                                    'client_email' => $clientEmail,
+                                    'response' => $createClientContent,
+                                ]);
+                            }
                         }
                     } catch (\Exception $e) {
-                        $this->logger->error('Erreur lors de la vérification du client chez Opisto.', [
+                        $this->logger->error('Erreur lors de la vérification ou de la création du client chez Opisto.', [
                             'error' => $e->getMessage(),
                             'client_email' => $clientEmail,
                         ]);
                     }
                 } else {
-                    $this->logger->warning('Impossible de vérifier le client chez Opisto : email non disponible.', [
+                    $this->logger->warning('Impossible de vérifier ou de créer le client chez Opisto : email non disponible.', [
                         'order_id' => $orderId,
                     ]);
                 }
 
-                // Synchronisation de la commande avec Opisto
-                $this->orderSyncService->syncOrderToOpisto($orderId);
-                $this->logger->info('Commande synchronisée avec succès vers Opisto.', ['order_id' => $orderId]);
-
-                $totalAmount = $eventData['total_amount'] ?? null;
-                if ($totalAmount !== null) {
-                    $this->orderPaymentService->handleOrderPayment($orderId, (float) $totalAmount);
-                    $this->logger->info('Paiement traité avec succès pour la commande.', ['order_id' => $orderId]);
-                } else {
-                    $this->logger->warning('Montant total non fourni pour la commande.', ['order_id' => $orderId]);
-                }
             } catch (\Exception $e) {
-                $this->logger->error('Erreur lors de la récupération ou du traitement de la commande.', [
-                    'order_id' => $orderId,
+                $this->logger->error('Erreur lors de la récupération des détails de la commande.', [
                     'error' => $e->getMessage(),
+                    'order_id' => $orderId,
                 ]);
             }
-        } else {
-            $this->logger->warning('Aucun ID de commande fourni dans l\'événement.', ['event_data' => $eventData]);
         }
     }
 
