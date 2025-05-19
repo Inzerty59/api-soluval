@@ -28,27 +28,33 @@ class OrderPaymentService
      */
     public function handleOrderPayment(string $orderId, float $amount): void
     {
+        $this->logger->info('Début du traitement du paiement.', [
+            'order_id' => $orderId,
+            'amount' => $amount,
+        ]);
+
         try {
-            $this->logger->info("Synchronisation de la commande {$orderId}...");
+            $this->logger->info('Synchronisation de la commande avant traitement du paiement.', ['order_id' => $orderId]);
             $this->syncOrderToOpisto($orderId);
 
             $opistoOrderId = $this->getOpistoOrderId($orderId);
+            $this->logger->info('ID de commande Opisto récupéré.', ['opisto_order_id' => $opistoOrderId]);
 
             if (!$opistoOrderId) {
-                $this->logger->error("Impossible de récupérer l'ID de la commande Opisto pour {$orderId}.");
+                $this->logger->error('Impossible de récupérer l\'ID de la commande Opisto.', ['order_id' => $orderId]);
                 return;
             }
 
             $paymentId = $this->getPaymentId($opistoOrderId);
+            $this->logger->info('ID de paiement récupéré.', ['payment_id' => $paymentId]);
 
             if (!$paymentId) {
-                $this->logger->error("Impossible de récupérer l'ID du paiement pour la commande {$opistoOrderId}.");
+                $this->logger->error('Impossible de récupérer l\'ID du paiement.', ['opisto_order_id' => $opistoOrderId]);
                 return;
             }
 
             $this->updatePayment($opistoOrderId, $paymentId, $amount);
-
-            $this->logger->info("Paiement mis à jour avec succès pour la commande {$opistoOrderId}.");
+            $this->logger->info('Paiement mis à jour avec succès.', ['opisto_order_id' => $opistoOrderId]);
         } catch (\Exception $e) {
             $this->logger->error('Erreur lors du traitement du paiement.', [
                 'order_id' => $orderId,
@@ -63,7 +69,8 @@ class OrderPaymentService
 
     private function getOpistoOrderId(string $orderId): ?string
     {
-        $url = $this->params->get('AUTH_URL_API') . "/orders/{$orderId}";
+        //$url = $this->params->get('AUTH_URL_API') . "/orders/{$orderId}";
+        $url = "https://api.opisto.fr/v2.15/orders/{$orderId}";
 
         try {
             $response = $this->httpClient->request('GET', $url);
@@ -81,7 +88,8 @@ class OrderPaymentService
 
     private function getPaymentId(string $opistoOrderId): ?string
     {
-        $url = $this->params->get('AUTH_URL_API') . "/orders/{$opistoOrderId}";
+        //$url = $this->params->get('AUTH_URL_API') . "/orders/{$opistoOrderId}";
+        $url = "https://api.opisto.fr/v2.15/orders/{$opistoOrderId}";
 
         try {
             $response = $this->httpClient->request('GET', $url);
@@ -99,11 +107,12 @@ class OrderPaymentService
 
     private function updatePayment(string $opistoOrderId, string $paymentId, float $amount): void
     {
-        $url = $this->params->get('AUTH_URL_API') . "/orders/{$opistoOrderId}/payments/{$paymentId}";
+        //$url = $this->params->get('AUTH_URL_API') . "/orders/{$opistoOrderId}/payments/{$paymentId}";
+        $url = "https://api.opisto.fr/v2.15/orders/{$opistoOrderId}/payments/{$paymentId}";
 
         $payload = [
             "Amount" => $amount,
-            "TypePayment" => 2,
+            "TypePayment" => 10,
         ];
 
         try {
