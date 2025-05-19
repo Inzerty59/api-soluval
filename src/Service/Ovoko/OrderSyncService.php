@@ -83,8 +83,8 @@ class OrderSyncService
                         'payment_id' => $paymentId,
                     ]);
 
-                    if (isset($orderDetails['total_price']['buyer']['amount'])) {
-                        $amount = (float) $orderDetails['total_price']['buyer']['amount'];
+                    if (isset($orderDetails['part_total_price']['buyer']['amount'])) {
+                        $amount = (float) $orderDetails['part_total_price']['buyer']['amount'];
                         $paymentUpdateUrl = "https://api.opisto.fr/v2.15/orders/{$opistoOrderId}/payments/{$paymentId}";
 
                         $paymentPayload = [
@@ -178,7 +178,7 @@ class OrderSyncService
             ],
             "CasseId" => self::CASSE_ID,
             "ClientId" => $clientId,
-            "Comment" => null,
+            "Comment" => 'numéro de commande ovoko : ' . ($orderDetails['order_id'] ?? 'inconnu'),
             "Origin" => self::ORIGIN,
             "ShippingStatus" => self::SHIPPING_STATUS,
             "Status" => self::STATUS,
