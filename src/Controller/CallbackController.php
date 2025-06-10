@@ -97,7 +97,7 @@ class CallbackController
 
             default:
                 $this->logger->info('Événement non pris en charge.', ['event_type' => $data['event_type']]);
-                return new JsonResponse(['message' => 'Event type not handled'], 200);
+                return new JsonResponse(['message' => 'Event type not handled', 'event_type' => $data['event_type']], 200);
         }
 
         return new JsonResponse(['message' => 'Callback handled successfully'], 200);
@@ -163,12 +163,23 @@ class CallbackController
                             ]);
 
                             // Création du client chez Opisto
+                            $clientFirstname = $orderDetails['list'][0]['client_name'] ? explode(' ', $orderDetails['list'][0]['client_name'])[0] : '';
+                            $clientLastname = $orderDetails['list'][0]['client_name'] ? trim(substr($orderDetails['list'][0]['client_name'], strlen($clientFirstname))) : '';
+
+                            $this->logger->info('Création du client chez Opisto avec données complètes.', [
+                                'Email' => $clientEmail,
+                                'Firstname' => $clientFirstname,
+                                'Lastname' => $clientLastname,
+                            ]);
+
                             $createClientResponse = $this->httpClient->request('POST', 'https://api.opisto.fr/v2.15/clients', [
                                 'headers' => [
                                     'Token' => $token,
                                 ],
                                 'json' => [
                                     'Email' => $clientEmail,
+                                    'Firstname' => $clientFirstname,
+                                    'Lastname' => $clientLastname,
                                 ],
                             ]);
 

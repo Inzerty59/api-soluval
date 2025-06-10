@@ -64,6 +64,7 @@ LEFT JOIN ovoko_car oc ON oc.opisto_model_name = p.model_name
 WHERE op.ovoko_part_id NOT IN ('Opisto one option in Ovoko more options', 'no category on Ovoko')
   AND p.available = 1
   AND p.vehicle_year IS NOT NULL
+    AND p.shipping_id IS NOT NULL
 GROUP BY p.external_id;
 
 SQL;
