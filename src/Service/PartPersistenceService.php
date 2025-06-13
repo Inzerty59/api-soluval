@@ -22,6 +22,18 @@ class PartPersistenceService
      */
     public function persistPart(array $partData): void
     {
+        // Ne persiste que si la pièce est disponible
+        if (empty($partData['Available']) || $partData['Available'] !== true) {
+            // Optionnel : supprimer la pièce si elle existe déjà dans la base
+            $existingPart = $this->entityManager->getRepository(Part::class)
+                ->findOneBy(['external_id' => $partData['Id'] ?? null]);
+            if ($existingPart) {
+                $this->entityManager->remove($existingPart);
+                $this->entityManager->flush();
+            }
+            return;
+        }
+
         $part = new Part();
 
         // Mapper les données de l'API à l'entité
