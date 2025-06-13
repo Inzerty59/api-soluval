@@ -16,5 +16,5 @@ while [ $COUNT -le $MAX_RETRIES ]; do
 done
 
 if [ $COUNT -gt $MAX_RETRIES ]; then
-  echo "La tâche opisto/parts a échoué après $MAX_RETRIES tentatives le $(date '+%Y-%m-%d %H:%M:%S')" | mail -s "Echec cron opisto/parts" florent.devynck@groupevitaminet.com,franck.depoorter@groupevitaminet.com
+  echo "La tâche opisto/parts a échoué après $MAX_RETRIES tentatives le $(date '+%Y-%m-%d %H:%M:%S')" | mail -s "Echec cron opisto/parts" dev.inzerty@groupevitaminet.com
 fi

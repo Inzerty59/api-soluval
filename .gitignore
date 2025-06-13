@@ -38,3 +38,4 @@ yarn-error.log
 ###< lexik/jwt-authentication-bundle ###
 
 /public/uploads/ovoko_export.csv
+/scripts/export_ovoko_orders.php
