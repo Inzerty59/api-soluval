@@ -57,15 +57,29 @@ SELECT
     1 AS part_quality, 
     1 AS part_status, 
     MAX(oc.ovoko_model_id) AS car_ovoko_model_id, 
-    MAX(p.vehicle_year) AS car_year 
+    MAX(p.vehicle_year) AS car_year,
+    p.category_name,
+    CASE
+        WHEN LOWER(p.category_name) LIKE '%gauche%' AND LOWER(p.category_name) LIKE '%arriere%' THEN 6 -- left_rear
+        WHEN LOWER(p.category_name) LIKE '%droit%' AND LOWER(p.category_name) LIKE '%arriere%' THEN 7 -- right_rear
+        WHEN LOWER(p.category_name) LIKE '%gauche%' AND LOWER(p.category_name) LIKE '%avant%' THEN 8 -- left_front
+        WHEN LOWER(p.category_name) LIKE '%droit%' AND LOWER(p.category_name) LIKE '%avant%' THEN 9 -- right_front
+        WHEN LOWER(p.category_name) LIKE '%gauche%' THEN 2 -- left
+        WHEN LOWER(p.category_name) LIKE '%droit%' THEN 4 -- right
+        WHEN LOWER(p.category_name) LIKE '%centre%' OR LOWER(p.category_name) LIKE '%central%' THEN 3 -- center
+        WHEN LOWER(p.category_name) LIKE '%ensemble%' OR LOWER(p.category_name) LIKE '%jeu%' OR LOWER(p.category_name) LIKE '%set%' THEN 5 -- set
+        WHEN LOWER(p.category_name) LIKE '%avant%' THEN 10 -- in_front
+        WHEN LOWER(p.category_name) LIKE '%arriere%' THEN 11 -- rear
+        ELSE 1 -- all
+    END AS part_position
 FROM part p 
 LEFT JOIN ovoko_part op ON op.opisto_category_name = p.category_name 
 LEFT JOIN ovoko_car oc ON oc.opisto_model_name = p.model_name
 WHERE op.ovoko_part_id NOT IN ('Opisto one option in Ovoko more options', 'no category on Ovoko')
   AND p.available = 1
   AND p.vehicle_year IS NOT NULL
-    AND p.shipping_id IS NOT NULL
-GROUP BY p.external_id;
+  AND p.shipping_id IS NOT NULL
+GROUP BY p.external_id, p.category_name;
 
 SQL;
 
