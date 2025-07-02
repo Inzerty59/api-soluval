@@ -60,17 +60,17 @@ SELECT
     MAX(p.vehicle_year) AS car_year,
     p.category_name,
     CASE
-        WHEN LOWER(p.category_name) LIKE '%gauche%' AND LOWER(p.category_name) LIKE '%arriere%' THEN 6 -- left_rear
-        WHEN LOWER(p.category_name) LIKE '%droit%' AND LOWER(p.category_name) LIKE '%arriere%' THEN 7 -- right_rear
-        WHEN LOWER(p.category_name) LIKE '%gauche%' AND LOWER(p.category_name) LIKE '%avant%' THEN 8 -- left_front
-        WHEN LOWER(p.category_name) LIKE '%droit%' AND LOWER(p.category_name) LIKE '%avant%' THEN 9 -- right_front
-        WHEN LOWER(p.category_name) LIKE '%gauche%' THEN 2 -- left
-        WHEN LOWER(p.category_name) LIKE '%droit%' THEN 4 -- right
-        WHEN LOWER(p.category_name) LIKE '%centre%' OR LOWER(p.category_name) LIKE '%central%' THEN 3 -- center
-        WHEN LOWER(p.category_name) LIKE '%ensemble%' OR LOWER(p.category_name) LIKE '%jeu%' OR LOWER(p.category_name) LIKE '%set%' THEN 5 -- set
-        WHEN LOWER(p.category_name) LIKE '%avant%' THEN 10 -- in_front
-        WHEN LOWER(p.category_name) LIKE '%arriere%' THEN 11 -- rear
-        ELSE 1 -- all
+        WHEN LOWER(p.category_name) LIKE '%gauche%' AND LOWER(p.category_name) LIKE '%arriere%' THEN 'left_rear'
+        WHEN LOWER(p.category_name) LIKE '%droit%' AND LOWER(p.category_name) LIKE '%arriere%' THEN 'right_rear'
+        WHEN LOWER(p.category_name) LIKE '%gauche%' AND LOWER(p.category_name) LIKE '%avant%' THEN 'left_front'
+        WHEN LOWER(p.category_name) LIKE '%droit%' AND LOWER(p.category_name) LIKE '%avant%' THEN 'right_front'
+        WHEN LOWER(p.category_name) LIKE '%gauche%' THEN 'left'
+        WHEN LOWER(p.category_name) LIKE '%droit%' THEN 'right'
+        WHEN LOWER(p.category_name) LIKE '%centre%' OR LOWER(p.category_name) LIKE '%central%' THEN 'center'
+        WHEN LOWER(p.category_name) LIKE '%ensemble%' OR LOWER(p.category_name) LIKE '%jeu%' OR LOWER(p.category_name) LIKE '%set%' THEN 'set'
+        WHEN LOWER(p.category_name) LIKE '%avant%' THEN 'in_front'
+        WHEN LOWER(p.category_name) LIKE '%arriere%' THEN 'rear'
+        ELSE 'all'
     END AS part_position
 FROM part p 
 LEFT JOIN ovoko_part op ON op.opisto_category_name = p.category_name 
