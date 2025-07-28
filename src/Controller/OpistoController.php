@@ -58,6 +58,7 @@ class OpistoController extends AbstractController
                 'photos' => $part->getPhotos(),
                 'price' => $part->getPrice(),
                 'origin' => $part->getOrigin(),
+                'vin' => $part->getVin(),
             ], $parts);
 
             return new JsonResponse($formattedParts);

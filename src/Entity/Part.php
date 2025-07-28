@@ -27,7 +27,6 @@ class Part
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
@@ -152,6 +151,10 @@ class Part
 
     #[ORM\Column]
     private ?bool $available = null;
+
+    #[ORM\Column(length: 256, nullable: true)]
+    #[Groups(['part:read'])] 
+    private ?string $vin = null;
 
     public function __construct()
     {
@@ -530,6 +533,18 @@ class Part
     public function setAvailable(bool $available): static
     {
         $this->available = $available;
+
+        return $this;
+    }
+
+    public function getVin(): ?string
+    {
+        return $this->vin;
+    }
+
+    public function setVin(?string $vin): static
+    {
+        $this->vin = $vin;
 
         return $this;
     }
