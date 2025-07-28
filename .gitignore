@@ -37,6 +37,5 @@ yarn-error.log
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
 
-/public/uploads/ovoko_export.csv
-/scripts/export_ovoko_orders.phppublic/uploads/*.csv
-public/uploads/ovoko_export.csv
+*.csv
+export_ovoko_orders.php
