@@ -42,7 +42,8 @@ class StockSyncCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $period = $input->getOption('period') ?? '2min';
-        $now = new \DateTimeImmutable();
+        $parisTz = new \DateTimeZone('Europe/Paris');
+        $now = new \DateTimeImmutable('now', $parisTz);
 
         switch ($period) {
             case '1h':
