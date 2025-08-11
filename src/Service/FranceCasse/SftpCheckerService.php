@@ -48,4 +48,45 @@ class SftpCheckerService
 
         return $jsonFiles;
     }
+    public function getFileContent(string $fileName): string
+{
+    $connection = ssh2_connect($this->host, 22);
+    if (!$connection) throw new \Exception('Connexion SSH échouée');
+    if (!ssh2_auth_password($connection, $this->username, $this->password)) {
+        throw new \Exception('Échec de l\'authentification');
+    }
+    $sftp = ssh2_sftp($connection);
+
+    $path = "ssh2.sftp://$sftp/{$this->remotePath}/$fileName";
+    $stream = @fopen($path, 'r');
+    if (!$stream) throw new \Exception("Impossible d'ouvrir le fichier : $fileName");
+
+    $content = stream_get_contents($stream);
+    fclose($stream);
+    return $content !== false ? $content : '';
+}
+
+public function moveFile(string $fileName, string $targetSubDir): void
+{
+    $connection = ssh2_connect($this->host, 22);
+    if (!$connection) throw new \Exception('Connexion SSH échouée');
+    if (!ssh2_auth_password($connection, $this->username, $this->password)) {
+        throw new \Exception('Échec de l\'authentification');
+    }
+    $sftp = ssh2_sftp($connection);
+
+    $targetDir = trim($targetSubDir, '/');
+    $source = "/{$this->remotePath}/$fileName";
+    $destDir = "/{$this->remotePath}/$targetDir";
+    $dest = "$destDir/$fileName";
+
+    // crée le dossier cible si besoin
+    if (!@opendir("ssh2.sftp://$sftp$destDir")) {
+        @ssh2_sftp_mkdir($sftp, $destDir, 0775, true);
+    }
+    if (!@ssh2_sftp_rename($sftp, $source, $dest)) {
+        throw new \Exception("Impossible de déplacer $fileName vers $targetSubDir");
+    }
+}
+
 }

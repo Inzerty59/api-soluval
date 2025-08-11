@@ -90,7 +90,6 @@ class OrderSyncService
                         $paymentPayload = [
                             "Amount" => $amount,
                             "TypePayment" => 10,
-                            "Cashier" => "OVOKO59",
                         ];
 
                         try {
@@ -105,7 +104,6 @@ class OrderSyncService
                             $this->logger->info('Paiement mis à jour avec succès.', [
                                 'opisto_order_id' => $opistoOrderId,
                                 'payment_id' => $paymentId,
-                                'cashier' => 'OVOKO59',
                                 'response' => $paymentResponse->getContent(false),
                             ]);
                         } catch (\Exception $e) {
@@ -192,6 +190,35 @@ class OrderSyncService
                     "Value" => 0.00,
                 ];
             }, $orderDetails['item_list'] ?? []),
+        ];
+    }
+
+    /**
+     * Transforme les données de commande France Casse pour correspondre au format Opisto.
+     *
+     * @param array $order Les détails de la commande reçus de France Casse.
+     * @param int $clientId L'ID du client récupéré ou créé chez Opisto.
+     * @return array Les données transformées au format attendu par Opisto.
+     */
+    private function transformFranceCasseOrder(array $order, int $clientId): array
+    {
+        return [
+            "BillingAddress" => $order['BillingAddress'],
+            "DeliveryAddress" => $order['DeliveryAddress'],
+            "CasseId" => self::CASSE_ID,
+            "ClientId" => $clientId,
+            "Comment" => "Commande FRANCE CASSE\n\nNuméro de commande FRANCE CASSE : #" . ($order['Comment'] ?? 'inconnu'),
+            "Origin" => self::ORIGIN,
+            "ShippingStatus" => self::SHIPPING_STATUS,
+            "Status" => self::STATUS,
+            "ToSend" => self::TO_SEND,
+            "IsFreeShipping" => self::IS_FREE_SHIPPING,
+            "Parts" => array_map(function ($part) {
+                return [
+                    "Key" => $part['Key'],
+                    "Value" => 0.00,
+                ];
+            }, $order['Parts'] ?? []),
         ];
     }
 
