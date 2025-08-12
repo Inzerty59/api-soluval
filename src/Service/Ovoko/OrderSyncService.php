@@ -200,7 +200,7 @@ class OrderSyncService
      * @param int $clientId L'ID du client récupéré ou créé chez Opisto.
      * @return array Les données transformées au format attendu par Opisto.
      */
-    private function transformFranceCasseOrder(array $order, int $clientId): array
+    public function transformFranceCasseOrder(array $order, int $clientId): array
     {
         return [
             "BillingAddress" => $order['BillingAddress'],
@@ -295,5 +295,97 @@ class OrderSyncService
         ];
 
         return $countries[strtoupper($isoCode)] ?? 'INCONNU';
+    }
+
+    public function getAuthToken(): string
+    {
+        return $this->authService->getValidToken();
+    }
+
+    public function sendOrderToOpisto(array $payload, string $token): array
+    {
+        $url = 'https://api.opisto.fr/v2.15/orders';
+        $this->logger->info('Payload envoyé à Opisto (France Casse).', [
+            'url' => $url,
+            'payload' => $payload,
+        ]);
+        try {
+            $response = $this->httpClient->request('POST', $url, [
+                'headers' => [
+                    'Token' => $token,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $payload,
+            ]);
+            $content = $response->getContent(false);
+            $this->logger->info('Réponse brute de l\'API Opisto (France Casse).', [
+                'response' => $content,
+            ]);
+            if ($content === '-200') {
+                $this->logger->error('Erreur Opisto : pièce non disponible ou inexistante (France Casse).', [
+                    'payload' => $payload,
+                ]);
+            }
+            if (is_numeric($content)) {
+                return ['order_id' => (int)$content];
+            }
+            return json_decode($content, true) ?? [];
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de l\'envoi de la commande France Casse à Opisto', [
+                'error' => $e->getMessage(),
+                'payload' => $payload,
+            ]);
+            throw $e;
+        }
+    }
+
+    public function updatePayment(int $orderId, int $paymentId, float $amount, string $token): void
+    {
+        $paymentUpdateUrl = "https://api.opisto.fr/v2.15/orders/{$orderId}/payments/{$paymentId}";
+        $paymentPayload = [
+            "Amount" => $amount,
+            "TypePayment" => 10,
+        ];
+
+        try {
+            $paymentResponse = $this->httpClient->request('PUT', $paymentUpdateUrl, [
+                'headers' => [
+                    'Token' => $token,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $paymentPayload,
+            ]);
+
+            $this->logger->info('Paiement mis à jour avec succès (France Casse).', [
+                'opisto_order_id' => $orderId,
+                'payment_id' => $paymentId,
+                'response' => $paymentResponse->getContent(false),
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la mise à jour du paiement (France Casse).', [
+                'opisto_order_id' => $orderId,
+                'payment_id' => $paymentId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function getOrderDetails(int $orderId, string $token): array
+    {
+        $orderDetailsUrl = "https://api.opisto.fr/v2.15/orders/{$orderId}";
+        try {
+            $response = $this->httpClient->request('GET', $orderDetailsUrl, [
+                'headers' => [
+                    'Token' => $token,
+                ],
+            ]);
+            return $response->toArray();
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la récupération des détails de la commande Opisto.', [
+                'order_id' => $orderId,
+                'error' => $e->getMessage(),
+            ]);
+            return [];
+        }
     }
 }

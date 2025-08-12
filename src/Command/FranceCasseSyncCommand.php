@@ -56,12 +56,27 @@ class FranceCasseSyncCommand extends Command
                     $payload = $this->orderSync->transformFranceCasseOrder($order, $clientId);
 
                     $token = $this->orderSync->getAuthToken();
-                    $response = $this->orderSync->sendOrderToOpisto($payload, $token); 
+                    $response = $this->orderSync->sendOrderToOpisto($payload, $token);
 
                     $opistoOrderId = $response['order_id'] ?? null;
-                    $paymentId = $response['payment_id'] ?? null;
-                    if ($opistoOrderId && $paymentId && isset($order['TotalPriceWithoutShipping'])) {
-                        $this->orderSync->updatePayment($opistoOrderId, $paymentId, $order['TotalPriceWithoutShipping'], $token);
+                    $this->logger->info('Order ID récupéré après création (France Casse)', [
+                        'order_id' => $opistoOrderId,
+                    ]);
+
+                    if ($opistoOrderId) {
+                        // Récupérer le payment_id via GET
+                        $orderDetailsUrl = "https://api.opisto.fr/v2.15/orders/{$opistoOrderId}";
+                        $orderDetailsContent = $this->orderSync->getOrderDetails($opistoOrderId, $token);
+                        $paymentId = $orderDetailsContent['Payment']['Id'] ?? null;
+
+                        $this->logger->info('Payment.Id récupéré pour la commande France Casse.', [
+                            'opisto_order_id' => $opistoOrderId,
+                            'payment_id' => $paymentId,
+                        ]);
+
+                        if ($paymentId && isset($order['TotalPriceWithoutShipping'])) {
+                            $this->orderSync->updatePayment($opistoOrderId, $paymentId, $order['TotalPriceWithoutShipping'], $token);
+                        }
                     }
 
                     $this->sftp->moveFile($file, 'processed');
