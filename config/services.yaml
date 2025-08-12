@@ -26,6 +26,15 @@ services:
             $client: '@http_client'
             $cache: '@cache.app'
 
+
+    App\Service\FranceCasse\SftpCheckerService:
+        arguments:
+            $host: '%env(SFTP_HOST)%'
+            $username: '%env(SFTP_USER)%'
+            $password: '%env(SFTP_PASS)%'
+            $remotePath: '%env(SFTP_PATH)%'
+
+
     # Autres services explicites
     App\Service\SiretVerificationService:
         arguments:
