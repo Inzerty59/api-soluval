@@ -55,8 +55,6 @@ services:
       args:
         PHP_MEMORY_LIMIT: ${PHP_MEMORY_LIMIT:-"-1"}
     container_name: www-api
-    ports:
-      - "9000:80"
     restart: always
     labels:
       - "traefik.enable=true"
