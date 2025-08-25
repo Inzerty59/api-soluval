@@ -207,7 +207,7 @@ class OrderSyncService
             "DeliveryAddress" => $order['DeliveryAddress'],
             "CasseId" => self::CASSE_ID,
             "ClientId" => $clientId,
-            "Comment" => "Commande FRANCE CASSE\n\nNuméro de commande FRANCE CASSE : #" . ($order['Comment'] ?? 'inconnu'),
+            "Comment" => "Commande FRANCE CASSE\n\n⚠️ Ne pas mettre en facture ⚠️\n\nRemplir les instructions de livraison sur le Site France casse également.\n\nNuméro de commande France casse : #" . ($order['Comment'] ?? 'inconnu'),
             "Origin" => self::ORIGIN,
             "ShippingStatus" => self::SHIPPING_STATUS,
             "Status" => self::STATUS,
