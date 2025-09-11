@@ -47,4 +47,37 @@ class OpistoApiService
 
         return $allParts;
     }
+
+    public function getPartsCreatedBetween(\DateTimeInterface $start, \DateTimeInterface $end): array
+    {
+        $token = $this->authService->getValidToken();
+        $url = 'https://api.opisto.fr/v2.15/parts';
+        $itemsPerPage = 100;
+        $page = 0;
+        $allParts = [];
+
+        do {
+            $params = [
+                'startCreationDate' => $start->format('d-m-Y-H-i-s'),
+                'endCreationDate' => $end->format('d-m-Y-H-i-s'),
+                'itemsPerPage' => $itemsPerPage,
+                'page' => $page,
+                'onlyParts' => 'true',
+            ];
+
+            $response = $this->httpClient->request('GET', $url, [
+                'query' => $params,
+                'headers' => ['Token' => $token],
+            ]);
+            $data = $response->toArray();
+
+            $parts = $data['Parts'] ?? [];
+            $allParts = array_merge($allParts, $parts);
+
+            $partsNumber = $data['PartsNumber'] ?? 0;
+            $page++;
+        } while (count($allParts) < $partsNumber);
+
+        return $allParts;
+    }
 }
