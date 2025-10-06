@@ -89,7 +89,7 @@ class OrderSyncService
 
                         $paymentPayload = [
                             "Amount" => $amount,
-                            "TypePayment" => 10,
+                            "TypePayment" => 4,
                         ];
 
                         try {
@@ -344,7 +344,7 @@ class OrderSyncService
         $paymentUpdateUrl = "https://api.opisto.fr/v2.15/orders/{$orderId}/payments/{$paymentId}";
         $paymentPayload = [
             "Amount" => $amount,
-            "TypePayment" => 10,
+            "TypePayment" => 4,
         ];
 
         try {

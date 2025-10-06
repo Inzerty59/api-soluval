@@ -112,7 +112,7 @@ class OrderPaymentService
 
         $payload = [
             "Amount" => $amount,
-            "TypePayment" => 10,
+            "TypePayment" => 4,
         ];
 
         try {
