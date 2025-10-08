@@ -40,6 +40,7 @@ class PartPersistenceService
         $part->setExternalId($partData['Id'] ?? null)
             ->setManufacturerReference($partData['ManufacturerReference'] ?? null)
             ->setAdaptableReference($partData['AdaptableReference'] ?? null)
+            ->setCategoryId($partData['Category']['Id'] ?? null)
             ->setCategoryName($partData['Category']['Name'] ?? null)
             ->setDescription($partData['Description'] ?? null)
             ->setPartCondition($partData['Condition'] ?? null)
@@ -77,6 +78,7 @@ class PartPersistenceService
             // Mettre à jour les propriétés de la pièce existante
             $existingPart->setManufacturerReference($partData['ManufacturerReference'] ?? null)
                 ->setAdaptableReference($partData['AdaptableReference'] ?? null)
+                ->setCategoryId($partData['Category']['Id'] ?? null)
                 ->setCategoryName($partData['Category']['Name'] ?? null)
                 ->setDescription($partData['Description'] ?? null)
                 ->setPartCondition($partData['Condition'] ?? null)
