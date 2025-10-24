@@ -41,6 +41,10 @@ class Part
     #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $adaptable_reference = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['part:read', 'part:write', 'order:read'])]
+    private ?int $category_id = null;
+
     #[ORM\Column(length: 80, nullable: true)]
     #[Groups(['part:read', 'part:write', 'order:read'])]
     private ?string $category_name = null;
@@ -197,6 +201,18 @@ class Part
     public function setAdaptableReference(?string $adaptable_reference): static
     {
         $this->adaptable_reference = $adaptable_reference;
+
+        return $this;
+    }
+
+    public function getCategoryId(): ?int
+    {
+        return $this->category_id;
+    }
+
+    public function setCategoryId(?int $category_id): static
+    {
+        $this->category_id = $category_id;
 
         return $this;
     }
