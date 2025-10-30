@@ -94,7 +94,10 @@ services:
         arguments:
             $opistoApi: '@App\Service\OpistoApiService'
             $ovokoApi: '@App\Service\OvokoApiService'
+            $intermobilitasSyncService: '@App\Service\Intermobilitas\IntermobilitasSyncService'
             $logger: '@logger'
+            $partRepository: '@App\Repository\PartRepository'
+            $entityManager: '@doctrine.orm.entity_manager'
 
     App\Service\Ovoko\DeletePartService: ~
     App\Service\Ovoko\OrderSyncService: ~
