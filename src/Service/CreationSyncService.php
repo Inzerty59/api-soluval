@@ -6,6 +6,7 @@ use App\Service\OpistoApiService;
 use App\Service\PartPersistenceService;
 use App\Repository\PartRepository;
 use App\Service\OpistoStockChecker;
+use App\Service\Intermobilitas\IntermobilitasSyncService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -17,6 +18,7 @@ class CreationSyncService
     private PartRepository $partRepository;
     private EntityManagerInterface $entityManager;
     private OpistoStockChecker $stockChecker;
+    private IntermobilitasSyncService $intermobilitasSyncService;
 
     public function __construct(
         OpistoApiService $opistoApi,
@@ -24,7 +26,8 @@ class CreationSyncService
         LoggerInterface $logger,
         PartRepository $partRepository,
         EntityManagerInterface $entityManager,
-        OpistoStockChecker $stockChecker
+        OpistoStockChecker $stockChecker,
+        IntermobilitasSyncService $intermobilitasSyncService
     ) {
         $this->opistoApi = $opistoApi;
         $this->persistenceService = $persistenceService;
@@ -32,6 +35,7 @@ class CreationSyncService
         $this->partRepository = $partRepository;
         $this->entityManager = $entityManager;
         $this->stockChecker = $stockChecker;
+        $this->intermobilitasSyncService = $intermobilitasSyncService;
     }
 
     public function sync(\DateTimeInterface $start, \DateTimeInterface $end): void
@@ -46,6 +50,8 @@ class CreationSyncService
         $ignored = 0;
         $added = 0;
         $updated = 0;
+        $intermobilitasAdded = 0;
+        $intermobilitasErrors = 0;
 
         for ($i = 0; $i < $totalParts; $i += $batchSize) {
             $batch = array_slice($parts, $i, $batchSize);
@@ -77,6 +83,9 @@ class CreationSyncService
                     $added++;
                 }
                 
+                // Synchroniser la pièce vers Intermobilitas en temps réel
+                $this->syncPartToIntermobilitas($externalId, $intermobilitasAdded, $intermobilitasErrors);
+                
                 $processed++;
             }
 
@@ -86,6 +95,43 @@ class CreationSyncService
             }
         }
         
-        $this->logger->info("Synchronisation terminée. Traité: $processed, Ajouté: $added, Mis à jour: $updated, Ignoré: $ignored");
+        $this->logger->info("Synchronisation terminée. Traité: $processed, Ajouté: $added, Mis à jour: $updated, Ignoré: $ignored, Intermobilitas ajouté: $intermobilitasAdded, Intermobilitas erreurs: $intermobilitasErrors");
+    }
+
+    /**
+     * Synchronise une pièce vers Intermobilitas (TotalParts)
+     */
+    private function syncPartToIntermobilitas(string $externalId, &$successCount, &$errorCount): void
+    {
+        try {
+            $part = $this->partRepository->findOneBy(['external_id' => $externalId]);
+
+            if (!$part) {
+                $this->logger->warning("Pièce $externalId non trouvée en base de données, synchronisation Intermobilitas ignorée.");
+                return;
+            }
+
+            if (!$part->isAvailable()) {
+                $this->logger->info("Pièce $externalId non disponible, synchronisation Intermobilitas ignorée.");
+                return;
+            }
+
+            $response = $this->intermobilitasSyncService->syncPart($part);
+
+            if (isset($response['result']) && $response['result'] === true) {
+                $this->logger->info("Pièce $externalId ajoutée avec succès chez Intermobilitas.");
+                $successCount++;
+            } else {
+                $this->logger->warning("Réponse inattendue lors de l'ajout de la pièce $externalId chez Intermobilitas.", [
+                    'response' => $response,
+                ]);
+                $errorCount++;
+            }
+        } catch (\Exception $e) {
+            $this->logger->error("Erreur lors de la synchronisation de la pièce $externalId chez Intermobilitas : " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            $errorCount++;
+        }
     }
 }
