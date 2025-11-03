@@ -135,48 +135,54 @@ class IntermobilitasSyncService
             'warranty' => $part->getWarranty() ?? 6,
         ];
 
+        $vehicleData = [];
+
         if ($part->getVin()) {
-            $data['vin'] = $part->getVin();
+            $vehicleData['vin'] = $part->getVin();
         }
 
         if ($part->getVehicleYear()) {
-            $data['year'] = $part->getVehicleYear();
+            $vehicleData['year'] = $part->getVehicleYear();
         }
 
         if ($part->getBrandName()) {
-            $data['make'] = $part->getBrandName();
+            $vehicleData['make'] = $part->getBrandName();
         }
 
         if ($part->getModelName()) {
-            $data['model'] = $part->getModelName();
+            $vehicleData['model'] = $part->getModelName();
         }
 
         if ($part->getFinishName()) {
-            $data['vehicleDescription'] = $part->getFinishName();
+            $vehicleData['vehicleDescription'] = $part->getFinishName();
         }
 
         if ($part->getDoorNumber()) {
-            $data['doorNr'] = $part->getDoorNumber();
+            $vehicleData['doorNr'] = $part->getDoorNumber();
         }
 
         if ($part->getDisplacement()) {
-            $data['engineSize'] = $part->getDisplacement();
+            $vehicleData['engineSize'] = $part->getDisplacement();
         }
 
         if ($part->getPower() && is_numeric($part->getPower())) {
-            $data['enginePower'] = (int) $part->getPower();
+            $vehicleData['enginePower'] = (int) $part->getPower();
         }
 
         if ($part->getEngineCode()) {
-            $data['engineCode'] = $part->getEngineCode();
+            $vehicleData['engineCode'] = $part->getEngineCode();
         }
 
         if ($part->getGearboxCode()) {
-            $data['gearboxCode'] = $part->getGearboxCode();
+            $vehicleData['gearboxCode'] = $part->getGearboxCode();
         }
 
         if ($part->getEnergyName()) {
-            $data['fuelType'] = $part->getEnergyName();
+            $vehicleData['fuelType'] = $part->getEnergyName();
+        }
+
+        if (!empty($vehicleData)) {
+            $data['vehicle'] = $vehicleData;
         }
 
         return $data;
