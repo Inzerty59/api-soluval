@@ -135,6 +135,12 @@ class IntermobilitasSyncService
             'warranty' => $part->getWarranty() ?? 6,
         ];
 
+        $oem = [];
+        if ($part->getManufacturerReference()) {
+            $oem[] = $part->getManufacturerReference();
+        }
+        $data['oem'] = $oem;
+
         $vehicleData = [];
 
         if ($part->getVin()) {
@@ -185,7 +191,31 @@ class IntermobilitasSyncService
             $data['vehicle'] = $vehicleData;
         }
 
+        $pictures = $this->extractValidPictureUrls($part->getPhotos());
+        if (!empty($pictures)) {
+            $data['pictures'] = $pictures;
+        }
+
         return $data;
+    }
+ 
+    private function extractValidPictureUrls(?array $photos): array
+    {
+        if (empty($photos)) {
+            return [];
+        }
+
+        $validUrls = [];
+
+        foreach ($photos as $photo) {
+            if (is_string($photo)) {
+                if (strpos($photo, 'https://') === 0) {
+                    $validUrls[] = $photo;
+                }
+            }
+        }
+
+        return $validUrls;
     }
 
     private function isPartValid(Part $part): bool
