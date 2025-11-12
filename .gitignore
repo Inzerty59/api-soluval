@@ -39,3 +39,4 @@ yarn-error.log
 
 *.csv
 export_ovoko_orders.php
+backup-db-sftp.sh
