@@ -289,11 +289,12 @@ class IntermobilitasOrderService
             ];
         }
 
-        $comment = "Commande INTERMOBILITAS\n\n";
+        $platformName = $this->getPlatformNameFromSource($source);
+        $comment = "Commande {$platformName}\n\n";
         $comment .= "⚠️ Ne pas mettre en facture ⚠️\n\n";
-        $comment .= "INTERMOBILITAS va vous fournir les instructions de livraison.\n";
-        $comment .= "Veuillez récupérer le bon de transport et valider la commande depuis votre boutique INTERMOBILITAS.\n\n";
-        $comment .= "Numéro de commande INTERMOBILITAS : #{$orderId}";
+        $comment .= "{$platformName} va vous fournir les instructions de livraison.\n";
+        $comment .= "Veuillez récupérer le bon de transport et valider la commande depuis votre boutique {$platformName}.\n\n";
+        $comment .= "Numéro de commande {$platformName} : #{$orderId}";
 
         $partsPayload = [];
         foreach ($items as $item) {
@@ -390,5 +391,43 @@ class IntermobilitasOrderService
         ];
 
         return $countries[strtoupper($isoCode)] ?? 'INCONNU';
+    }
+
+    private function getPlatformNameFromSource(string $source): string
+    {
+        $platformMapping = [
+            'AL000000PL' => 'Allegro.pl',
+            'AP000000DK' => 'AutoParts24',
+            'AM000000DE' => 'Autoteile-Markt',
+            'AZ000000ES' => 'Azeler Recambios',
+            'BP000000PT' => 'B-Parts',
+            'EB000000US' => 'eBay motors',
+            'EB000000AT' => 'eBay.at',
+            'EB000000Bx' => 'eBay.be V',
+            'EB000000BE' => 'eBay.be W',
+            'EB000000CH' => 'eBay.ch',
+            'EB000000UK' => 'eBay.co.uk',
+            'EB000000DE' => 'eBay.de',
+            'EB000000ES' => 'eBay.es',
+            'EB000000FR' => 'eBay.fr',
+            'EB000000IE' => 'eBay.ie',
+            'EB000000IT' => 'eBay.it',
+            'EB000000NL' => 'eBay.nl',
+            'EB000000PL' => 'eBay.pl',
+            'FC000000FR' => 'France Casse',
+            'MC000000FR' => 'MotorsClub',
+            'OP000000FR' => 'Opisto',
+            'OV000000LT' => 'Ovoko.com',
+            'RF000000ES' => 'RecambioFacil',
+            'TH000000DE' => 'Teilehaber',
+            'VU000000FR' => 'Valused',
+        ];
+        
+        // Vérification spéciale pour TotalParts qui commence par TP000000
+        if (strpos($source, 'TP000000') === 0) {
+            return 'TotalParts';
+        }
+        
+        return $platformMapping[$source] ?? 'INTERMOBILITAS';
     }
 }
