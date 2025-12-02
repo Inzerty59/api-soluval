@@ -214,7 +214,7 @@ class IntermobilitasOrderService
 
             $paymentPayload = [
                 "Amount" => $totalAmount,
-                "TypePayment" => 4,
+                "TypePayment" => 0,
             ];
 
             $this->logger->info('[Intermobilitas] Mise à jour du paiement', [
