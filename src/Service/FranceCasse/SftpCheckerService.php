@@ -25,9 +25,22 @@ class SftpCheckerService
      */
     public function getJsonFiles(): array
     {
-        $connection = ssh2_connect($this->host, 22);
+        $connection = null;
+        $attempts = 3;
+        $delay = 1;
+        
+        while ($attempts > 0 && !$connection) {
+            $connection = @ssh2_connect($this->host, 22);
+            if (!$connection) {
+                $attempts--;
+                if ($attempts > 0) {
+                    sleep($delay);
+                }
+            }
+        }
+        
         if (!$connection) {
-            throw new \Exception('Connexion SSH échouée');
+            throw new \Exception('Connexion SSH échouée après 3 tentatives');
         }
 
         if (!ssh2_auth_password($connection, $this->username, $this->password)) {
@@ -50,8 +63,21 @@ class SftpCheckerService
     }
     public function getFileContent(string $fileName): string
 {
-    $connection = ssh2_connect($this->host, 22);
-    if (!$connection) throw new \Exception('Connexion SSH échouée');
+    $connection = null;
+    $attempts = 3;
+    $delay = 1;
+    
+    while ($attempts > 0 && !$connection) {
+        $connection = @ssh2_connect($this->host, 22);
+        if (!$connection) {
+            $attempts--;
+            if ($attempts > 0) {
+                sleep($delay);
+            }
+        }
+    }
+    
+    if (!$connection) throw new \Exception('Connexion SSH échouée après 3 tentatives');
     if (!ssh2_auth_password($connection, $this->username, $this->password)) {
         throw new \Exception('Échec de l\'authentification');
     }
@@ -68,8 +94,21 @@ class SftpCheckerService
 
 public function moveFile(string $fileName, string $targetSubDir): void
 {
-    $connection = ssh2_connect($this->host, 22);
-    if (!$connection) throw new \Exception('Connexion SSH échouée');
+    $connection = null;
+    $attempts = 3;
+    $delay = 1;
+    
+    while ($attempts > 0 && !$connection) {
+        $connection = @ssh2_connect($this->host, 22);
+        if (!$connection) {
+            $attempts--;
+            if ($attempts > 0) {
+                sleep($delay);
+            }
+        }
+    }
+    
+    if (!$connection) throw new \Exception('Connexion SSH échouée après 3 tentatives');
     if (!ssh2_auth_password($connection, $this->username, $this->password)) {
         throw new \Exception('Échec de l\'authentification');
     }
