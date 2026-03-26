@@ -402,6 +402,7 @@ class IntermobilitasOrderService
             'AZ000000ES' => 'Azeler Recambios',
             'BP000000PT' => 'B-Parts',
             'EB000000US' => 'eBay motors',
+            'RB000000FR' => 'Rusty Bobby',
             'EB000000AT' => 'eBay.at',
             'EB000000Bx' => 'eBay.be V',
             'EB000000BE' => 'eBay.be W',
