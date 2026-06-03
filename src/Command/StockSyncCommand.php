@@ -34,7 +34,7 @@ class StockSyncCommand extends Command
                 'period',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Période à synchroniser (ex: 2min, 1h, 3h, 6h, 12h, 24h, 3d, 7d)',
+                'Période à synchroniser (ex: 2min, 1h, 3h, 6h, 12h, 24h, 3d, 7d, 14d)',
                 '2min'
             );
     }
@@ -66,6 +66,9 @@ class StockSyncCommand extends Command
                 break;
             case '7d':
                 $start = $now->modify('-7 days');
+                break;
+            case '14d':
+                $start = $now->modify('-14 days');
                 break;
             case '2min':
             default:
