@@ -157,8 +157,12 @@ class Part
     private ?bool $available = null;
 
     #[ORM\Column(length: 256, nullable: true)]
-    #[Groups(['part:read'])] 
+    #[Groups(['part:read'])]
     private ?string $vin = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['part:read'])]
+    private ?string $police_id = null;
 
     public function __construct()
     {

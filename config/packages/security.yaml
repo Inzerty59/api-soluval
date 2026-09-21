@@ -57,6 +57,7 @@ security:
     access_control:
         - { path: ^/api/callback, roles: PUBLIC_ACCESS }
         - { path: ^/api/intermobilitas, roles: PUBLIC_ACCESS }
+        - { path: ^/api/globalpre, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/admin/access-denied, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/paiement, roles: IS_AUTHENTICATED_FULLY }

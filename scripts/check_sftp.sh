@@ -24,4 +24,4 @@ else
 fi
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Lancement de la commande app:francecasse:sync" >> "$LOGFILE"
-/usr/bin/docker exec www-api bash -c "php bin/console app:francecasse:sync" >> "$LOGFILE" 2>&1
+/usr/bin/docker exec -u www-data www-api bash -c "php bin/console app:francecasse:sync" >> "$LOGFILE" 2>&1

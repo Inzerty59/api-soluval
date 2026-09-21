@@ -68,7 +68,8 @@ class PartPersistenceService
             ->SetWeight($partData['Weight'] ?? null)
             ->setOrigin($partData['Category']['DataOrigin'] ?? null)
             ->setAvailable($partData['Available'] ?? null)
-            ->setVin($partData['Vehicle']['VIN'] ?? null);
+            ->setVin($partData['Vehicle']['VIN'] ?? null)
+            ->setPoliceId($partData['Vehicle']['PoliceId'] ?? null);
 
         // Vérifier l'existence pour éviter les doublons
         $existingPart = $this->entityManager->getRepository(Part::class)
@@ -106,7 +107,8 @@ class PartPersistenceService
                 ->SetWeight($partData['Weight'] ?? null)
                 ->setOrigin($partData['Category']['DataOrigin'] ?? null)
                 ->setAvailable($partData['Available'] ?? null)
-                ->setVin($partData['Vehicle']['VIN'] ?? null);
+                ->setVin($partData['Vehicle']['VIN'] ?? null)
+                ->setPoliceId($partData['Vehicle']['PoliceId'] ?? null);
 
         } else {
             $this->entityManager->persist($part);

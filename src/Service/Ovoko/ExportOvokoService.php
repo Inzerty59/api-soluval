@@ -37,6 +37,10 @@ class ExportOvokoService
 
             $csvFilePath = 'public/uploads/ovoko_export.csv';
 
+            if (is_file($csvFilePath) && !is_writable($csvFilePath)) {
+                @unlink($csvFilePath);
+            }
+
             $csvFile = fopen($csvFilePath, 'w');
             if ($csvFile === false) {
                 throw new \Exception('Impossible de créer le fichier CSV.');
