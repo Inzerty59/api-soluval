@@ -164,6 +164,14 @@ class Part
     #[Groups(['part:read'])]
     private ?string $police_id = null;
 
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['part:read'])]
+    private ?string $type_mine = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['part:read'])]
+    private ?string $code_couleur = null;
+
     public function __construct()
     {
     }
@@ -565,6 +573,42 @@ class Part
     public function setVin(?string $vin): static
     {
         $this->vin = $vin;
+
+        return $this;
+    }
+
+    public function getPoliceId(): ?string
+    {
+        return $this->police_id;
+    }
+
+    public function setPoliceId(?string $police_id): static
+    {
+        $this->police_id = $police_id;
+
+        return $this;
+    }
+
+    public function getTypeMine(): ?string
+    {
+        return $this->type_mine;
+    }
+
+    public function setTypeMine(?string $type_mine): static
+    {
+        $this->type_mine = $type_mine;
+
+        return $this;
+    }
+
+    public function getCodeCouleur(): ?string
+    {
+        return $this->code_couleur;
+    }
+
+    public function setCodeCouleur(?string $code_couleur): static
+    {
+        $this->code_couleur = $code_couleur;
 
         return $this;
     }

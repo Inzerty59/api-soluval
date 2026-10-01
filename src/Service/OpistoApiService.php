@@ -15,6 +15,28 @@ class OpistoApiService
         $this->authService = $authService;
     }
 
+    /**
+     * Parcourt tout le catalogue Opisto page par page (une page = 100 pièces complètes).
+     *
+     * @return \Generator<int, array>
+     */
+    public function iterateAllPartsPages(): \Generator
+    {
+        $page = 0;
+
+        do {
+            $response = $this->httpClient->request('GET', 'https://api.opisto.fr/v2.15/parts', [
+                'query' => ['itemsPerPage' => 100, 'page' => $page++, 'onlyParts' => 'true'],
+                'headers' => ['Token' => $this->authService->getValidToken()],
+            ]);
+            $parts = $response->toArray()['Parts'] ?? [];
+
+            if ($parts) {
+                yield $parts;
+            }
+        } while ($parts);
+    }
+
     public function getPartsDeletedBetween(\DateTimeInterface $start, \DateTimeInterface $end): array
     {
         $token = $this->authService->getValidToken();

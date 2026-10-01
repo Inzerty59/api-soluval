@@ -69,7 +69,9 @@ class PartPersistenceService
             ->setOrigin($partData['Category']['DataOrigin'] ?? null)
             ->setAvailable($partData['Available'] ?? null)
             ->setVin($partData['Vehicle']['VIN'] ?? null)
-            ->setPoliceId($partData['Vehicle']['PoliceId'] ?? null);
+            ->setPoliceId($partData['Vehicle']['PoliceId'] ?? null)
+            ->setTypeMine($partData['Vehicle']['TypeMine'] ?? null)
+            ->setCodeCouleur($partData['Vehicle']['CodeCouleur'] ?? null);
 
         // Vérifier l'existence pour éviter les doublons
         $existingPart = $this->entityManager->getRepository(Part::class)
@@ -108,7 +110,9 @@ class PartPersistenceService
                 ->setOrigin($partData['Category']['DataOrigin'] ?? null)
                 ->setAvailable($partData['Available'] ?? null)
                 ->setVin($partData['Vehicle']['VIN'] ?? null)
-                ->setPoliceId($partData['Vehicle']['PoliceId'] ?? null);
+                ->setPoliceId($partData['Vehicle']['PoliceId'] ?? null)
+                ->setTypeMine($partData['Vehicle']['TypeMine'] ?? null)
+                ->setCodeCouleur($partData['Vehicle']['CodeCouleur'] ?? null);
 
         } else {
             $this->entityManager->persist($part);
