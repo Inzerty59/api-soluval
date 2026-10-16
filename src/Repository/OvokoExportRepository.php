@@ -53,11 +53,29 @@ SELECT
         ), 
         ',', ''
     ) AS part_price, 
-    MAX(p.manufacturer_reference) AS part_manufacturer_code, 
-    1 AS part_quality, 
-    1 AS part_status, 
-    MAX(oc.ovoko_model_id) AS car_ovoko_model_id, 
+    MAX(p.manufacturer_reference) AS part_manufacturer_code,
+    'used' AS part_quality,
+    'in_stock' AS part_status,
+    MAX(p.description) AS part_description,
+    MAX(oc.ovoko_model_id) AS car_ovoko_model_id,
     MAX(p.vehicle_year) AS car_year,
+    MAX(p.police_id) AS car_external_id,
+    MAX(p.vin) AS car_vin_code,
+    MAX(p.engine_code) AS car_engine_number,
+    MAX(p.power) AS car_engine_power,
+    MAX(p.displacement) AS car_engine_cubic_capacity,
+    MAX(CASE p.energy_name
+        WHEN 'Diesel' THEN 'diesel'
+        WHEN 'Essence' THEN 'petrol'
+        WHEN 'Electricité' THEN 'electric'
+        WHEN 'Essence/Hybride' THEN 'petrol_electricity'
+        WHEN 'Diesel/Hybride' THEN 'diesel_electricity'
+        WHEN 'Essence/GPL' THEN 'petrol_lpg'
+        WHEN 'GPL' THEN 'petrol_lpg'
+        WHEN 'Essence/Ethanol' THEN 'bioethanol'
+        WHEN 'Ethanol' THEN 'bioethanol'
+        ELSE NULL
+    END) AS car_fuel_id,
     p.category_name,
     CASE
         WHEN LOWER(p.category_name) LIKE '%gauche%' AND LOWER(p.category_name) LIKE '%arriere%' THEN 'left_rear'
