@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\AppropoUnstock;
 use App\Service\OpistoApiService;
 use App\Service\OvokoApiService;
 use App\Service\Intermobilitas\IntermobilitasSyncService;
@@ -65,6 +66,12 @@ class StockSyncService
                 }
             } catch (\Exception $e) {
                 $this->logger->warning("Erreur lors de la suppression de la pièce $externalId chez Intermobilitas : " . $e->getMessage());
+            }
+
+            // Signalé à Appropo au prochain dépôt hour/ (app:export-appropo-unstock).
+            if (is_numeric($externalId)) {
+                $this->entityManager->persist(new AppropoUnstock((int) $externalId));
+                $this->entityManager->flush();
             }
 
             $entity = $this->partRepository->findOneBy(['external_id' => $externalId]);

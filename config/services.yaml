@@ -35,6 +35,21 @@ services:
             $remotePath: '%env(SFTP_PATH)%'
 
 
+    App\Service\Appropo\AppropoSftpUploader:
+        arguments:
+            $host: '%env(APPROPO_SFTP_HOST)%'
+            $port: '%env(int:APPROPO_SFTP_PORT)%'
+            $username: '%env(APPROPO_SFTP_USER)%'
+            $password: '%env(APPROPO_SFTP_PASS)%'
+
+    App\Command\ExportAppropoCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Command\ExportAppropoUnstockCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
     # Autres services explicites
     App\Service\SiretVerificationService:
         arguments:
