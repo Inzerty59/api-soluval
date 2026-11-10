@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\Appropo\AppropoOrderService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -17,7 +18,8 @@ class WebhookAppropoController extends AbstractController
 
     public function __construct(
         LoggerInterface $logger,
-        ParameterBagInterface $params
+        ParameterBagInterface $params,
+        private AppropoOrderService $orderService
     ) {
         $this->logger = $logger;
         $this->webhookSecret = $params->get('APPROPO_WEBHOOK_SECRET');
@@ -70,9 +72,23 @@ class WebhookAppropoController extends AbstractController
             'items_count' => count($data['items'] ?? []),
         ]);
 
+        try {
+            $this->orderService->processOrder($data);
+        } catch (\Throwable $e) {
+            $this->logger->error('[Appropo] Erreur lors du traitement de la commande', [
+                'order_id' => $orderId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'Internal server error',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
         return new JsonResponse([
             'status' => 'success',
-            'message' => 'Order received',
+            'message' => 'Order processed successfully',
         ], Response::HTTP_OK);
     }
 
